@@ -698,3 +698,4 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
     timestamp: new Date().toLocaleString('vi-VN'),
   };
 }
+

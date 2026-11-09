@@ -25,14 +25,12 @@ import {
   SLUG_TO_STAR,
 } from '@/lib/seo/knowledge';
 import { SITE_URL } from '@/lib/site';
+import { getStarName, PALACE_VI, TOPIC_VI } from '@/lib/ziwei/vietnamese';
 
-// 允许动态参数：如果某个 star/topic 组合不在 generateStaticParams 列表中
-// 也允许运行时按需渲染，避免中文 URL 编码问题导致 404
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const routes = getAllKnowledgeRoutes();
-  // URL 用拼音 slug 替代中文，避开 Vercel/CDN 中文路由边界问题
   return routes.map(r => ({ star: r.slug, topic: r.topic }));
 }
 
@@ -43,9 +41,13 @@ export async function generateMetadata({ params }: { params: Promise<{ star: str
   const data = getKnowledge(star, topic as TopicKey);
   if (!data.exists) return {};
 
-  const title = `${star}入${data.palaceName}宫 · ${data.topicLabel} · 倪海厦体系详解`;
+  const starVi = getStarName(star);
+  const pName = PALACE_VI[data.palaceName]?.vi || data.palaceName;
+  const tName = TOPIC_VI[topic as TopicKey]?.title || data.topicLabel;
+
+  const title = `Sao ${starVi.vi} ngự tại ${pName} · ${tName} · Phái Thiên Kỷ Nghê Hải Hà`;
   const description = data.parsed.dingdiao
-    || `${star}入${data.palaceName}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。`;
+    || `Luận giải chuyên sâu sao ${starVi.vi} ngự tại ${pName} — Giáo trình Thiên Kỷ Nghê Hải Hà & Cổ tịch Tử Vi Đẩu Số.`;
 
   return {
     title,
@@ -59,11 +61,6 @@ export async function generateMetadata({ params }: { params: Promise<{ star: str
     alternates: {
       canonical: `${SITE_URL}/knowledge/${slug}/${topic}`,
     },
-    keywords: [
-      '紫微斗数', '倪海厦', star, data.palaceName, data.topicLabel,
-      `${star}${data.palaceName}`, `${star}入${data.palaceName}`,
-      `紫微斗数 ${star}`, '倪海厦紫微斗数', '紫微斗数全集',
-    ],
   };
 }
 
@@ -74,70 +71,57 @@ export default async function KnowledgePage({ params }: { params: Promise<{ star
   const data = getKnowledge(star, topic as TopicKey);
   if (!data.exists) notFound();
 
-  // 同主星其他 topic
-  const otherTopicsForStar = ALL_TOPICS.filter(t => t !== topic && getKnowledge(star, t).exists);
-  // 同 topic 其他主星
-  const otherStarsForTopic = ALL_STARS.filter(s => s !== star && getKnowledge(s, topic as TopicKey).exists);
+  const starVi = getStarName(star);
+  const pName = PALACE_VI[data.palaceName]?.vi || data.palaceName;
+  const pShort = PALACE_VI[data.palaceName]?.short || data.palaceName;
+  const tName = TOPIC_VI[topic as TopicKey]?.title || data.topicLabel;
 
-  // JSON-LD
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: `${star}入${data.palaceName}宫 · ${data.topicLabel}`,
-    description: data.parsed.dingdiao,
-    author: { '@type': 'Organization', name: '紫微研究 · 倪海厦正宗' },
-    publisher: {
-      '@type': 'Organization',
-      name: '紫微研究',
-      url: SITE_URL,
-    },
-    datePublished: '2026-04-28',
-    dateModified: '2026-04-28',
-    mainEntityOfPage: `${SITE_URL}/knowledge/${slug}/${topic}`,
-    articleSection: '紫微斗数 · 倪海厦体系',
-    keywords: [`紫微斗数`, star, data.palaceName, data.topicLabel].join(', '),
-  };
+  // Đồng chủ tinh các topic khác
+  const otherTopicsForStar = ALL_TOPICS.filter(t => t !== topic && getKnowledge(star, t).exists);
+  // Đồng topic các chủ tinh khác
+  const otherStarsForTopic = ALL_STARS.filter(s => s !== star && getKnowledge(s, topic as TopicKey).exists);
 
   return (
     <div style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
       {/* 顶栏 */}
       <div className="px-6 py-4 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
-        <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 首页
+        <Link href="/knowledge" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.15em', textDecoration: 'none', fontWeight: 600 }}>
+          ← Vạn Tinh Các (知识库)
         </Link>
-        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em' }}>
-          倪师方法论 · 知识库
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em', fontWeight: 700 }}>
+          KHO TRI THỨC TINH DIỆU THIÊN KỶ
         </div>
-        <Link href="/chart" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          起盘 →
+        <Link href="/chart" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.15em', textDecoration: 'none', fontWeight: 600 }}>
+          Lập Lá Số (起盘) →
         </Link>
       </div>
 
       <article className="max-w-3xl mx-auto px-6 py-12">
         {/* 面包屑 */}
-        <nav style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.1em', marginBottom: '16px' }}>
-          <Link href="/" style={{ color: 'var(--tx-3)', textDecoration: 'none' }}>首页</Link>
+        <nav style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.05em', marginBottom: '20px', fontWeight: 500 }}>
+          <Link href="/" style={{ color: 'var(--tx-3)', textDecoration: 'none' }}>Trang Chủ</Link>
           <span style={{ margin: '0 8px' }}>/</span>
-          <Link href="/knowledge" style={{ color: 'var(--tx-3)', textDecoration: 'none' }}>知识库</Link>
+          <Link href="/knowledge" style={{ color: 'var(--tx-3)', textDecoration: 'none' }}>Vạn Tinh Các</Link>
           <span style={{ margin: '0 8px' }}>/</span>
-          <span>{star}</span>
+          <span style={{ color: 'var(--tx-0)', fontWeight: 700 }}>Sao {starVi.vi}</span>
           <span style={{ margin: '0 8px' }}>·</span>
-          <span style={{ color: 'var(--ac)' }}>{data.palaceName}宫</span>
+          <span style={{ color: 'var(--ac)', fontWeight: 700 }}>{pName}</span>
         </nav>
 
         {/* 标题区 */}
         <header style={{ marginBottom: '36px' }}>
-          <div style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.25em', marginBottom: '8px' }}>
-            {data.topicLabel} · 倪海厦体系详解
+          <div style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase' }}>
+            {tName} · GIÁO TRÌNH THIÊN KỶ NGHÊ HẢI HÀ
           </div>
-          <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.1em', lineHeight: 1.2 }}>
-            {star}入{data.palaceName}宫
+          <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 800, color: 'var(--tx-0)', letterSpacing: '0.05em', lineHeight: 1.25 }}>
+            Sao {starVi.vi} ngự tại {pName}
           </h1>
+          <div style={{ fontSize: '13px', color: 'var(--tx-3)', marginTop: '4px', fontStyle: 'italic' }}>
+            ({starVi.zh} nhập {data.palaceName} cung · Chuyên đề {tName})
+          </div>
           {STAR_BRIEF_SEO[star] && (
-            <p style={{ fontSize: '13px', color: 'var(--tx-2)', marginTop: '14px', lineHeight: 1.8 }}>
+            <p style={{ fontSize: '14px', color: 'var(--tx-2)', marginTop: '16px', lineHeight: 1.8 }}>
               {STAR_BRIEF_SEO[star]}
             </p>
           )}
@@ -145,32 +129,32 @@ export default async function KnowledgePage({ params }: { params: Promise<{ star
 
         {/* 内容 4 段 */}
         {data.parsed.dingdiao && (
-          <Section title="一句话定调" gradient>
-            <p style={{ fontSize: '17px', color: 'var(--tx-0)', lineHeight: 1.9, fontWeight: 500, letterSpacing: '0.04em' }}>
+          <Section title="ĐỊNH HƯỚNG TỔNG QUÁT" gradient>
+            <p style={{ fontSize: '17px', color: 'var(--tx-0)', lineHeight: 1.9, fontWeight: 600, letterSpacing: '0.02em' }}>
               {data.parsed.dingdiao}
             </p>
           </Section>
         )}
 
         {data.parsed.lundian && (
-          <Section title="核心论断">
-            <div style={{ fontSize: '15px', color: 'var(--tx-0)', lineHeight: 2, letterSpacing: '0.02em', whiteSpace: 'pre-wrap' }}>
+          <Section title="LUẬN ĐIỂM TRỌNG TÂM">
+            <div style={{ fontSize: '15px', color: 'var(--tx-0)', lineHeight: 2, letterSpacing: '0.01em', whiteSpace: 'pre-wrap' }}>
               {data.parsed.lundian}
             </div>
           </Section>
         )}
 
         {data.parsed.yiju && (
-          <Section title="命盘依据">
-            <div style={{ fontSize: '14px', color: 'var(--tx-0)', lineHeight: 2, letterSpacing: '0.02em', whiteSpace: 'pre-wrap' }}>
+          <Section title="CĂN CỨ TINH DIỆU & TAM PHƯƠNG">
+            <div style={{ fontSize: '14px', color: 'var(--tx-0)', lineHeight: 2, letterSpacing: '0.01em', whiteSpace: 'pre-wrap' }}>
               {data.parsed.yiju}
             </div>
           </Section>
         )}
 
         {data.parsed.chuchu && (
-          <Section title="经典出处" minimal>
-            <div style={{ fontSize: '13px', color: 'var(--tx-2)', lineHeight: 2, letterSpacing: '0.02em', whiteSpace: 'pre-wrap' }}>
+          <Section title="XUẤT XỨ CỔ TỊCH & LỜI GIẢNG DANH SƯ" minimal>
+            <div style={{ fontSize: '13px', color: 'var(--tx-2)', lineHeight: 2, letterSpacing: '0.01em', whiteSpace: 'pre-wrap' }}>
               {data.parsed.chuchu}
             </div>
           </Section>
@@ -179,54 +163,59 @@ export default async function KnowledgePage({ params }: { params: Promise<{ star
         {/* CTA */}
         <div style={{
           margin: '40px 0 30px',
-          padding: '24px',
-          background: 'linear-gradient(135deg, rgba(212,169,72,0.15) 0%, rgba(184,146,42,0.06) 100%)',
-          borderRadius: '14px',
-          border: '1px solid rgba(184,146,42,0.3)',
+          padding: '28px 24px',
+          background: 'linear-gradient(135deg, rgba(212,169,72,0.18) 0%, rgba(184,146,42,0.08) 100%)',
+          borderRadius: '16px',
+          border: '1px solid rgba(184,146,42,0.35)',
           textAlign: 'center',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
         }}>
-          <div style={{ fontSize: '14px', color: 'var(--tx-0)', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '6px' }}>
-            想看你自己命盘的{data.topicLabel}？
+          <div style={{ fontSize: '16px', color: 'var(--tx-0)', fontWeight: 800, letterSpacing: '0.05em', marginBottom: '8px' }}>
+            Bạn muốn xem {pName} trên lá số của chính mình?
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--tx-2)', marginBottom: '16px' }}>
-            输入生辰起盘 · 倪师正宗解读 · AI 答疑伴学
+          <div style={{ fontSize: '13px', color: 'var(--tx-2)', marginBottom: '18px', lineHeight: 1.6 }}>
+            Nhập ngày giờ sinh để an lá số Tử Vi trọn vẹn · Luận giải chuyên sâu theo phái Thiên Kỷ · 100% Tiếng Việt
           </div>
           <Link href="/chart" style={{
             display: 'inline-block',
-            padding: '12px 28px',
+            padding: '12px 32px',
             background: 'linear-gradient(135deg, #d4a948 0%, #b8922a 100%)',
-            color: 'white',
+            color: '#0a0a0c',
             borderRadius: '999px',
             fontSize: '14px',
-            fontWeight: 600,
-            letterSpacing: '0.15em',
+            fontWeight: 800,
+            letterSpacing: '0.1em',
             textDecoration: 'none',
-            boxShadow: '0 4px 12px rgba(184,146,42,0.3)',
+            boxShadow: '0 4px 14px rgba(184,146,42,0.4)',
           }}>
-            立即起盘 →
+            LẬP LÁ SỐ MIỄN PHÍ NGAY →
           </Link>
         </div>
 
         {/* 内链：同主星其他 topic */}
-        <Section title={`${star}星的其他宫位解读`} minimal>
+        <Section title={`CÁC CUNG VỊ KHÁC CỦA SAO ${starVi.vi.toUpperCase()}`} minimal>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {otherTopicsForStar.map(t => {
               const d = getKnowledge(star, t);
+              const pTName = PALACE_VI[d.palaceName]?.short || d.palaceName;
+              const tTName = TOPIC_VI[t]?.title || d.topicLabel;
               return (
                 <Link
                   key={t}
                   href={`/knowledge/${slug}/${t}`}
                   style={{
                     fontSize: '12px',
-                    padding: '6px 12px',
+                    padding: '6px 14px',
                     background: 'var(--bg-card)',
                     border: '1px solid rgba(184,146,42,0.25)',
                     borderRadius: '999px',
                     color: 'var(--tx-2)',
                     textDecoration: 'none',
+                    fontWeight: 500,
                   }}
+                  className="hover:border-amber-400 hover:text-amber-400 transition-colors"
                 >
-                  {star}入{d.palaceName}
+                  Cung {pTName} · {tTName}
                 </Link>
               );
             })}
@@ -234,50 +223,55 @@ export default async function KnowledgePage({ params }: { params: Promise<{ star
         </Section>
 
         {/* 内链：同 topic 其他主星 */}
-        <Section title={`其他主星入${data.palaceName}宫的解读`} minimal>
+        <Section title={`CÁC SAO KHÁC CHIẾU VÀO ${pName.toUpperCase()}`} minimal>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {otherStarsForTopic.slice(0, 13).map(s => (
-              <Link
-                key={s}
-                href={`/knowledge/${STAR_TO_SLUG[s]}/${topic}`}
-                style={{
-                  fontSize: '12px',
-                  padding: '6px 12px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid rgba(184,146,42,0.25)',
-                  borderRadius: '999px',
-                  color: 'var(--tx-2)',
-                  textDecoration: 'none',
-                }}
-              >
-                {s}入{data.palaceName}
-              </Link>
-            ))}
+            {otherStarsForTopic.slice(0, 13).map(s => {
+              const oStarVi = getStarName(s);
+              return (
+                <Link
+                  key={s}
+                  href={`/knowledge/${STAR_TO_SLUG[s]}/${topic}`}
+                  style={{
+                    fontSize: '12px',
+                    padding: '6px 14px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid rgba(184,146,42,0.25)',
+                    borderRadius: '999px',
+                    color: 'var(--tx-2)',
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                  }}
+                  className="hover:border-amber-400 hover:text-amber-400 transition-colors"
+                >
+                  Sao {oStarVi.vi} ngự tại {pShort}
+                </Link>
+              );
+            })}
           </div>
         </Section>
 
         {/* 古籍库链接 */}
         <div style={{
           marginTop: '40px',
-          padding: '16px 20px',
-          background: 'rgba(184,146,42,0.04)',
-          border: '1px dashed rgba(184,146,42,0.25)',
-          borderRadius: '10px',
+          padding: '18px 20px',
+          background: 'rgba(184,146,42,0.06)',
+          border: '1px dashed rgba(184,146,42,0.3)',
+          borderRadius: '12px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '11px', color: 'var(--ac-dim)', letterSpacing: '0.15em', marginBottom: '6px' }}>
-            想读原典？
+          <div style={{ fontSize: '11px', color: 'var(--ac)', letterSpacing: '0.15em', marginBottom: '6px', fontWeight: 700 }}>
+            TRA CỨU ĐIỂN TÍCH GỐC
           </div>
-          <Link href="/library" style={{ fontSize: '13px', color: 'var(--ac)', fontWeight: 500, letterSpacing: '0.1em', textDecoration: 'none' }}>
-            📜 查阅古籍原典库 — 紫微斗数全集 / 全书 / 骨髓赋 →
+          <Link href="/library" style={{ fontSize: '13px', color: 'var(--ac)', fontWeight: 600, letterSpacing: '0.05em', textDecoration: 'none' }}>
+            📜 Tra Cứu Tàng Kinh Các — 《Tử Vi Đẩu Số Toàn Thư》《Cốt Tủy Phú》 →
           </Link>
         </div>
       </article>
 
       {/* 页脚 */}
-      <footer style={{ borderTop: '1px solid rgba(184,146,42,0.15)', padding: '20px 24px', textAlign: 'center', fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.1em' }}>
-        <div style={{ marginBottom: '6px' }}>紫微研究 · 基于倪海厦正宗体系 · 仅供学习参考</div>
-        <div style={{ opacity: 0.85 }}>本平台不构成任何医疗、投资、法律或重大决策建议</div>
+      <footer style={{ borderTop: '1px solid rgba(184,146,42,0.15)', padding: '24px', textAlign: 'center', fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.05em' }}>
+        <div style={{ marginBottom: '6px', fontWeight: 600 }}>Tử Vi Đẩu Số Thiên Kỷ · Dựa trên giáo trình chính tông của danh sư Nghê Hải Hà</div>
+        <div style={{ opacity: 0.85 }}>Mục đích nghiên cứu văn hóa truyền thống Á Đông, không cấu thành các khuyến nghị y tế, tài chính hay pháp lý.</div>
       </footer>
     </div>
   );

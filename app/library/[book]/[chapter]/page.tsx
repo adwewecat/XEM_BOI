@@ -35,14 +35,14 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
     <div style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
       <div className="px-6 py-4 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
-        <Link href={`/library/${book.slug}`} style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 《{book.title}》目录
+        <Link href={`/library/${book.slug}`} style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.1em', textDecoration: 'none', fontWeight: 600 }}>
+          ← Mục Lục 《{book.title}》
         </Link>
-        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em' }}>
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em', fontWeight: 700 }}>
           {chapter.title}
         </div>
-        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          古籍库 →
+        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.1em', textDecoration: 'none', fontWeight: 600 }}>
+          Tàng Kinh Các →
         </Link>
       </div>
 
@@ -111,7 +111,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px' }}>白话</span>
+                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px', fontWeight: 700 }}>DỊCH NGHĨA</span>
                   {p.translation}
                 </div>
               )}
@@ -126,7 +126,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px' }}>倪师注</span>
+                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px', fontWeight: 700 }}>LỜI THẦY NGHÊ HẢI HÀ</span>
                   {p.niNote}
                 </div>
               )}
@@ -149,8 +149,8 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 color: 'var(--tx-0)',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>← 上一章</div>
-              <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[prevIdx].title}</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.1em', marginBottom: '2px', fontWeight: 600 }}>← CHƯƠNG TRƯỚC</div>
+              <div style={{ fontSize: '13px', fontWeight: 600 }}>{book.chapters[prevIdx].title}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}
           {nextIdx < book.chapters.length ? (
@@ -167,8 +167,8 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 textAlign: 'right',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>下一章 →</div>
-              <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[nextIdx].title}</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.1em', marginBottom: '2px', fontWeight: 600 }}>CHƯƠNG TIẾP THEO →</div>
+              <div style={{ fontSize: '13px', fontWeight: 600 }}>{book.chapters[nextIdx].title}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}
         </div>

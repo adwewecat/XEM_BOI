@@ -36,7 +36,7 @@ export default function LibrarySearch() {
         value={q}
         onChange={e => setQ(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && submit()}
-        placeholder="搜索古籍原文，如：七杀朝斗 / 双禄朝垣 / 化忌"
+        placeholder="Tìm kiếm điển tích cổ, ví dụ: Thất Sát Triều Đẩu / Song Lộc Triều Viên / Hóa Kỵ..."
         style={{
           flex: 1,
           padding: '10px 14px',
@@ -55,15 +55,15 @@ export default function LibrarySearch() {
           borderRadius: '8px',
           border: 'none',
           background: 'linear-gradient(135deg, #d4a948 0%, #b8922a 100%)',
-          color: 'white',
+          color: '#0a0a0c',
           fontSize: '13px',
-          fontWeight: 600,
-          letterSpacing: '0.15em',
+          fontWeight: 700,
+          letterSpacing: '0.05em',
           cursor: q.trim() ? 'pointer' : 'not-allowed',
           opacity: q.trim() ? 1 : 0.5,
         }}
       >
-        {isPending ? '…' : '搜索'}
+        {isPending ? 'Đang Tìm…' : 'Tìm Kiếm'}
       </button>
     </div>
   );

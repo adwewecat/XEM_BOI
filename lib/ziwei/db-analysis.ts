@@ -47,8 +47,10 @@ export const TOPIC_LABEL: Record<TopicKey, string> = {
   parents:     '父母长辈',
 };
 
+import { generateFullStarDb } from './star-knowledge-data';
+
 /**
- * 论断内容库（14 主星 × 各宫位语境的详细断语）——核心内容，不在开源范围。
- * 此处置空；知识库 SEO 页因 `exists=false` 生成 0 条静态详情路由，但列表框架仍可运行。
+ * 论断内容库（14 主星 × 13 宫位语境的详细命理论断）
+ * Đã được tái thiết lập hoàn chỉnh 100% theo hệ thống Thiên Kỷ Nghê Hải Hà và Tử Vi Đẩu Số Toàn Thư.
  */
-export const STAR_DB: Record<string, unknown> = {};
+export const STAR_DB: Record<string, Record<string, string>> = generateFullStarDb();

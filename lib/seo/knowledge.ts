@@ -118,7 +118,7 @@ export interface KnowledgeData {
 }
 
 export function getKnowledge(star: string, topic: TopicKey): KnowledgeData {
-  const profile = STAR_DB[star] as StarContent | undefined;
+  const profile = (STAR_DB[star] as unknown) as StarContent | undefined;
   const field = TOPIC_TO_FIELD[topic];
   const content = profile && field ? (profile[field] as string | undefined) ?? '' : '';
   return {

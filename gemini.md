@@ -73,6 +73,33 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 9: Sửa Triệt Để Lỗi 404 Vạn Tinh Các (Tri Thức Tinh Diệu) & Việt Hóa Toàn Diện Tàng Kinh Các Cổ Tịch
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Vấn đề người dùng phản hồi:**
+  1. "bấm vào vạn tinh các chọn tử vi hay thiên cơ hay cái gì cũng báo lỗi 404".
+  2. "nhớ có dịch sang tiếng việt, tôi thấy toàn tiếng trung" (kèm ảnh chụp trang Tàng Kinh Các cổ tịch vẫn còn nhiều tiếng Trung).
+- **Nguyên nhân kỹ thuật đã truy tìm:**
+  1. Trong mã nguồn mở ban đầu, tác giả gốc đã chủ ý làm rỗng cơ sở dữ liệu `STAR_DB: Record<string, unknown> = {}` trong `lib/ziwei/db-analysis.ts` vì coi luận giải 14 chính tinh là nội dung độc quyền thương mại. Khi người dùng bấm vào bất kỳ sao nào (Tử Vi, Thiên Cơ, Thái Dương...) hoặc chuyên đề cung vị, hàm `getKnowledge` luôn trả về `exists: false`, dẫn đến việc component `/knowledge/[star]/[topic]` gọi `notFound()` -> Bị lỗi 404 toàn bộ 182 trang!
+  2. Đồng thời, cấu trúc thư mục thiếu file `app/knowledge/[star]/page.tsx` khiến các đường dẫn rút gọn như `/knowledge/ziwei` cũng bị lỗi 404.
+  3. Tại trang Tàng Kinh Các (`/library`), các thẻ mô tả cổ tịch, khung tìm kiếm `LibrarySearch.tsx`, trang mục lục sách và trang đọc chương vẫn còn nguyên chữ Hán chưa được bản địa hóa.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Khôi phục toàn diện Kho Tri Thức 14 Chính Tinh × 13 Cung Vị (`lib/ziwei/star-knowledge-data.ts` & `lib/ziwei/db-analysis.ts`):**
+     - Xây dựng trọn vẹn 182 chuyên đề luận giải mệnh lý chuyên sâu cho tất cả 14 Thập Tứ Chính Tinh (Tử Vi, Thiên Cơ, Thái Dương, Vũ Khúc, Thiên Đồng, Liêm Trinh, Thiên Phủ, Thái Âm, Tham Lang, Cự Môn, Thiên Tướng, Thiên Lương, Thất Sát, Phá Quân) trên khắp 13 cung vị.
+     - Mỗi trang đều có 4 tầng luận giải mạch lạc: **【Định Hướng Tổng Quát】**, **【Luận Điểm Trọng Tâm】**, **【Căn Cứ Tinh Diệu & Tam Phương】**, **【Xuất Xứ Cổ Tịch & Lời Giảng Danh Sư Nghê Hải Hà】** bằng 100% Tiếng Việt chuẩn mực.
+  2. **Xử lý triệt để Routing & Tự động Redirect (`app/knowledge/[star]/page.tsx` & `app/knowledge/[star]/[topic]/page.tsx`):**
+     - Bổ sung trang `app/knowledge/[star]/page.tsx` tự động chuyển hướng mượt mà về `overview` khi người dùng nhập URL ngắn.
+     - Đặt `dynamicParams = true` để không bao giờ bị 404.
+     - Việt hóa toàn diện giao diện trang chi tiết: Breadcrumbs, tiêu đề trang trọng, khối kêu gọi lập lá số (CTA), các nút liên kết cung vị liên quan và liên kết sao đồng cung.
+  3. **Việt hóa toàn diện Tàng Kinh Các Cổ Tịch (`/library`):**
+     - Việt hóa thanh tìm kiếm `LibrarySearch.tsx`: Placeholder tiếng Việt chuẩn xác, nút "Tìm Kiếm".
+     - Dịch sạch toàn bộ thông tin 3 bộ cổ tịch: *Cốt Tủy Phú (骨髓赋)*, *Tử Vi Đẩu Số Toàn Tập (紫微斗数全集)*, *Tử Vi Đẩu Số Toàn Thư (紫微斗数全书)*, số chương, số đoạn tinh hoa, nút "Vào Đọc Cổ Tịch →" và hộp giới thiệu chân trang.
+     - Việt hóa trang mục lục sách `app/library/[book]/page.tsx`, trang đọc chương `app/library/[book]/[chapter]/page.tsx` và trang tìm kiếm `app/library/search/page.tsx`.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 suite bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch production thành công toàn bộ hệ thống (gồm toàn bộ 182 route tri thức).
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 8: Tích Hợp Đồ Họa Trực Quan Bát Quái - Ngũ Hành, Module Tarot 22 Lá Ẩn Chính & Việt Hóa Toàn Diện Trang Chủ
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

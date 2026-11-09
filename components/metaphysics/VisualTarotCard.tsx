@@ -122,3 +122,4 @@ export default function VisualTarotCard({ drawnCard, index = 0 }: VisualTarotCar
     </motion.div>
   );
 }
+
