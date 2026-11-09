@@ -22,21 +22,20 @@ export default function MetaphysicsPage() {
   const [activeTab, setActiveTab] = useState<'bazi' | 'dongtam' | 'iching' | 'numerology' | 'tarot'>('dongtam');
 
   // --- STATE CHO BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) ---
-  const [dongTamQuestion, setDongTamQuestion] = useState(
-    'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?'
-  );
-  const [dongTamDate, setDongTamDate] = useState('2026-11-09');
-  const [dongTamTime, setDongTamTime] = useState('08:44');
-  const [dongTamResult, setDongTamResult] = useState<DongTamResult>(() =>
-    castDongTam(
-      'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?',
-      '2026-11-09',
-      '08:44'
-    )
-  );
+  const [dongTamQuestion, setDongTamQuestion] = useState('');
+  const [dongTamDate, setDongTamDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  });
+  const [dongTamTime, setDongTamTime] = useState(() => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  });
+  const [dongTamResult, setDongTamResult] = useState<DongTamResult | null>(null);
   const [isDongTamCasting, setIsDongTamCasting] = useState(false);
 
   const handleCastDongTam = () => {
+    if (!dongTamQuestion.trim()) return;
     setIsDongTamCasting(true);
     setTimeout(() => {
       setDongTamResult(castDongTam(dongTamQuestion, dongTamDate, dongTamTime));
@@ -57,16 +56,14 @@ export default function MetaphysicsPage() {
 
   // --- STATE CHO BÀI TAROT ---
   const [tarotType, setTarotType] = useState<'three_cards' | 'single' | 'love'>('three_cards');
-  const [tarotQuestion, setTarotQuestion] = useState('Hướng đi sắp tới trong sự nghiệp và tài chính của tôi thế nào?');
-  const [tarotResult, setTarotResult] = useState<TarotSpreadResult>(() =>
-    drawTarotSpread('three_cards', 'Hướng đi sắp tới trong sự nghiệp và tài chính của tôi thế nào?')
-  );
+  const [tarotQuestion, setTarotQuestion] = useState('');
+  const [tarotResult, setTarotResult] = useState<TarotSpreadResult | null>(null);
   const [isTarotDrawing, setIsTarotDrawing] = useState(false);
 
   const handleDrawTarot = () => {
     setIsTarotDrawing(true);
     setTimeout(() => {
-      setTarotResult(drawTarotSpread(tarotType, tarotQuestion));
+      setTarotResult(drawTarotSpread(tarotType, tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'));
       setIsTarotDrawing(false);
     }, 500);
   };
@@ -449,53 +446,9 @@ export default function MetaphysicsPage() {
                   rows={3}
                   value={dongTamQuestion}
                   onChange={(e) => setDongTamQuestion(e.target.value)}
-                  placeholder="Ví dụ: Cháu hỏi cho ông nội nằm viện do viêm phổi, có tim nữa... Liệu có qua khỏi không ạ?"
+                  placeholder="Nhập việc bạn đang trăn trở muốn gieo quẻ (về công danh sự nghiệp, tài lộc làm ăn, tình duyên gia đạo, xuất hành chuyển chỗ, sức khỏe...)"
                   className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-xl p-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none resize-none leading-relaxed"
                 />
-              </div>
-
-              {/* Gợi ý câu hỏi mẫu */}
-              <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                <span className="text-zinc-500 font-semibold">Gợi ý mẫu:</span>
-                {[
-                  {
-                    label: '🫁 Hỏi bệnh ông nội (viêm phổi & tim)',
-                    text: 'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?',
-                    date: '2026-11-09',
-                    time: '08:44',
-                  },
-                  {
-                    label: '💼 Hỏi chuyển việc & thăng chức',
-                    text: 'Con đang làm việc ở công ty cũ nhưng có lời mời sang công ty mới với mức đãi ngộ tốt hơn. Xin thầy cho biết con đổi việc lúc này có thuận lợi không ạ?',
-                    date: '2026-11-09',
-                    time: '10:15',
-                  },
-                  {
-                    label: '💰 Hỏi đầu tư kinh doanh',
-                    text: 'Tôi chuẩn bị hùn vốn với bạn mở cửa hàng kinh doanh cuối năm nay. Xin hỏi công việc làm ăn buôn bán này có thu được tài lộc không?',
-                    date: '2026-11-09',
-                    time: '14:30',
-                  },
-                  {
-                    label: '❤️ Hỏi tình duyên kết hôn',
-                    text: 'Chúng con yêu nhau đã được 3 năm và đang tính chuyện cưới hỏi vào năm tới. Xin thầy xem giúp tình duyên gia đạo hai bên có hòa hợp lâu dài không ạ?',
-                    date: '2026-11-09',
-                    time: '20:00',
-                  },
-                ].map((sample, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => {
-                      setDongTamQuestion(sample.text);
-                      setDongTamDate(sample.date);
-                      setDongTamTime(sample.time);
-                    }}
-                    className="px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-amber-200 transition-colors"
-                  >
-                    {sample.label}
-                  </button>
-                ))}
               </div>
 
               {/* Ngày giờ động tâm & Nút bấm */}
@@ -522,8 +475,12 @@ export default function MetaphysicsPage() {
                   <button
                     type="button"
                     onClick={handleCastDongTam}
-                    disabled={isDongTamCasting}
-                    className="w-full py-2.5 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-lg shadow-amber-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    disabled={isDongTamCasting || !dongTamQuestion.trim()}
+                    className={`w-full py-2.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 ${
+                      !dongTamQuestion.trim()
+                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-lg shadow-amber-500/25 hover:scale-[1.02] active:scale-[0.98]'
+                    }`}
                   >
                     <span>{isDongTamCasting ? '🌀' : '🔮'}</span>
                     <span>{isDongTamCasting ? 'ĐANG REO QUẺ...' : 'THẦY REO QUẺ & PHÁN'}</span>
@@ -1056,7 +1013,7 @@ export default function MetaphysicsPage() {
                   type="text"
                   value={tarotQuestion}
                   onChange={(e) => setTarotQuestion(e.target.value)}
-                  placeholder="Ví dụ: Công việc sắp tới thế nào? Có nên chuyển việc không?"
+                  placeholder="Nhập câu hỏi hoặc phương diện bạn muốn vũ trụ hồi đáp (hoặc để trống để nhận thông điệp tổng quan)..."
                   className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-xl px-4 py-2.5 text-sm text-zinc-100 font-semibold focus:outline-none"
                 />
               </div>

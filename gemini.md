@@ -73,6 +73,29 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 10: Gỡ Bỏ Triệt Để Các Ví Dụ Nhạy Cảm Riêng Tư, Tối Ưu Giao Diện Sạch Sẽ & Hoàn Thiện Bản Địa Hóa
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "các ví dụ không nên đưa lên" (kèm ảnh chụp màn hình tab Bói Hữu Duyên vẫn hiển thị câu hỏi mẫu và lời phán về trường hợp ông nội nằm viện do viêm phổi và tim).
+- **Phân tích vấn đề:** Câu hỏi mẫu trong yêu cầu trước của người dùng là một tình huống giả định / minh họa để kiểm tra logic Lục Hào chiêm bệnh. Việc hiển thị sẵn câu hỏi này trong ô nhập liệu và hiển thị sẵn lời phán bệnh tình nặng khó qua khỏi là thiếu bảo mật quyền riêng tư, gây cảm giác u ám và không phù hợp với giao diện sản phẩm thực tế.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Xóa sạch việc hardcode câu hỏi & kết quả ban đầu (`app/metaphysics/page.tsx`):**
+     - Đặt `dongTamQuestion = ''` (chuỗi rỗng ban đầu).
+     - Đặt `dongTamResult = null` và `tarotResult = null`. Khi người dùng mới vào trang, khu vực kết quả hoàn toàn để trống hoặc ở trạng thái chờ đợi, chỉ hiển thị sau khi người dùng thực sự nhập việc của mình và bấm nút "THẦY REO QUẺ & PHÁN" hoặc "XÀO BÀI & RÚT BÀI TAROT".
+     - Xóa bỏ triệt để toàn bộ khối "Gợi ý mẫu" và tất cả các nút chip câu hỏi mẫu.
+     - Thay đổi placeholder thành dạng trung tính, lịch sự: *"Nhập việc bạn đang trăn trở muốn gieo quẻ (về công danh sự nghiệp, tài lộc làm ăn, tình duyên gia đạo, xuất hành chuyển chỗ, sức khỏe...)"*.
+     - Nút "THẦY REO QUẺ & PHÁN" tự động vô hiệu hóa (disabled) nếu ô nhập liệu rỗng.
+     - Ngày giờ động tâm được khởi tạo linh hoạt theo đúng thời gian thực của hệ thống (`new Date()`).
+  2. **Thuần khiết hóa thuật toán Dịch Lý (`lib/metaphysics/dongtam.ts`):**
+     - Xóa bỏ toàn bộ nhánh ghi đè `isGrandfatherLungExample` và các đoạn phán cứng.
+     - Toàn bộ quẻ Mai Hoa và hào Lục Hào được tính toán 100% bằng thuật toán toán học Dịch lý từ thời khắc động tâm của người hỏi.
+  3. **Việt hóa tóm tắt 14 chính tinh (`lib/seo/knowledge.ts`):**
+     - Việt hóa toàn diện trường `STAR_BRIEF_SEO` của 14 sao thành tiếng Việt to rõ, chuẩn mực học thuật Tử Vi.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 9: Sửa Triệt Để Lỗi 404 Vạn Tinh Các (Tri Thức Tinh Diệu) & Việt Hóa Toàn Diện Tàng Kinh Các Cổ Tịch
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Vấn đề người dùng phản hồi:**

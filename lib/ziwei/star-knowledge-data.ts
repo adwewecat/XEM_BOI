@@ -286,3 +286,4 @@ export function generateFullStarDb(): Record<string, Record<string, string>> {
 
   return db;
 }
+

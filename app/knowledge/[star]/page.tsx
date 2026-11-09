@@ -9,3 +9,4 @@ export default async function StarIndexPage({ params }: { params: Promise<{ star
   const { star } = await params;
   redirect(`/knowledge/${star}/overview`);
 }
+

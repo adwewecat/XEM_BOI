@@ -143,20 +143,20 @@ export function getAllKnowledgeRoutes() {
   return routes;
 }
 
-/** 主星属性简介（用于 SEO 页"了解 XX 星"section） */
+/** Chủ tinh thuộc tính tóm tắt tiếng Việt (hiển thị tại trang Vạn Tinh Các và SEO) */
 export const STAR_BRIEF_SEO: Record<string, string> = {
-  '紫微': '紫微为帝星，主尊贵，化气为尊。落命主有领导气场、宜大平台高位。',
-  '天机': '天机为智慧星，主善变机灵，化气为善。落命主聪明机变、宜辅佐策划。',
-  '太阳': '太阳为男贵星，主名誉公务，化气为贵。落命主光明磊落、宜公职名声。',
-  '武曲': '武曲为财星，主刚毅果决，化气为财。落命主理财能力强、宜实业金融。',
-  '天同': '天同为福星，主温和享乐，化气为福。落命主性情温和、有福气。',
-  '廉贞': '廉贞为次桃花星，文武兼备，化气为囚。落命主多才多艺、感情丰富。',
-  '天府': '天府为南帝守财星，主稳重保守，化气为令。落命主品行端正、善守财库。',
-  '太阴': '太阴为月亮富贵星，主田宅富贵，化气为富。落命主感情细腻、女命最吉。',
-  '贪狼': '贪狼为桃花欲望星，多才多社交，化气为桃花。落命主多才艺、社交广。',
-  '巨门': '巨门为是非口才星，主辩论传媒，化气为暗。落命主口才好、宜律师教师。',
-  '天相': '天相为印星辅佐，主忠厚老实，化气为印。落命主品行端正、宜行政法务。',
-  '天梁': '天梁为老人星荫星，善逢凶化吉，化气为荫。落命主慈悲善良、宜法律医学。',
-  '七杀': '七杀为将星，主孤独果决冒险，化气为肃杀。落命主刚毅果决、宜军警创业。',
-  '破军': '破军为破坏创新星，主六亲缘薄，化气为耗。落命主开创变动、宜技术专长。',
+  '紫微': 'Tử Vi là Đế Tinh, chủ tôn quý, hóa khí vi Tôn. Tọa Mệnh chủ về phong thái lãnh đạo uy nghi, thích hợp giữ vị trí quản lý cao trong tổ chức lớn.',
+  '天机': 'Thiên Cơ là Trí Tuệ Tinh, chủ linh hoạt mưu trí, hóa khí vi Thiện. Tọa Mệnh chủ về thông minh cơ biến, mưu lược tham mưu đại tài.',
+  '太阳': 'Thái Dương là Nhật Tinh, chủ công danh danh dự, hóa khí vi Quý. Tọa Mệnh chủ về quang minh lỗi lạc, khẳng khái trượng nghĩa, hợp công chức.',
+  '武曲': 'Vũ Khúc là Tài Tinh, chủ cương nghị quả quyết, hóa khí vi Tài. Tọa Mệnh chủ về năng lực quản lý tài chính xuất sắc, hợp thực nghiệp ngân hàng.',
+  '天同': 'Thiên Đồng là Phúc Tinh, chủ ôn hòa an lạc, hóa khí vi Phúc. Tọa Mệnh chủ về tính tình nhân hậu, biến nguy thành an, cuộc đời nhiều phúc báo.',
+  '廉贞': 'Liêm Trinh là Thứ Đào Hoa, văn võ kiêm toàn, hóa khí vi Tù. Tọa Mệnh chủ về đa tài đa nghệ, lòng tự tôn cao, tình cảm nồng nhiệt sâu sắc.',
+  '天府': 'Thiên Phủ là Nam Đế Tinh thủ tài khố, chủ ổn định bảo trọng, hóa khí vi Lệnh. Tọa Mệnh chủ về tính tình khoan dung, giữ tài khố vững như bàn thạch.',
+  '太阴': 'Thái Âm là Nguyệt Tinh phú quý, chủ điền trạch và tình cảm, hóa khí vi Phú. Tọa Mệnh chủ về ôn nhu tinh tế, giỏi tích lũy của cải, nữ mệnh đại cát.',
+  '贪狼': 'Tham Lang là Đào Hoa và Dục Vọng Tinh, chủ phong lưu nghệ thuật, hóa khí vi Đào Hoa. Tọa Mệnh chủ về đa tài đa nghệ, giỏi giao tế xã hội rộng rãi.',
+  '巨门': 'Cự Môn là Khẩu Tài Tinh, chủ biện luận truyền thông, hóa khí vi Ám. Tọa Mệnh chủ về tài ăn nói hùng biện, tư duy phản biện sắc bén, hợp luật sư giáo dục.',
+  '天相': 'Thiên Tướng là Ấn Tinh phụ tá, chủ trung hậu thành tín, hóa khí vi Ấn. Tọa Mệnh chủ về hành sự cẩn trọng, công minh chính trực, hợp hành chính quản lý.',
+  '天梁': 'Thiên Lương là Lão Nhân Tinh che chở, chủ tiêu tai giải ách, hóa khí vi Ấm. Tọa Mệnh chủ về từ bi nhân hậu, tâm hồn thanh cao, hợp y dược tư pháp.',
+  '七杀': 'Thất Sát là Tướng Tinh dũng mãnh, chủ độc lập quyết đoán, hóa khí vi Túc Sát. Tọa Mệnh chủ về cương nghị dũng cảm, tự lực cánh sinh khai sáng cơ đồ.',
+  '破军': 'Phá Quân là Dũng Tướng tiên phong cải cách, chủ phá cũ lập mới, hóa khí vi Hao. Tọa Mệnh chủ về dám nghĩ dám làm, khai mở cục diện mới trong gian khó.',
 };

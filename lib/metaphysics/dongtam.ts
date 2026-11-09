@@ -184,19 +184,6 @@ export function castDongTam(
   let movingLine = (yearZhiNum + lunarMonth + lunarDay + hourZhiNum + minute) % 6;
   if (movingLine === 0) movingLine = 6;
 
-  // Nếu người dùng nhập đúng câu hỏi kinh điển về "ông nội", "viêm phổi" (như ví dụ người dùng):
-  // Trạch Sơn Hàm (Đoài 2, Cấn 7) động Hào 5 biến Lôi Sơn Tiểu Quá (Chấn 4, Cấn 7)
-  const qLower = question.toLowerCase();
-  const isGrandfatherLungExample =
-    (qLower.includes('ông nội') || qLower.includes('viêm phổi')) &&
-    (dateStr.includes('2026-11-09') || dateStr.includes('09/11/2026'));
-
-  if (isGrandfatherLungExample) {
-    upperNum = 2; // Đoài (Trạch)
-    lowerNum = 7; // Cấn (Sơn)
-    movingLine = 5; // Hào 5
-  }
-
   const upperTrigram = MAIHUA_TRIGRAMS[upperNum] || MAIHUA_TRIGRAMS[2];
   const lowerTrigram = MAIHUA_TRIGRAMS[lowerNum] || MAIHUA_TRIGRAMS[7];
 
@@ -239,19 +226,13 @@ export function castDongTam(
     changedUpperNum = flipTrigram(upperNum, movingLine - 3);
   }
 
-  // Với quẻ Trạch Sơn Hàm động hào 5:
-  // Thượng quái Đoài (011), động hào 2 của Đoài (tức hào 5 toàn quẻ) biến thành (001 Chấn) -> Lôi Sơn Tiểu Quá!
-  if (isGrandfatherLungExample) {
-    changedUpperNum = 4; // Chấn (Lôi)
-    changedLowerNum = 7; // Cấn (Sơn)
-  }
-
   const changedUpperTrigram = MAIHUA_TRIGRAMS[changedUpperNum] || MAIHUA_TRIGRAMS[4];
   const changedLowerTrigram = MAIHUA_TRIGRAMS[changedLowerNum] || MAIHUA_TRIGRAMS[7];
   const changedKey = `${changedUpperNum === 8 ? 0 : changedUpperNum}-${changedLowerNum === 8 ? 0 : changedLowerNum}`;
   const changedName = HEXAGRAM_NAMES_64[changedKey] || `${changedUpperTrigram.vi} ${changedLowerTrigram.vi}`;
 
   // --- NHẬN DIỆN DỤNG THẦN TỪ CÂU HỎI ---
+  const qLower = question.toLowerCase();
   let subject = 'Thế Hào (Bản Thân Người Hỏi)';
   let targetName = 'Bản thân';
   let state = 'Vượng Tướng';
@@ -259,7 +240,7 @@ export function castDongTam(
 
   if (qLower.includes('ông') || qLower.includes('bà') || qLower.includes('cha') || qLower.includes('mẹ') || qLower.includes('bố') || qLower.includes('phụ mẫu') || qLower.includes('bác') || qLower.includes('chú') || qLower.includes('nhà đất')) {
     subject = 'Phụ Mẫu (Trưởng Bối & Che Chở)';
-    targetName = qLower.includes('ông') ? 'Ông nội / Trưởng bối' : 'Cha mẹ / Trưởng bối';
+    targetName = 'Trưởng Bối / Người Thân Lớn Tuổi';
     state = 'Lưỡng Hiện Trong Quẻ, Hưu Tù Trực Tuần Không';
     explanation = `Người hỏi hỏi cho ${targetName}, trong Lục Hào lấy hào Phụ Mẫu làm Dụng Thần. Trong quẻ Dụng Thần lưỡng hiện (xuất hiện 2 lần) chủ sự việc dây dưa, phức tạp; lại rơi vào hưu tù trực Tuần Không (${xunKong}) nên nguyên khí suy vi.`;
   } else if (qLower.includes('con') || qLower.includes('cháu') || qLower.includes('bé') || qLower.includes('sinh') || qLower.includes('thuốc') || qLower.includes('bác sĩ')) {
@@ -305,27 +286,14 @@ export function castDongTam(
   }
 
   // --- XÁC ĐỊNH ỨNG KỲ VÀ LỜI PHÁN CỦA THẦY ---
-  let ungKy = 'Tháng 11 - 12 Âm lịch năm nay; xa thì tháng 1 - 2 Âm lịch năm sau';
-  let thayPhan = '';
-
-  if (isGrandfatherLungExample) {
-    thayPhan = `🔮 THẦY REO QUẺ VÀ PHÁN:
-
-"${originalName.toLowerCase()} động hào năm biến ${changedName.toLowerCase()}
-cháu hỏi cho ông nội
-phụ mẫu là dụng thần lưỡng hiện trong quẻ . dụng hưu tù trực tuần ko .
-huynh đệ thân kim bệnh địa tại nhật nguyệt động hoá thoái thần lâm huyền vũ . kim là phổi . quẻ đoài là phổi . phổi kém đi chứ ko khá hơn .
-tháng 11-12 âm năm nay . xa tháng 1-2 âm năm 2027 thì ko khả quan cho ông , ông khó vượt qua"`;
-    ungKy = 'Tháng 11 - 12 Âm lịch năm nay; xa thì tháng 1 - 2 Âm lịch năm 2027';
-  } else {
-    thayPhan = `🔮 THẦY REO QUẺ VÀ PHÁN:
+  const ungKy = 'Tháng 11 - 12 Âm lịch năm nay; xa thì tháng 1 - 2 Âm lịch năm sau';
+  const thayPhan = `🔮 THẦY REO QUẺ VÀ PHÁN:
 
 Quẻ khởi: **${originalName}** động hào ${movingLine} biến **${changedName}**.
 - Người hỏi chiêm bốc về: "${question.trim()}"
-- Trong Dịch lý Lục Hào: Lấy **${subject}** làm Dụng Thần. Hiện tại Dụng Thần ${state}.
+- Trong Dịch lý Lục Hào: Lấy **${subject}** (${targetName}) làm Dụng Thần. Hiện tại Dụng Thần ${state}.
 ${diseaseAnalysis ? `- Xét về ngũ hành tạng phủ: ${diseaseAnalysis.involvedOrgan}. ${diseaseAnalysis.details}\n` : ''}- Hào động phát tiết chuyển hóa sang ${changedName}, hào lâm tiết khí của Nhật Nguyệt (${ganZhiDay} / ${ganZhiMonth}), Tuần Không tại [${xunKong}].
 - Thời điểm chuyển biến then chốt (Ứng Kỳ): ${ungKy}. Cần giữ tâm an định, chăm sóc chu toàn và chuẩn bị phương án thận trọng nhất.`;
-  }
 
   return {
     question,
