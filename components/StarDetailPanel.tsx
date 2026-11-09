@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Star } from '@/lib/ziwei/types';
 import { STAR_DESCRIPTIONS } from '@/lib/ziwei/constants';
+import { getStarName, PALACE_VI } from '@/lib/ziwei/vietnamese';
 
 interface StarDetailPanelProps {
   star: Star | null;
@@ -163,10 +164,10 @@ const STAR_DETAIL: Record<string, {
 };
 
 const levelConfig = {
-  major: { label: '主星', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10' },
-  lucky: { label: '吉星', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10' },
-  sha:   { label: '煞星', color: 'text-red-400 border-red-500/30 bg-red-500/10' },
-  minor: { label: '杂星', color: 'text-slate-400 border-slate-500/25 bg-slate-500/10' },
+  major: { label: 'Chính Tinh (主星)', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10' },
+  lucky: { label: 'Cát Tinh (吉星)', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10' },
+  sha:   { label: 'Sát Tinh (煞星)', color: 'text-red-400 border-red-500/30 bg-red-500/10' },
+  minor: { label: 'Tạp Diệu (杂星)', color: 'text-slate-400 border-slate-500/25 bg-slate-500/10' },
 };
 
 const siHuaColors: Record<string, string> = {
@@ -176,10 +177,19 @@ const siHuaColors: Record<string, string> = {
   '忌': 'text-red-400 bg-red-500/10 border-red-500/30',
 };
 
+const siHuaLabels: Record<string, string> = {
+  '禄': 'Hóa Lộc (化禄)',
+  '权': 'Hóa Quyền (化权)',
+  '科': 'Hóa Khoa (化科)',
+  '忌': 'Hóa Kỵ (化忌)',
+};
+
 export default function StarDetailPanel({ star, palaceName, onClose }: StarDetailPanelProps) {
   const desc = star ? STAR_DESCRIPTIONS[star.name] : null;
   const detail = star ? STAR_DETAIL[star.name] : null;
   const typeConfig = star ? levelConfig[star.type] : null;
+  const starNameInfo = star ? getStarName(star.name) : { vi: '', zh: '' };
+  const palaceVi = palaceName ? (PALACE_VI[palaceName] ? `${PALACE_VI[palaceName]} (${palaceName})` : palaceName) : '';
 
   return (
     <AnimatePresence>
@@ -191,10 +201,13 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
           transition={{ duration: 0.2 }}
           className="card-glass rounded-xl overflow-hidden"
         >
-          {/* 标题栏 */}
+          {/* Tiêu đề sao */}
           <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--t-border)' }}>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold" style={{ color: 'var(--t-gold)' }}>{star.name}</span>
+              <div>
+                <span className="text-xl font-bold" style={{ color: 'var(--t-gold)' }}>{starNameInfo.vi}</span>
+                <span className="text-xs text-slate-400 ml-1.5 font-normal">({star.name})</span>
+              </div>
               {typeConfig && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${typeConfig.color}`}>
                   {typeConfig.label}
@@ -202,7 +215,7 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
               )}
               {star.siHua && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${siHuaColors[star.siHua] || ''}`}>
-                  化{star.siHua}
+                  {siHuaLabels[star.siHua] || `Hóa ${star.siHua}`}
                 </span>
               )}
             </div>
@@ -210,19 +223,19 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
           </div>
 
           <div className="p-4 space-y-4 overflow-y-auto max-h-[560px]">
-            {/* 基本信息 */}
+            {/* Thông tin cơ bản */}
             {desc && (
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  `五行 · ${desc.element}`,
-                  `性质 · ${desc.nature}`,
-                  ...(palaceName ? [`位置 · ${palaceName}`] : []),
-                  ...(star.brightness ? [star.brightness === 'bright' ? '庙旺' : star.brightness === 'dim' ? '落陷' : '平和'] : []),
+                  `Ngũ Hành · ${desc.element}`,
+                  `Đặc tính · ${desc.nature}`,
+                  ...(palaceVi ? [`Toạ thủ · ${palaceVi}`] : []),
+                  ...(star.brightness ? [star.brightness === 'bright' ? 'Miếu Vượng (庙旺)' : star.brightness === 'dim' ? 'Lạc Hãm (落陷)' : 'Bình Hòa (平和)'] : []),
                 ].map(tag => (
                   <div key={tag} className="text-[10px] px-2 py-1 rounded-full"
                     style={{
                       border: '1px solid var(--t-border)',
-                      color: tag.includes('庙旺') ? '#eab308' : tag.includes('落陷') ? '#ef4444' : 'var(--t-text2)',
+                      color: tag.includes('Miếu') ? '#eab308' : tag.includes('Hãm') ? '#ef4444' : 'var(--t-text2)',
                     }}>
                     {tag}
                   </div>
@@ -230,10 +243,10 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
               </div>
             )}
 
-            {/* 关键词 */}
+            {/* Đặc tính tinh diệu */}
             {desc && (
               <div>
-                <div className="text-[10px] tracking-widest mb-1.5" style={{ color: 'var(--t-faint)' }}>星曜特质</div>
+                <div className="text-[10px] tracking-widest mb-1.5" style={{ color: 'var(--t-faint)' }}>ĐẶC TÍNH TINH DIỆU (星曜特质)</div>
                 <div className="flex flex-wrap gap-1.5">
                   {desc.keywords.split('·').map(k => (
                     <span key={k} className="text-[11px] px-2 py-0.5 rounded-full"
@@ -245,23 +258,23 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
               </div>
             )}
 
-            {/* 古书原文 */}
+            {/* Cổ thư nguyên văn */}
             {detail && (
               <div className="rounded-xl p-3" style={{ background: 'rgba(212,168,67,0.04)', border: '1px solid rgba(212,168,67,0.12)' }}>
                 <div className="text-[10px] tracking-widest mb-1.5 flex items-center gap-1" style={{ color: 'var(--t-gold)', opacity: 0.7 }}>
-                  古书原文
+                  CỔ THƯ KINH ĐIỂN TRÍCH DẪN (古书原文)
                 </div>
                 <p className="text-[11px] leading-relaxed italic" style={{ color: 'var(--t-gold)', opacity: 0.8 }}>{detail.classical}</p>
               </div>
             )}
 
-            {/* 倪海厦解读 */}
+            {/* Danh sư Nghê Hải Hà giải đoán */}
             {detail && (
               <>
                 <div>
                   <div className="text-[10px] tracking-widest mb-1.5 flex items-center gap-1.5" style={{ color: 'var(--t-faint)' }}>
                     <span className="w-3 h-px inline-block" style={{ background: 'var(--t-border-acc)' }} />
-                    倪海厦老师解读
+                    DANH SƯ NGHÊ HẢI HÀ LUẬN GIẢI (倪海厦老师解读)
                     <span className="w-3 h-px inline-block" style={{ background: 'var(--t-border-acc)' }} />
                   </div>
                   <p className="text-xs leading-relaxed" style={{ color: 'var(--t-text2)' }}>{detail.niHaixia}</p>
@@ -269,10 +282,10 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
 
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { label: '事业方向', value: detail.career, icon: '◈' },
-                    { label: '感情特质', value: detail.relationship, icon: '♡' },
-                    { label: '财运分析', value: detail.wealth, icon: '◆' },
-                    { label: '健康提示', value: detail.health, icon: '☯' },
+                    { label: 'Sự Nghiệp & Công Danh (事业方向)', value: detail.career, icon: '◈' },
+                    { label: 'Tình Duyên & Gia Đạo (感情特质)', value: detail.relationship, icon: '♡' },
+                    { label: 'Tài Lộc & Tiền Bạc (财运分析)', value: detail.wealth, icon: '◆' },
+                    { label: 'Sức Khỏe & Tạng Phủ (健康提示)', value: detail.health, icon: '☯' },
                   ].map(item => (
                     <div key={item.label} className="card-inner rounded-lg p-3">
                       <div className="text-[10px] mb-1 flex items-center gap-1" style={{ color: 'var(--t-faint)' }}>
@@ -286,40 +299,40 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-[10px] p-2.5 rounded-lg" style={{ border: '1px solid rgba(74,222,128,0.15)', background: 'rgba(74,222,128,0.05)' }}>
-                    <div className="text-emerald-500 mb-0.5 font-medium">最佳宫位</div>
+                    <div className="text-emerald-500 mb-0.5 font-medium">Cung Vị Đắc Lợi Nhất (最佳宫位)</div>
                     <div className="text-emerald-500/70">{detail.bestPalace}</div>
                   </div>
                   <div className="text-[10px] p-2.5 rounded-lg" style={{ border: '1px solid rgba(248,113,113,0.15)', background: 'rgba(248,113,113,0.05)' }}>
-                    <div className="text-red-500 mb-0.5 font-medium">注意宫位</div>
+                    <div className="text-red-500 mb-0.5 font-medium">Cung Vị Cần Lưu Ý (注意宫位)</div>
                     <div className="text-red-500/70">{detail.worstPalace}</div>
                   </div>
                 </div>
               </>
             )}
 
-            {/* 辅星/煞星说明 */}
+            {/* Phụ tinh / Sát tinh */}
             {!detail && star.type !== 'major' && (
               <div className="text-xs leading-relaxed" style={{ color: 'var(--t-text2)' }}>
                 {star.type === 'lucky' && (
                   <>
-                    {star.name === '文昌' && '文昌入宫，主学业考试顺利，文书印鉴有利，宜从事文字相关工作。古诀：「文昌科甲，主文章显达，逢考必第。」'}
-                    {star.name === '文曲' && '文曲入宫，主才艺出众，口才佳，善于表达，艺术天赋强。古诀：「文曲为才艺之星，能文能武，口才胜人。」'}
-                    {star.name === '左辅' && '左辅入宫，主贵人相助，有人提携，该宫位事项受到善意支持。古诀：「左辅为助力之星，坐命则贵人多，逢凶化吉。」'}
-                    {star.name === '右弼' && '右弼入宫，主贵人相助，多出女性贵人，该宫位事项有人协助。古诀：「右弼为阴助之星，多女性贵人，化险为夷。」'}
-                    {star.name === '天魁' && '天魁入宫，主白天出生的贵人，男性贵人多，逢凶化吉之力。古诀：「天魁为天乙贵人，逢之必有贵人扶持。」'}
-                    {star.name === '天钺' && '天钺入宫，主夜晚出生的贵人，女性贵人多，增添吉祥之气。古诀：「天钺为玉堂贵人，主阴助，女贵人多。」'}
-                    {star.name === '禄存' && '禄存入宫，主财禄守成，该宫位有财气，但属于保守型财运。古诀：「禄存为财禄之星，主守财有余，进财稳健。」'}
-                    {star.name === '天马' && '天马入宫，主奔波动荡，动中求财，宜主动出击，不宜守株待兔。古诀：「天马主动，逢禄则财禄双全，动中生财。」'}
+                    {star.name === '文昌' && '【Văn Xương入Cung】Chủ về thi cử hanh thông, học nghiệp xuất chúng, văn thư ấn tín thuận lợi, hợp công việc nghiên cứu học thuật sáng tác. Cổ quyết: "Văn Xương khoa giáp, chủ văn chương hiển đạt, phùng khảo tất đệ."'}
+                    {star.name === '文曲' && '【Văn Khúc入Cung】Chủ về tài hoa nghệ thuật, ăn nói khéo léo, hùng biện lưu loát, năng khiếu thẩm mỹ cao. Cổ quyết: "Văn Khúc vi tài nghệ chi tinh, năng văn năng võ, khẩu tài thăng nhân."'}
+                    {star.name === '左辅' && '【Tả Phụ入Cung】Chủ về quý nhân tương trợ, có người nâng đỡ phò tá, việc ở cung vị này luôn nhận được sự trợ lực đắc lực. Cổ quyết: "Tả Phụ vi trợ lực chi tinh, toạ mệnh tắc quý nhân đa, phùng hung hóa cát."'}
+                    {star.name === '右弼' && '【Hữu Bật入Cung】Chủ về quý nhân tương trợ, đặc biệt là nữ quý nhân ngầm giúp đỡ, hóa giải hiểm nguy. Cổ quyết: "Hữu Bật vi âm trợ chi tinh, đa nữ tính quý nhân, hóa hiểm vi di."'}
+                    {star.name === '天魁' && '【Thiên Khôi入Cung】Chủ về Dương Quý Nhân (người sinh ban ngày), nam quý nhân nâng đỡ công khai, gặp dữ hóa lành. Cổ quyết: "Thiên Khôi vi Thiên Ất quý nhân, phùng chi tất hữu quý nhân phù trì."'}
+                    {star.name === '天钺' && '【Thiên Việt入Cung】Chủ về Âm Quý Nhân (người sinh ban đêm), nữ quý nhân giúp đỡ âm thầm, gia tăng điềm cát lành. Cổ quyết: "Thiên Việt vi Ngọc Đường quý nhân, chủ âm trợ, nữ quý nhân đa."'}
+                    {star.name === '禄存' && '【Lộc Tồn入Cung】Chủ về tài lộc tích lũy, giữ tiền của vững vàng, cung vị có tài khí ổn định, thiên về phòng thủ chắc chắn. Cổ quyết: "Lộc Tồn vi tài lộc chi tinh, chủ thủ tài hữu dư, tiến tài ổn kiện."'}
+                    {star.name === '天马' && '【Thiên Mã入Cung】Chủ về bôn ba di động, cầu tài trong sự biến chuyển, hợp chủ động xuất kích, không nên thụ động. Cổ quyết: "Thiên Mã chủ động, phùng Lộc tắc tài lộc song toàn, động trung sinh tài."'}
                   </>
                 )}
                 {star.type === 'sha' && (
                   <>
-                    {star.name === '地空' && '地空入宫，主该宫位事项有落空感，精神耗散，宜注意心理健康。古诀：「地空主虚耗，入命宫者多精神迷茫，须防空想。」'}
-                    {star.name === '地劫' && '地劫入宫，主该宫位事项有意外损失，财物需谨慎，防小人。古诀：「地劫主劫财，入命宫者财运受损，防意外之失。」'}
-                    {star.name === '火星' && '火星入宫，主该宫位事项急躁冲动，情绪波动，但若遇贪狼则反吉。古诀：「火星主急燥，然遇贪狼同宫，反为火贪格，主暴发。」'}
-                    {star.name === '铃星' && '铃星入宫，主该宫位事项有暗中阻碍，防背后小人，凡事宜低调。古诀：「铃星主暗煞，入命者多暗中受敌，须防背后是非。」'}
-                    {star.name === '擎羊' && '擎羊入宫，主刑克，该宫位事项多波折，有血光之灾或意外。古诀：「擎羊为刑克之星，入命宫者多刑克，须防意外血光。」'}
-                    {star.name === '陀罗' && '陀罗入宫，主是非缠身，该宫位事项拖延不决，凡事宜早做准备。古诀：「陀罗主是非拖延，入命宫者做事迟缓，须防纠缠不清。」'}
+                    {star.name === '地空' && '【Địa Không入Cung】Chủ về sự hư hao, cảm giác hụt hẫng, tinh thần dễ phiêu bồng, cần chú ý giữ vững tâm thế. Cổ quyết: "Địa Không chủ hư hao, nhập Mệnh cung giả đa tinh thần mê mang, tu phòng không tưởng."'}
+                    {star.name === '地劫' && '【Địa Kiếp入Cung】Chủ về sự hao tổn bất ngờ, tài vật cần cẩn trọng gìn giữ, đề phòng tiểu nhân. Cổ quyết: "Địa Kiếp chủ kiếp tài, nhập Mệnh cung giả tài vận thụ tổn, phòng ý ngoại chi thất."'}
+                    {star.name === '火星' && '【Hỏa Tinh入Cung】Chủ về tính tình nóng nảy, cảm xúc bộc phát nhanh, nếu gặp Tham Lang đồng cung lại biến thành cách cục bạo phát đại phú (Hỏa Tham Cách). Cổ quyết: "Hỏa Tinh chủ cấp táo, nhiên ngộ Tham Lang đồng cung, phản vi Hỏa Tham cách, chủ bạo phát."'}
+                    {star.name === '铃星' && '【Linh Tinh入Cung】Chủ về trở ngại ngầm, đề phòng tiểu nhân sau lưng, làm việc gì cũng nên khiêm tốn kín đáo. Cổ quyết: "Linh Tinh chủ ám sát, nhập Mệnh giả đa ám trung thụ địch, tu phòng bối hậu thị phi."'}
+                    {star.name === '擎羊' && '【Kình Dương入Cung】Chủ về hình khắc, trắc trở, xung đột trực diện, cần cẩn trọng đề phòng va chạm trầy xước. Cổ quyết: "Kình Dương vi hình khắc chi tinh, nhập Mệnh cung giả đa hình khắc, tu phòng ý ngoại huyết quang."'}
+                    {star.name === '陀罗' && '【Đà La入Cung】Chủ về thị phi dằng dai, kéo dài chậm trễ, việc dễ bị dây dưa trăn trở, cần chủ động chuẩn bị kỹ từ sớm. Cổ quyết: "Đà La chủ thị phi tha diên, nhập Mệnh cung giả tố sự trì hoãn, tu phòng củ triền bất thanh."'}
                   </>
                 )}
               </div>

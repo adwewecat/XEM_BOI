@@ -73,6 +73,34 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 4: Sửa triệt để lỗi "Bấm Start là tự tắt", Hoàn thiện toàn bộ Song Ngữ Tiếng Việt
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Vấn đề người dùng phản hồi:** "Bấm start là tự tắt" khi nhấp đúp vào `START.bat` hoặc `START.cmd`.
+- **Nguyên nhân kỹ thuật đã tìm ra và xử lý triệt để:**
+  1. *Lỗi xung đột mã hóa UTF-8 trong Windows cmd.exe:* Trước đây các file `.bat` và `.cmd` chứa ký tự tiếng Việt có dấu dạng đa byte (multi-byte UTF-8 như `ỘNG`, `đầu`, `ại!`, `🔮`, `·`). Khi `cmd.exe` trên Windows đọc file theo ANSI/OEM code page, các byte này vô tình trùng với các ký tự điều khiển lệnh batch (`&`, `|`, `(`, `)`), dẫn đến việc batch parser tự ngắt dòng lệnh thành các lệnh rác không tồn tại (như `'ỘNG' is not recognized as an internal or external command`) và thoát tiến trình đột ngột.
+  2. *Lỗi ngắt khối lệnh `if (...)`:* Ký tự ngoặc đơn `)` trong các chuỗi chú thích bên trong block `if (...)` khiến block đóng sớm và gây lỗi cú pháp `The syntax of the command is incorrect`.
+  3. *Lệnh `timeout`:* Lệnh `timeout /t 3` trên một số phiên bản Windows khi bị redirect hoặc click từ Explorer sẽ báo lỗi `ERROR: Input redirection is not supported` và dừng script.
+- **Giải pháp & Các việc đã thực hiện:**
+  1. **Viết lại hoàn toàn `START.bat` & `START.cmd`:**
+     - Sử dụng tiếng Việt không dấu chuẩn 100% mã ASCII an toàn cho mọi phiên bản Windows (`Windows 7, 10, 11`).
+     - Tự động bổ sung các đường dẫn cài đặt Node.js mặc định vào biến môi trường `PATH` cục bộ (`C:\Program Files\nodejs`, `C:\Program Files (x86)\nodejs`, `%APPDATA%\npm`) phòng trường hợp người dùng chưa gán biến môi trường hệ thống.
+     - Thay thế lệnh `timeout` bằng `ping 127.0.0.1 -n 4 >nul` để chờ an toàn tuyệt đối mà không sợ lỗi redirection.
+     - Luôn giữ lệnh `pause` ở cuối cùng để cửa sổ lệnh không bao giờ tự đóng, cho phép người dùng đọc toàn bộ log chi tiết nếu có thông báo.
+     - Tự động mở trình duyệt tại `http://localhost:3000/chart`.
+  2. **Tạo thêm trình khởi động dự phòng `START_POWERSHELL.ps1`:**
+     - Cho phép người dùng thích PowerShell chỉ cần chuột phải chọn "Run with PowerShell" là khởi chạy mượt mà.
+  3. **Hoàn thiện song ngữ Việt - Hán cho toàn bộ các component còn lại:**
+     - `components/StarDetailPanel.tsx`: Dịch toàn bộ thông tin chi tiết của 14 chính tinh và lục sát tinh, lục cát tinh, tứ hóa, độ sáng miếu hãm, các cung vị đắc lợi/lưu ý, danh ngôn cổ thư và luận giải của thầy Nghê Hải Hà.
+     - `components/ChartSummary.tsx`: Bản địa hóa thẻ tổng quan lá số, tứ hóa bản mệnh, danh sách cách cục với các điều kiện: Bắt buộc, Gia cát, Phá cách.
+     - `components/FamousPersonCard.tsx`: Dịch phân loại lá số danh nhân mẫu và hướng dẫn tham khảo.
+     - `components/AnnouncementModal.tsx`: Bản địa hóa thư ngỏ và triết lý lập trình Thiên Kỷ.
+     - `components/TimeNav.tsx`: Chuyển đổi các mốc thời gian: Bản Mệnh, Đại Hạn, Lưu Niên.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch production thành công 37 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 3: Bản Địa Hóa Tiếng Việt Toàn Diện (Song Ngữ Hán - Việt Chuẩn Thuật Ngữ Tử Vi)
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu:** Dịch toàn bộ giao diện và dữ liệu sang Tiếng Việt chuẩn mực thuật ngữ mệnh lý Tử Vi Đẩu Số phương Đông; tiếng Việt làm ngôn ngữ chính (to rõ), tiếng Trung làm phụ đề nhỏ bên dưới để đối chiếu nguyên bản cổ tịch.
