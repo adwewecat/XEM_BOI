@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateBazi, BaziResult } from '@/lib/metaphysics/bazi';
 import { castIChingCoins, DivinationResult, getHexagramByBinary } from '@/lib/metaphysics/iching';
+import { castDongTam, DongTamResult } from '@/lib/metaphysics/dongtam';
 import {
   calculateLifePath,
   calculateDestinyNumber,
@@ -15,7 +16,41 @@ import {
 } from '@/lib/metaphysics/numerology';
 
 export default function MetaphysicsPage() {
-  const [activeTab, setActiveTab] = useState<'bazi' | 'iching' | 'numerology'>('bazi');
+  const [activeTab, setActiveTab] = useState<'bazi' | 'dongtam' | 'iching' | 'numerology'>('dongtam');
+
+  // --- STATE CHO BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) ---
+  const [dongTamQuestion, setDongTamQuestion] = useState(
+    'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?'
+  );
+  const [dongTamDate, setDongTamDate] = useState('2026-11-09');
+  const [dongTamTime, setDongTamTime] = useState('08:44');
+  const [dongTamResult, setDongTamResult] = useState<DongTamResult>(() =>
+    castDongTam(
+      'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?',
+      '2026-11-09',
+      '08:44'
+    )
+  );
+  const [isDongTamCasting, setIsDongTamCasting] = useState(false);
+
+  const handleCastDongTam = () => {
+    setIsDongTamCasting(true);
+    setTimeout(() => {
+      setDongTamResult(castDongTam(dongTamQuestion, dongTamDate, dongTamTime));
+      setIsDongTamCasting(false);
+    }, 450);
+  };
+
+  const handleSetCurrentTime = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const h = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    setDongTamDate(`${y}-${m}-${d}`);
+    setDongTamTime(`${h}:${min}`);
+  };
 
   // --- STATE CHO BÁT TỰ TỨ TRỤ ---
   const [baziYear, setBaziYear] = useState(1995);
@@ -105,6 +140,18 @@ export default function MetaphysicsPage() {
             >
               <span>🎴</span>
               <span>Tử Bình Bát Tự (Tứ Trụ)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('dongtam')}
+              className={`px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'dongtam'
+                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
+                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
+              }`}
+            >
+              <span>🔮</span>
+              <span>Bói Hữu Duyên (Giờ Động Tâm)</span>
             </button>
 
             <button
@@ -341,6 +388,204 @@ export default function MetaphysicsPage() {
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* TAB BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) */}
+        {activeTab === 'dongtam' && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
+            {/* Form Nhập Câu Hỏi & Ngày Giờ Động Tâm */}
+            <div className="card-glass p-5 rounded-2xl border border-amber-500/40 bg-zinc-950/80 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-2 text-sm font-black text-amber-300">
+                  <span>🔮</span> BÓI HỮU DUYÊN · MAI HOA & LỤC HÀO CHIÊM ĐOÁN THEO GIỜ ĐỘNG TÂM
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSetCurrentTime}
+                  className="px-3 py-1 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-amber-300 border border-amber-500/20 transition-all flex items-center gap-1.5"
+                >
+                  <span>⏱️</span> Lấy Giờ Hiện Tại
+                </button>
+              </div>
+
+              {/* Textarea câu hỏi */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-zinc-300 flex items-center gap-1.5">
+                  <span>✍️</span> Vấn đề cần hỏi / Sự việc trăn trở trong tâm:
+                </label>
+                <textarea
+                  rows={3}
+                  value={dongTamQuestion}
+                  onChange={(e) => setDongTamQuestion(e.target.value)}
+                  placeholder="Ví dụ: Cháu hỏi cho ông nội nằm viện do viêm phổi, có tim nữa... Liệu có qua khỏi không ạ?"
+                  className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-xl p-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Gợi ý câu hỏi mẫu */}
+              <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                <span className="text-zinc-500 font-semibold">Gợi ý mẫu:</span>
+                {[
+                  {
+                    label: '🫁 Hỏi bệnh ông nội (viêm phổi & tim)',
+                    text: 'Cháu hỏi cho ông nội ông nội con nằm viện nửa tháng nay do bị viêm phổi có bị tim nữa ạ. Nhưng nửa tháng nay không thấy khá lên, xin các thầy cho con hỏi ông nội con có thể khoẻ lên được không ạ vượt qua cơn bệnh này được không ạ?',
+                    date: '2026-11-09',
+                    time: '08:44',
+                  },
+                  {
+                    label: '💼 Hỏi chuyển việc & thăng chức',
+                    text: 'Con đang làm việc ở công ty cũ nhưng có lời mời sang công ty mới với mức đãi ngộ tốt hơn. Xin thầy cho biết con đổi việc lúc này có thuận lợi không ạ?',
+                    date: '2026-11-09',
+                    time: '10:15',
+                  },
+                  {
+                    label: '💰 Hỏi đầu tư kinh doanh',
+                    text: 'Tôi chuẩn bị hùn vốn với bạn mở cửa hàng kinh doanh cuối năm nay. Xin hỏi công việc làm ăn buôn bán này có thu được tài lộc không?',
+                    date: '2026-11-09',
+                    time: '14:30',
+                  },
+                  {
+                    label: '❤️ Hỏi tình duyên kết hôn',
+                    text: 'Chúng con yêu nhau đã được 3 năm và đang tính chuyện cưới hỏi vào năm tới. Xin thầy xem giúp tình duyên gia đạo hai bên có hòa hợp lâu dài không ạ?',
+                    date: '2026-11-09',
+                    time: '20:00',
+                  },
+                ].map((sample, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setDongTamQuestion(sample.text);
+                      setDongTamDate(sample.date);
+                      setDongTamTime(sample.time);
+                    }}
+                    className="px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-amber-200 transition-colors"
+                  >
+                    {sample.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Ngày giờ động tâm & Nút bấm */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div>
+                  <label className="text-[11px] font-semibold text-zinc-400 block mb-1">Ngày động tâm</label>
+                  <input
+                    type="date"
+                    value={dongTamDate}
+                    onChange={(e) => setDongTamDate(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-lg px-3 py-1.5 text-sm text-zinc-100 font-bold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-zinc-400 block mb-1">Giờ động tâm (Giờ:Phút)</label>
+                  <input
+                    type="time"
+                    value={dongTamTime}
+                    onChange={(e) => setDongTamTime(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-lg px-3 py-1.5 text-sm text-zinc-100 font-bold focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={handleCastDongTam}
+                    disabled={isDongTamCasting}
+                    className="w-full py-2.5 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-lg shadow-amber-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>{isDongTamCasting ? '🌀' : '🔮'}</span>
+                    <span>{isDongTamCasting ? 'ĐANG REO QUẺ...' : 'THẦY REO QUẺ & PHÁN'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* KẾT QUẢ THẦY PHÁN */}
+            {dongTamResult && (
+              <div className="space-y-6">
+                {/* Khung Lời Phán Của Thầy (Vàng Kim Sang Trọng) */}
+                <div className="card-glass p-6 sm:p-8 rounded-2xl border-2 border-amber-500/60 bg-gradient-to-br from-amber-950/40 via-zinc-950/90 to-zinc-950 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                  
+                  <div className="flex items-center justify-between border-b border-amber-500/30 pb-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">⛩️</span>
+                      <div>
+                        <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase block">LỜI THẦY PHÁN TRỰC TIẾP</span>
+                        <h3 className="text-base sm:text-lg font-black text-amber-200">
+                          {dongTamResult.hexagram.originalName} Động Hào {dongTamResult.hexagram.movingLine} Biến {dongTamResult.hexagram.changedName}
+                        </h3>
+                      </div>
+                    </div>
+                    <div className="text-right text-[11px] font-mono text-zinc-400">
+                      <div>{dongTamResult.datetimeInput.solarStr}</div>
+                      <div className="text-amber-300 font-bold">{dongTamResult.datetimeInput.lunarStr}</div>
+                    </div>
+                  </div>
+
+                  {/* Lời phán văn phong cổ truyền to rõ */}
+                  <div className="p-4 sm:p-5 rounded-xl bg-zinc-900/90 border border-amber-500/30 text-amber-100 text-sm sm:text-base leading-relaxed font-serif whitespace-pre-line shadow-inner">
+                    {dongTamResult.thayPhan}
+                  </div>
+
+                  {/* Tóm tắt then chốt */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 text-xs">
+                    <div className="p-3 rounded-xl bg-zinc-900/70 border border-zinc-800">
+                      <span className="text-zinc-500 block text-[11px]">Dụng Thần Xác Định:</span>
+                      <strong className="text-sky-300 block text-sm mt-0.5">{dongTamResult.dungThan.subject}</strong>
+                      <span className="text-zinc-400 text-[11px]">{dongTamResult.dungThan.state}</span>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-zinc-900/70 border border-zinc-800">
+                      <span className="text-zinc-500 block text-[11px]">Hào Động & Biến Quái:</span>
+                      <strong className="text-amber-300 block text-sm mt-0.5">Hào {dongTamResult.hexagram.movingLine} Động</strong>
+                      <span className="text-zinc-400 text-[11px]">{dongTamResult.hexagram.originalName} ➔ {dongTamResult.hexagram.changedName}</span>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-zinc-900/70 border border-zinc-800">
+                      <span className="text-zinc-500 block text-[11px]">Thời Điểm Ứng Kỳ:</span>
+                      <strong className="text-rose-300 block text-sm mt-0.5">Ứng Kỳ Then Chốt</strong>
+                      <span className="text-zinc-300 text-[11px] leading-tight block">{dongTamResult.ungKy}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BẢNG CHI TIẾT KỸ THUẬT DỊCH LÝ LỤC HÀO */}
+                <div className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/70 space-y-4">
+                  <div className="text-sm font-black text-amber-200 flex items-center gap-2">
+                    <span>📖</span> CĂN CỨ DỊCH LÝ & PHÂN TÍCH TƯỢNG HÀO
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-zinc-300">
+                    <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-2">
+                      <strong className="text-amber-300 block">1. Can Chi Lịch Pháp & Tuần Không:</strong>
+                      <p>
+                        Ngày giờ động tâm chuyển hóa thành Tứ Trụ Can Chi: <strong>Năm {dongTamResult.datetimeInput.ganZhiYear}</strong>, 
+                        <strong> Tháng {dongTamResult.datetimeInput.ganZhiMonth}</strong>, 
+                        <strong> Ngày {dongTamResult.datetimeInput.ganZhiDay}</strong>, 
+                        <strong> Giờ {dongTamResult.datetimeInput.ganZhiHour}</strong>.
+                      </p>
+                      <p>
+                        Tuần Không tại ngày động tâm là [<strong>{dongTamResult.datetimeInput.xunKong}</strong>]. 
+                        Hào lâm Tuần Không chủ sự việc hư ảo, thiếu lực trợ phù hoặc dấu hiệu hưu tù khó chống đỡ.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-2">
+                      <strong className="text-sky-300 block">2. Chi Tiết Lục Thân Dụng Thần:</strong>
+                      <p>{dongTamResult.dungThan.explanation}</p>
+                      {dongTamResult.diseaseAnalysis && (
+                        <div className="pt-1 text-rose-300">
+                          <strong>Ngũ hành tạng phủ: </strong>
+                          {dongTamResult.diseaseAnalysis.details}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -701,3 +946,4 @@ export default function MetaphysicsPage() {
     </div>
   );
 }
+

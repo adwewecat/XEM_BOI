@@ -337,3 +337,4 @@ export function calculateBazi(year: number, month: number, day: number, hour: nu
     loveMarriage,
   };
 }
+

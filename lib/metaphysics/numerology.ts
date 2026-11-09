@@ -468,3 +468,4 @@ export function calculatePersonalYear(day: number, month: number, targetYear: nu
     advice: themes[yearNum]?.advice || 'Kiên trì theo đuổi ước mơ.',
   };
 }
+

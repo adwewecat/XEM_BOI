@@ -558,12 +558,74 @@ Mệnh tọa **${mingBranchVi}** (${mingStarsStr}), Thân cư **${shenBranchVi}*
 Mệnh chủ là người có nội tâm sâu sắc, trọng tình nghĩa, biết trước biết sau. Bề ngoài có thể ôn hòa điềm đạm nhưng bên trong lại chứa đựng nghị lực kiên cường và quyết đoán khi cần thiết. Có tinh thần cầu tiến cao và luôn hướng thiện.`;
   }
 
-  // Câu hỏi chiêm nghiệm tùy biến
+  // Câu hỏi chiêm nghiệm tùy biến chuyên sâu
   if (customQuestion) {
-    return `**【CHIÊM NGHIỆM VẬN MỆNH】**
+    const qLower = customQuestion.toLowerCase();
+    
+    if (qLower.includes('tình') || qLower.includes('duyên') || qLower.includes('hôn nhân') || qLower.includes('yêu') || qLower.includes('vợ') || qLower.includes('chồng') || qLower.includes('kết hôn')) {
+      return `**【CHIÊM NGHIỆM TÌNH DUYÊN & HÔN PHỐI】**
+Về câu hỏi: *"${customQuestion}"*
+
+**1. Cung Phu Thê Bản Mệnh:**
+Cung Phu Thê an tại **${phuThe ? BRANCHES_VI[phuThe.branch] : ''}**, tọa thủ: **${formatStars(phuThe)}**. Cung Phúc Đức phối chiếu: **${formatStars(phucDuc)}**.
+Theo bí truyền Thiên Kỷ của thầy Nghê Hải Hà, cung Phu Thê thể hiện khí chất và duyên phận của người phối ngẫu. Đối phương là người có chính kiến, chu toàn công việc và là bạn đồng hành cùng xây đắp tương lai.
+
+**2. Thời Điểm Khởi Sắc & Lời Khuyên:**
+Tình cảm cần xây dựng trên nền tảng thấu hiểu, kiên nhẫn lắng nghe và tôn trọng không gian riêng của nhau. Khi bước vào các năm gặp sao Đào Hoa (Hồng Loan, Thiên Hỷ) hoặc cung Phu Thê được cát hóa (Hóa Lộc, Hóa Khoa), nhân duyên ắt đơm hoa kết trái viên mãn.`;
+    }
+
+    if (qLower.includes('việc') || qLower.includes('nghề') || qLower.includes('sự nghiệp') || qLower.includes('công danh') || qLower.includes('đổi việc') || qLower.includes('thăng chức') || qLower.includes('làm ăn') || qLower.includes('kinh doanh')) {
+      return `**【CHIÊM NGHIỆM CÔNG DANH & ĐỊNH HƯỚNG SỰ NGHIỆP】**
+Về câu hỏi: *"${customQuestion}"*
+
+**1. Cung Quan Lộc & Thế Đứng Bản Mệnh:**
+Cung Quan Lộc toạ thủ: **${formatStars(quanLoc)}**. Mệnh tọa thủ: **${mingStarsStr}**.
+Tam phương tứ chính hội tụ cách cục **${patternNames}**. Đây là cấu trúc chủ về trí tuệ sáng suốt, mưu lược và có năng lực quản trị, tổ chức độc lập.
+
+**2. Chiến Lược Phát Triển Đắc Lợi:**
+Bản mệnh thích hợp với công việc mang tính chuyên môn cao, quản lý, đổi mới sáng tạo, tài chính hoặc điều hành hệ thống. Nếu có ý định chuyển đổi công việc hoặc khởi sự, nên chuẩn bị kỹ lưỡng về nguồn lực và chọn thời điểm đại vận/lưu niên được cát tinh trợ lực để bứt phá.`;
+    }
+
+    if (qLower.includes('tiền') || qLower.includes('tài') || qLower.includes('giàu') || qLower.includes('đầu tư') || qLower.includes('mua đất') || qLower.includes('bất động sản') || qLower.includes('nợ')) {
+      return `**【CHIÊM NGHIỆM TÀI LỘC & ĐIỀN SẢN】**
+Về câu hỏi: *"${customQuestion}"*
+
+**1. Cung Tài Bạch & Kho Điền Trạch:**
+Tài Bạch toạ thủ: **${formatStars(taiBach)}**. Kho tích lũy Điền Trạch toạ thủ: **${formatStars(dienTrach)}**.
+Dòng tiền của bản mệnh mang tính vững bền, tích tiểu thành đại. Của cải có xu hướng tích tụ dần và sinh sôi nảy nở tốt nhất khi chuyển hóa thành các tài sản cố định như nhà cửa, đất đai, bất động sản.
+
+**2. Lời Khuyên Quản Trị Tài Chính:**
+Tránh đầu cơ mạo hiểm vào các kênh không minh bạch. Càng kiên định với năng lực cốt lõi và tích lũy điền sản, hậu vận tài chính càng sung túc, thảnh thơi.`;
+    }
+
+    if (qLower.includes('bệnh') || qLower.includes('sức khỏe') || qLower.includes('khỏe') || qLower.includes('tai nạn') || qLower.includes('mổ') || qLower.includes('viện') || qLower.includes('ốm')) {
+      return `**【CHIÊM NGHIỆM SỨC KHỎE & TẬT ÁCH】**
+Về câu hỏi: *"${customQuestion}"*
+
+**1. Cung Tật Ách Bản Mệnh:**
+Cung Tật Ách toạ thủ: **${formatStars(tatAch)}**, nhị hợp với cung Phụ Mẫu và tam hợp với Huynh Đệ, Điền Trạch.
+Theo lý số Đông y của thầy Nghê Hải Hà, sức khỏe con người chịu ảnh hưởng sâu sắc từ nhịp sinh học tự nhiên và sự cân bằng Ngũ Hành tạng phủ.
+
+**2. Lời Khuyên Dưỡng Sinh:**
+Cần chú trọng chế độ ẩm thực thanh đạm, điều dưỡng giấc ngủ và giữ tâm trạng thư thái. Khi gặp những giai đoạn có sát tinh chiếu, cần đi kiểm tra sức khỏe định kỳ và rèn luyện thể thao để tăng cường chính khí, đẩy lùi tà khí.`;
+    }
+
+    if (qLower.includes('năm nay') || qLower.includes('đại hạn') || qLower.includes('vận hạn') || qLower.includes('tương lai') || qLower.includes('thời vận') || qLower.includes('khi nào')) {
+      return `**【CHIÊM NGHIỆM VẬN HẠN & THỜI THẾ】**
+Về câu hỏi: *"${customQuestion}"*
+
+**1. Vận Trình Cốt Lõi:**
+Mệnh chủ đang trong giai đoạn tích lũy nội lực mạnh mẽ. Cung Mệnh (**${mingStarsStr}**) phối chiếu cùng các cung vị trọng yếu tạo nên thế cờ nhiều cơ hội đan xen thử thách.
+
+**2. Phương Châm Hành Động:**
+Biết người biết ta, thuận thời mà tiến, nghịch thời mà thủ. Khi thời cơ chưa chín muồi, nên mài giũa chuyên môn và mở rộng quan hệ; khi thiên thời địa lợi nhân hòa hội tụ, lập tức dũng cảm nắm bắt để gặt hái thành công lớn.`;
+    }
+
+    return `**【CHIÊM NGHIỆM CHUYÊN SÂU LÁ SỐ】**
 Về vấn đề: *"${customQuestion}"*
 
-Căn cứ vào Mệnh bàn với chính tinh **${mingStarsStr}** hội tụ cùng các cách cục **${patternNames}**, thời điểm này bản mệnh nên giữ tâm thế điềm tĩnh, sáng suốt phân tích thấu đáo mọi khía cạnh. Mọi quyết định xuất phát từ sự chính trực, cẩn trọng và chuẩn bị kỹ lưỡng đều sẽ mang lại kết quả cát tường viên mãn.`;
+Căn cứ vào Mệnh bàn với chính tinh **${mingStarsStr}** hội tụ cùng các cách cục **${patternNames}**, cung Thân cư tại **${shenBranchVi}**:
+Thời điểm này bản mệnh nên giữ tâm thế điềm tĩnh, sáng suốt phân tích thấu đáo mọi khía cạnh. Mọi quyết định xuất phát từ sự chính trực, cẩn trọng và chuẩn bị kỹ lưỡng đều sẽ mang lại kết quả cát tường viên mãn.`;
   }
 
   return `Lá số bản mệnh an Mệnh tại cung ${mingBranchVi}, ${mingStarsStr}, nạp âm ${juVi}. Cuộc đời nhiều cơ duyên cát lành, nên vững tâm phát triển tài đức.`;

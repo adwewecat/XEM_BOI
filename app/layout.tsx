@@ -40,11 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();` }} />
       </head>
-      <body className="min-h-screen relative overflow-x-hidden flex flex-col">
+      <body suppressHydrationWarning className="min-h-screen relative overflow-x-hidden flex flex-col">
         <ThemeProvider>
           <StarField />
           <Navbar />
-          <div className="relative z-10 flex-1">
+          <div suppressHydrationWarning className="relative z-10 flex-1">
             {children}
           </div>
         </ThemeProvider>

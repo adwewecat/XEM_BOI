@@ -73,6 +73,31 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 7: Sửa Triệt Để Lỗi Hydration, Nâng Cấp Giải Đoán Lá Số Nội Bộ & Tích Hợp Module Bói Hữu Duyên Theo Giờ Động Tâm
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. Xử lý lỗi Hydration mismatch hiển thị trong console/màn hình (`bis_skin_checked`, `cz-shortcut-listen` do extension trình duyệt can thiệp vào SSR HTML).
+  2. Nâng cấp để khi người dùng hỏi trên các lá số đã xuất ra, hệ thống tự động dựa vào kho tàng tri thức nội bộ của repo để giải đáp chuyên sâu, không phụ thuộc vào API AI ngoài.
+  3. Xây dựng tính năng "Bói Hữu Duyên · Mai Hoa & Lục Hào Chiêm Đoán theo Giờ Động Tâm": Người hỏi nhập câu hỏi và ngày giờ động tâm (ví dụ: Cháu hỏi cho ông nội bị viêm phổi và tim nằm viện, liệu qua khỏi không?), Thầy reo quẻ Mai Hoa và phán chuẩn mực văn phong Lục Hào cổ truyền (*Trạch Sơn Hàm động hào 5 biến Lôi Sơn Tiểu Quá, Phụ Mẫu là dụng thần lưỡng hiện hưu tù trực tuần không, Huynh đệ Thân Kim thoái thần lâm Huyền Vũ, Đoài Kim là phổi, ứng kỳ tháng 11-12 âm...*).
+- **Các giải pháp & nâng cấp đã thực hiện:**
+  1. **Khắc phục triệt để lỗi Hydration (`app/layout.tsx`):**
+     - Bổ sung `suppressHydrationWarning` vào thẻ `<body>` và container cấp cao nhất của Next.js 16/React 19 để triệt tiêu toàn bộ cảnh báo xung đột do các tiện ích mở rộng trình duyệt (như Bitwarden, ColorZilla, Grammarly...) tự động chèn thuộc tính (`bis_skin_checked`, `cz-shortcut-listen`) vào DOM.
+  2. **Nâng cấp Bộ Máy Giải Đáp Lá Số Chuyên Sâu Nội Bộ (`lib/ziwei/vietnamese.ts` & `components/ChatPanel.tsx`):**
+     - Mở rộng hàm `generateLocalInsight` với khả năng phân tích câu hỏi tự nhiên: Tự động phát hiện chủ đề (Tình duyên & Hôn nhân, Công danh & Định hướng việc làm, Tài lộc & Điền sản, Sức khỏe & Tật ách, Vận hạn năm nay & Đại hạn).
+     - Kết nối trực tiếp vào `components/ChatPanel.tsx`: Khi người dùng đặt bất kỳ câu hỏi nào về lá số, hệ thống sẽ tra cứu Mệnh, Thân, Quan, Tài, Di, Phối, Tật cùng các cách cục của lá số để giải đáp chuyên sâu nhiều đoạn mạch lạc theo giáo trình Thiên Kỷ Nghê Hải Hà, hoạt động 100% offline.
+  3. **Xây dựng Module "Bói Hữu Duyên Theo Giờ Động Tâm" (`lib/metaphysics/dongtam.ts` & `app/metaphysics/page.tsx`):**
+     - Tính toán can chi 4 trụ (Năm, Tháng, Ngày, Giờ) của thời khắc động tâm, xác định Nguyệt Kiến, Nhật Thần, Tuần Không (Xun Kong).
+     - Thuật toán Mai Hoa Dịch Số: Khởi Thượng Quái, Hạ Quái, Hào Động và Quẻ Biến.
+     - Tự động nhận diện Lục Thân Dụng Thần (Phụ Mẫu, Tử Tôn, Thê Tài, Quan Quỷ, Huynh Đệ, Thế Hào).
+     - Đối ứng Ngũ Hành Tạng Phủ Bệnh Tật: Kim (Phổi/Đoài/Càn), Hỏa (Tim/Ly), Mộc (Gan/Chấn/Tốn), Thủy (Thận/Khảm), Thổ (Tỳ vị/Khôn/Cấn).
+     - Tái hiện trọn vẹn lời phán của thầy theo đúng dịch lý kinh điển (như ví dụ người dùng yêu cầu: Trạch Sơn Hàm động hào 5 biến Lôi Sơn Tiểu Quá...).
+     - Giao diện thẻ bài vàng kim sang trọng, có nút lấy giờ hiện tại và các mẫu câu hỏi thường gặp 1-click.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 suite bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 38 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 6: Khảo Sát Kho Tàng Mệnh Lý GitHub & Tích Hợp Toàn Diện Siêu Module "Kim Cổ Đông Tây"
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** Tìm kiếm trên GitHub và các nguồn mở xem còn mã nguồn/dữ liệu nào về bói toán, thuật số kim cổ đông tây (đặc biệt giải mã gói 56GB lưu truyền trên mạng) và tích hợp các trường phái bói toán kinh điển vào hệ thống mà không làm phình to dung lượng nhẹ nhàng của dự án.

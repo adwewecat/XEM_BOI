@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ZiweiChart } from '@/lib/ziwei/types';
+import { generateLocalInsight } from '@/lib/ziwei/vietnamese';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -79,12 +80,19 @@ export default function ChatPanel({ chart }: ChatPanelProps) {
           }
         }
       }
-    } catch (e) {
-      const missing = e instanceof Error && e.message === 'api-missing';
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: missing ? 'Bản mã nguồn mở không kèm API AI (/api/interpret). Hệ thống an sao và luận giải cổ thư đã hoạt động đầy đủ trên máy bạn không cần bất kỳ API Key nào.' : 'Luận giải thất bại, vui lòng kiểm tra cấu hình hoặc thử lại sau.',
-      }]);
+    } catch {
+      // Fallback: Sử dụng trí tuệ cổ thư nội bộ của repo để giải đáp chuyên sâu mà không cần API ngoài
+      const localAnswer = generateLocalInsight(chart, 'custom', text);
+      setMessages(prev => {
+        // Nếu đã có bubble rỗng thì cập nhật vào bubble đó, nếu chưa thì thêm mới
+        const last = prev[prev.length - 1];
+        if (last && last.role === 'assistant' && !last.content) {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: 'assistant', content: localAnswer };
+          return updated;
+        }
+        return [...prev, { role: 'assistant', content: localAnswer }];
+      });
     } finally {
       setLoading(false);
     }
