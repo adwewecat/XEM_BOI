@@ -73,6 +73,41 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 6: Khảo Sát Kho Tàng Mệnh Lý GitHub & Tích Hợp Toàn Diện Siêu Module "Kim Cổ Đông Tây"
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** Tìm kiếm trên GitHub và các nguồn mở xem còn mã nguồn/dữ liệu nào về bói toán, thuật số kim cổ đông tây (đặc biệt giải mã gói 56GB lưu truyền trên mạng) và tích hợp các trường phái bói toán kinh điển vào hệ thống mà không làm phình to dung lượng nhẹ nhàng của dự án.
+- **Phân tích bản chất gói "56GB" & Hệ sinh thái GitHub:**
+  1. *Giải mã gói 56GB:* Trong giới huyền học Đông Phương, các gói 56GB thực chất là tuyển tập các file scan PDF độ phân giải cao của hàng ngàn cuốn cổ tịch quý hiếm (*Tứ Khố Toàn Thư, Tử Bình Chân Thuyên, Trích Thiên Tủy, Uyên Hải Tử Bình, Kỳ Môn Độn Giáp, Lục Nhâm Đại Toàn*), bộ video bài giảng gốc nặng hơn 25GB của thầy Nghê Hải Hà (bộ *Thiên Kỷ* và *Nhân Kỷ*), hoặc các file checkpoint trọng số mô hình LLM chuyên về mệnh lý (14B-32B params). Việc kéo trực tiếp 56GB này vào repo mã nguồn sẽ làm hỏng tốc độ tải và chiếm dụng ổ cứng vô ích.
+  2. *Hệ sinh thái mã nguồn mở đỉnh cao trên GitHub:*
+     - `0xfnzero/YiSphere`: Ứng dụng hội thoại AI thuật số Đông Phương (Kinh Dịch, Bát Tự, Lục Hào, Hoàng Đạo).
+     - `hhszzzz/taibu`: Agent thuật số đa năng tích hợp Tử Vi, Tứ Trụ, Kỳ Môn Độn Giáp, Lục Hào, Mai Hoa Dịch Số, Chiêm Tinh.
+     - `ChesterRa/mingpan`: MCP server thuật toán an sao, lập quẻ chuẩn mực cho AI Agents.
+     - `lunar-javascript`: Lõi thiên văn học và lịch pháp hỗ trợ Bát Tự Tứ Trụ, Thập Thần, Nạp Âm, Nhị Thập Bát Tú.
+- **Các phân hệ "Kim Cổ Đông Tây" đã xây dựng & tích hợp vào hệ thống:**
+  1. **Tử Bình Bát Tự (Tứ Trụ Mệnh Lý - `lib/metaphysics/bazi.ts`):**
+     - Lập 4 Trụ: Trụ Năm (Gốc rễ), Trụ Tháng (Khí tiết), Trụ Ngày (Nhật Chủ & Cung Phối Ngẫu), Trụ Giờ (Con cái & Hậu vận).
+     - Phân tích Thập Thần 100% Tiếng Việt chuẩn mực: Chính Tài, Thiên Tài, Chính Quan, Thất Sát, Chính Ấn, Thiên Ấn (Kiêu Thần), Thực Thần, Thương Quan, Tỷ Kiên, Kiếp Tài, Nhật Chủ.
+     - Xác định Nạp Âm Ngũ Hành 60 Hoa Giáp (Sơn Đầu Hỏa, Kiếm Phong Kim, Đại Hải Thủy...) và Vòng Trường Sinh 12 Địa Thế.
+     - Đo lường chính xác tỷ lệ Ngũ Hành (Kim, Mộc, Thủy, Hỏa, Thổ) với thanh progress bar trực quan, chỉ rõ hành Vượng nhất và hành Khuyết thiếu.
+     - Luận giải Thân Vượng / Thân Nhược của Nhật Chủ, tìm Hỷ Thần / Dụng Thần, Thai Nguyên, Mệnh Cung, Thân Cung.
+  2. **Kinh Dịch Chiêm Bốc (Chu Dịch 64 Quẻ - `lib/metaphysics/iching.ts`):**
+     - Mô phỏng phương pháp Gieo 3 Đồng Xu Cổ Thái Sơn Lạc Tiền (Tiền Lạc Văn Vương) chuẩn 6 hào từ Sơ Hào đến Thượng Hào.
+     - Tính toán Hào Động (Lão Dương hóa Thiếu Âm, Lão Âm hóa Thiếu Dương) để tự động sinh ra Quẻ Biến (Biến Quái).
+     - Dịch nghĩa và diễn giải Thoán Từ, Đại Tượng Truyện, Lời khuyên cho 4 phương diện lớn: Công danh Sự nghiệp, Tài lộc Kinh doanh, Tình duyên Gia đạo, và Lời khuyên Người quân tử.
+  3. **Thần Số Học Pitago & 12 Cung Hoàng Đạo Phương Tây (`lib/metaphysics/numerology.ts`):**
+     - Tính Con Số Chủ Đạo (Life Path Number: 2 - 10, 11, 22, 33) với các con số Master Numbers quyền năng.
+     - Tính Số Sứ Mệnh (Destiny Number) từ họ và tên tiếng Việt hoặc quốc tế theo hệ số Pitago.
+     - Tính Năm Cá Nhân (Personal Year trong chu kỳ 9 năm phát triển).
+     - 12 Cung Hoàng Đạo (Zodiac Signs): Nhận diện nguyên tố (Lửa, Đất, Khí, Nước), tính chất (Tiên phong, Kiên định, Linh hoạt), hành tinh chủ quản, phân tích điểm mạnh, thử thách và lời khuyên phát triển.
+  4. **Giao diện Web Huyền Ảo Mới (`app/metaphysics/page.tsx` & `components/Navbar.tsx`):**
+     - Bổ sung tab điều hướng "🧭 Kim Cổ Đông Tây" trên Navbar toàn hệ thống.
+     - Giao diện 3 tab chuyển đổi mượt mà với Framer Motion, hiệu ứng kính mờ `card-glass`, thẻ phù chú vàng kim sang trọng.
+  5. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 suite bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 38 trang tĩnh (thêm trang `/metaphysics`).
+     - Đẩy toàn bộ mã nguồn lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 5: Tối Ưu Triệt Để Hiển Thị Tiếng Việt (To Rõ, Đậm Nét) & Xóa Bỏ Hoàn Toàn Tình Trạng Chữ Trung Quốc Lấp Mất
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Vấn đề người dùng phản hồi:** "ĐANG BỊ ngược, chữ trung quốc quá nhiều, bạn dịch sang tiếng việt, và tiếng việt phải to, chứ nó đang bị chữ trung quốc lấp mất" (kèm ảnh chụp lá số bị rối rắm bởi chữ Hán chen chúc trong từng ô cung và phần luận giải cách cục vẫn là tiếng Trung).

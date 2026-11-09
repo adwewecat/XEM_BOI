@@ -87,7 +87,7 @@ export default function HemingPage() {
   const runAnalysis = useCallback(async (q?: string) => {
     setFormError(null);
     if (!isFormReady(formA) || !isFormReady(formB)) {
-      setFormError('请先填写双方完整出生信息');
+      setFormError('Vui lòng điền đầy đủ thông tin ngày giờ sinh của cả 2 bên');
       return;
     }
     setAnalyzing(true);

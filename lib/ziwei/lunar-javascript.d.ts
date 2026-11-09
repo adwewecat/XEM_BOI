@@ -13,14 +13,18 @@ declare module 'lunar-javascript' {
     getDayZhi(): string;
     /** 换算成公历(2026-08-05 补声明:lib/ziwei/share.ts 早在用，只是从前靠 as any 绕过) */
     getSolar(): Solar;
+    getEightChar(): any;
+    getXiu(): string;
   }
 
   class Solar {
     static fromYmd(year: number, month: number, day: number): Solar;
+    static fromYmdHms(year: number, month: number, day: number, hour: number, minute: number, second: number): Solar;
     getLunar(): Lunar;
     getYear(): number;
     getMonth(): number;
     getDay(): number;
+    getXingZuo(): string;
   }
 
   /** 农历月信息(2026-06-10 补:闰月大小月边界 clamp 用) */

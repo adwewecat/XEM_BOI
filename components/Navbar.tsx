@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
   { href: '/chart', label: 'Lập Lá Số', icon: '🔮', desc: 'An sao 12 cung & Vận hạn' },
+  { href: '/metaphysics', label: 'Kim Cổ Đông Tây', icon: '🧭', desc: 'Bát Tự · Kinh Dịch · Thần Số' },
   { href: '/heming', label: 'So Hợp Mệnh', icon: '☯️', desc: 'Hợp duyên & Đối tác' },
   { href: '/knowledge', label: 'Vạn Tinh Các', icon: '🌌', desc: 'Tra cứu 14 Chính tinh' },
   { href: '/library', label: 'Tàng Kinh Các', icon: '📜', desc: 'Cổ thư kinh điển' },
