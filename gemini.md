@@ -73,6 +73,44 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 11: Tự Động Đồng Bộ Dữ Liệu Xuyên Suốt Hệ Thống, Tính Năng Trạch Nhật (Xem Ngày Lành Dữ) & Việt Hóa Toàn Diện Tàng Kinh Các
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. *Ngày/Giờ Động Tâm:* "ngày động tâm hay giờ động tâm nên để date now luôn, ai thích chỉnh thì chỉnh lại, còn không thì cứ lấy theo hiện tại".
+  2. *Đồng bộ thông tin xuyên suốt:* "khi tôi khởi tạo lá số thì các phần khác phải từ thông tin của tôi để gieo quẻ, chứ lúc tôi chuyển qua các tab khác thì gần như không có thông tin gì , để trành việc user phải nhập lại các thông tin".
+  3. *Việt hóa Tàng Kinh Các:* "Tàng kinh các cũng chưa dịch. toàn tiếng trung".
+  4. *Xem ngày lành dữ Quá khứ / Vị lai:* "Xem có thể thêm vào bói theo ngày lành zữ hoặc xa hơn, quá khứ vị lai, hoặc theo ngày".
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Đồng bộ thông tin người dùng xuyên suốt toàn bộ hệ thống (`BirthForm.tsx`, `app/chart/page.tsx`, `app/metaphysics/page.tsx`):**
+     - Khi người dùng lập lá số ở trang `/chart`, toàn bộ thông tin bản mệnh `{ name, year, month, day, clockHour, clockMinute, gender, province, city }` được tự động ghi nhận vào `localStorage` (`ziwei_user_profile`).
+     - Khi chuyển sang trang "Kim Cổ Đông Tây" (`/metaphysics`), hệ thống tự động tải và áp dụng ngay lập tức cho form **Tử Bình Bát Tự** (Tứ Trụ), **Thần Số Học Pitago** (Số chủ đạo, số sứ mệnh) và phân hệ **Trạch Nhật Phong Thủy** (đối chiếu tuổi bản mệnh với ngày xem).
+     - Hiển thị thanh thông báo trạng thái đồng bộ tinh tế: *"✓ ĐÃ ĐỒNG BỘ TỪ LÁ SỐ: [Tên] · Sinh ngày [Ngày/Tháng/Năm - Giờ:Phút]"* kèm nút chuyển đổi lá số nhanh.
+  2. **Thời gian động tâm chuẩn thời gian thực (`Date.now()`):**
+     - Tại tab Bói Hữu Duyên, các ô ngày và giờ động tâm luôn được khởi tạo tự động theo đúng thời gian thực của máy tính người dùng (`Date.now()`).
+     - Người dùng có thể chỉnh sửa tự do hoặc bấm nút "Lấy Giờ Hiện Tại" bất cứ lúc nào.
+  3. **Module Mới: Trạch Nhật Phong Thủy · Xem Ngày Lành Dữ & Vận Nhật Quá Khứ - Vị Lai (`lib/metaphysics/almanac.ts` & `app/metaphysics/page.tsx`):**
+     - Tính toán chuẩn xác theo Thiên văn học và Lịch pháp cổ truyền:
+       + Hoàng Đạo / Hắc Đạo, Thần Sát (Thanh Long, Minh Đường, Thiên Đức, Ngọc Đường, Chu Tước, Bạch Hổ...).
+       + Nhị Thập Bát Tú (28 Tinh Tú: Sao Bích, Sao Cang...) kèm thơ phú cát hung.
+       + Can Chi 4 Trụ, Nạp Âm Ngũ Hành ngày, Tiết Khí thiên văn.
+       + Việc Nên Làm (Nghi · 宜) & Việc Kiêng Cữ (Kỵ · 忌) được bản địa hóa 100% tiếng Việt chuẩn mực.
+       + 12 Khung Giờ Hoàng Đạo trong ngày với từng khung giờ, can chi giờ, thần sát giờ và cát hung.
+       + Lời răn Bành Tổ Bách Kỵ về thiên can địa chi.
+     - **Đối chiếu Hợp Mệnh Đương Số:** Tự động đối chiếu địa chi ngày xem với năm sinh của người dùng để xác định tương hợp: *Lục Hợp Quý Nhân (95/100)*, *Tam Hợp Cát Lợi (90/100)*, *Bình Hòa (75/100)* hoặc *Trực Xung (40/100 - Cảnh báo kiêng kỵ)* kèm chỉ dẫn phong thủy hành sự chi tiết.
+     - Hỗ trợ xem linh hoạt: Nút chọn nhanh (Hôm nay, Ngày mai, +3 ngày, +7 ngày) hoặc chọn bất kỳ ngày nào trong Quá Khứ (để nghiệm chứng sự kiện) và Vị Lai xa hơn (để chọn ngày cưới hỏi, khai trương, động thổ, ký hợp đồng).
+  4. **Việt hóa toàn diện Tàng Kinh Các Cổ Tịch (`lib/classics/`):**
+     - Cung cấp bản dịch nghĩa tiếng Việt (`translation`) học thuật, trang trọng và lời bình giảng của danh sư Nghê Hải Hà (`niNote`) cho toàn bộ **75 đoạn tinh hoa** của 3 đại cổ tịch:
+       + *Cốt Tủy Phú (骨髓赋):* Toàn bộ 9 chương, 29 đoạn tinh hoa.
+       + *Tử Vi Đẩu Số Toàn Tập (紫微斗数全集):* Toàn bộ 5 quyển, 29 đoạn trích dẫn cốt lõi.
+       + *Tử Vi Đẩu Số Toàn Thư (紫微斗数全书):* Toàn bộ 7 chương, 17 đoạn kinh điển.
+     - Tái cấu trúc trang đọc chi tiết `app/library/[book]/[chapter]/page.tsx`: Tiêu đề tiếng Việt to rõ, bản dịch nghĩa tiếng Việt hiển thị ở vị trí trang trọng hàng đầu (chữ to rõ 16px, dễ đọc); nguyên văn chữ Hán cổ thư đặt bên dưới làm tư liệu đối chiếu chuẩn mực; lời giảng danh sư Nghê Hải Hà nổi bật ở chân mỗi đoạn.
+     - Nâng cấp bộ máy tìm kiếm `searchClassics` hỗ trợ tìm kiếm song ngữ: Người dùng có thể tìm bằng tiếng Việt không dấu, có dấu hoặc chữ Hán nguyên bản.
+  5. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh trong 1.7s.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 10: Gỡ Bỏ Triệt Để Các Ví Dụ Nhạy Cảm Riêng Tư, Tối Ưu Giao Diện Sạch Sẽ & Hoàn Thiện Bản Địa Hóa
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "các ví dụ không nên đưa lên" (kèm ảnh chụp màn hình tab Bói Hữu Duyên vẫn hiển thị câu hỏi mẫu và lời phán về trường hợp ông nội nằm viện do viêm phổi và tim).

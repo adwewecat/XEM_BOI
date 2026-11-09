@@ -73,6 +73,17 @@ export default function ChartPage() {
       gender: person.gender,
       city: person.name
     });
+    try {
+      localStorage.setItem('ziwei_user_profile', JSON.stringify({
+        name: person.name,
+        year: person.year,
+        month: person.month,
+        day: person.day,
+        clockHour: person.hour * 2,
+        clockMinute: 0,
+        gender: person.gender,
+      }));
+    } catch {}
     setChart(generateChart(info));
     setSelectedPalace(null);
   };

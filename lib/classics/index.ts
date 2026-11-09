@@ -52,34 +52,39 @@ export function getParagraphById(id: string) {
 }
 
 /**
- * 全文搜索
- *
- * 简单子字符串匹配（不分词，对中文 OK）
- * 大小写不敏感、繁简转换暂不支持
+ * 全文搜索 (Hỗ trợ tìm kiếm song ngữ: Tiếng Việt hoặc chữ Hán)
  */
 export function searchClassics(query: string, limit = 30): SearchHit[] {
-  const q = query.trim();
+  const q = query.trim().toLowerCase();
   if (q.length < 1) return [];
 
   const hits: SearchHit[] = [];
   for (const book of ALL_BOOKS) {
     for (const chapter of book.chapters) {
       for (const p of chapter.paragraphs) {
-        const idx = p.text.indexOf(q);
+        let idx = p.text.toLowerCase().indexOf(q);
+        let targetStr = p.text;
+
+        // Nếu không khớp chữ Hán, tìm tiếp trong bản dịch Tiếng Việt
+        if (idx < 0 && p.translation) {
+          idx = p.translation.toLowerCase().indexOf(q);
+          targetStr = p.translation;
+        }
+
         if (idx < 0) continue;
 
-        // 提取上下文（前后各 40 字）
-        const start = Math.max(0, idx - 40);
-        const end = Math.min(p.text.length, idx + q.length + 40);
-        const before = p.text.slice(start, idx);
-        const matched = p.text.slice(idx, idx + q.length);
-        const after = p.text.slice(idx + q.length, end);
+        // Trích xuất ngữ cảnh xung quanh từ khóa
+        const start = Math.max(0, idx - 45);
+        const end = Math.min(targetStr.length, idx + q.length + 45);
+        const before = targetStr.slice(start, idx);
+        const matched = targetStr.slice(idx, idx + q.length);
+        const after = targetStr.slice(idx + q.length, end);
 
         const snippet = (start > 0 ? '…' : '')
           + escapeHtml(before)
           + `<mark>${escapeHtml(matched)}</mark>`
           + escapeHtml(after)
-          + (end < p.text.length ? '…' : '');
+          + (end < targetStr.length ? '…' : '');
 
         hits.push({
           bookSlug: book.slug,

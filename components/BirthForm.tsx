@@ -61,6 +61,28 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
+  // Tự động khôi phục thông tin người dùng đã lưu từ localStorage để không phải nhập lại
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ziwei_user_profile');
+      if (saved && !initialData?.year) {
+        const data = JSON.parse(saved);
+        if (data && data.year) {
+          setForm(prev => ({
+            ...prev,
+            name: prev.name || data.name || '',
+            year: prev.year || String(data.year),
+            month: prev.month || String(data.month),
+            day: prev.day || String(data.day),
+            clockHour: prev.clockHour || String(data.clockHour ?? 8),
+            clockMinute: prev.clockMinute || String(data.clockMinute ?? 0),
+            gender: prev.gender || data.gender || 'male',
+          }));
+        }
+      }
+    } catch {}
+  }, [initialData]);
+
   // 表单状态变化时实时同步给父级（合盘等场景下父级靠这个收集双方数据）
   useEffect(() => {
     onFormSave?.({ ...form });
@@ -138,6 +160,22 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
     setTouched({ year: true, month: true, day: true });
     if (hasError) return;
     onFormSave?.({ ...form });
+
+    // Lưu thông tin người dùng vào localStorage để đồng bộ sang các tab khác (Bát Tự, Thần Số, Trạch Nhật)
+    try {
+      localStorage.setItem('ziwei_user_profile', JSON.stringify({
+        name: form.name.trim() || 'Người Xem',
+        year: parseInt(form.year),
+        month: parseInt(form.month),
+        day: parseInt(form.day),
+        clockHour: parseInt(form.clockHour) || 0,
+        clockMinute: parseInt(form.clockMinute) || 0,
+        gender: form.gender,
+        province: form.province,
+        city: form.city,
+      }));
+    } catch {}
+
     // 统一走 lib/ziwei/share.ts 的转换：它负责晚子时换日（23:00–23:59 按次日排盘）。
     // 在这里手拼 BirthInfo 会绕过这条规则，使 /chart 与 /heming 对同一份输入排出相差一天的盘。
     onSubmit(formToBirthInfo(form));

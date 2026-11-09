@@ -9,9 +9,9 @@ import { TOPIC_LABEL } from '@/lib/ziwei/db-analysis';
 import { getStarName, PALACE_VI, TOPIC_VI } from '@/lib/ziwei/vietnamese';
 
 export const metadata = {
-  title: '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
-  description: '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。',
-  keywords: ['紫微斗数', '倪海厦', '倪海厦紫微斗数', '紫微斗数全集', '紫微斗数全书', '14 主星', '12 宫位'],
+  title: 'Vạn Tinh Các · Tri Thức 14 Chính Tinh × 13 Cung Vị · Phái Thiên Kỷ Nghê Hải Hà',
+  description: 'Kho tàng tri thức luận giải Tử Vi Đẩu Số 14 Chính Tinh × 13 Cung Vị chuẩn xác theo giáo trình Thiên Kỷ của danh sư Nghê Hải Hà & Cổ tịch Toàn Thư / Cốt Tủy Phú. Bao gồm định hướng tổng quát, luận giải trọng tâm, căn cứ tinh diệu và trích dẫn kinh điển.',
+  keywords: ['Tử Vi Đẩu Số', 'Nghê Hải Hà', 'Ni Haixia', 'Thiên Kỷ', '14 Chính Tinh', '12 Cung Vị', 'Vạn Tinh Các'],
 };
 
 export default function KnowledgeHomePage() {
@@ -43,8 +43,8 @@ export default function KnowledgeHomePage() {
         <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, color: 'var(--tx-0)', letterSpacing: '0.05em', marginBottom: '8px' }}>
           VẠN TINH CÁC · TRI THỨC TỬ VI
         </h1>
-        <div style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', marginBottom: '12px', opacity: 0.8 }}>
-          紫微斗数知识库 · PHÁI THIÊN KỶ
+        <div style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', marginBottom: '12px', opacity: 0.9, fontWeight: 700 }}>
+          KHO TRI THỨC MỆNH LÝ · PHÁI THIÊN KỶ
         </div>
         <p style={{ fontSize: '14px', color: 'var(--tx-2)', letterSpacing: '0.04em', maxWidth: '640px', margin: '0 auto', lineHeight: 1.7 }}>
           14 Chính Tinh × 13 Cung Vị = <strong style={{ color: 'var(--ac)' }}>{ALL_STARS.length * ALL_TOPICS.length}</strong> Chuyên Đề Luận Giải Chi Tiết<br />
@@ -104,8 +104,8 @@ export default function KnowledgeHomePage() {
                   <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.05em' }}>
                     Sao {starVi.vi}
                   </span>
-                  <span style={{ fontSize: '12px', color: 'var(--tx-3)', opacity: 0.7 }}>
-                    ({starVi.zh}星 · ZI WEI 14 STARS)
+                  <span style={{ fontSize: '12px', color: 'var(--tx-3)', opacity: 0.75, fontWeight: 500 }}>
+                    ({starVi.zh} · THẬP TỨ CHÍNH TINH)
                   </span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--tx-2)', lineHeight: 1.7, marginBottom: '14px' }}>
