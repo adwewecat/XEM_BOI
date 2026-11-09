@@ -45,9 +45,9 @@ export default function SideCouplets() {
                     <span>📜</span>
                   </div>
 
-                  {/* Thân câu đối: 2 cột đối song song, chữ lật nghiêng sang phải dễ đọc */}
+                  {/* Thân câu đối bên trái: "Không cổ xúy" nằm ngoài, "Thông tin..." nằm trong, chữ quay ngược lại */}
                   <div className="flex flex-row justify-center items-center gap-1.5 2xl:gap-2 py-1">
-                    {/* Cột 1: Thông tin chỉ mang tính chất giải trí */}
+                    {/* Cột 1 (Nằm ngoài mép trái): Không cổ xúy mê tín dị đoan */}
                     <div
                       className="text-[10px] 2xl:text-[11px] font-black text-amber-200 uppercase tracking-[0.14em] text-center group-hover:text-amber-100 transition-colors whitespace-nowrap"
                       style={{
@@ -55,15 +55,16 @@ export default function SideCouplets() {
                         textOrientation: 'sideways',
                         WebkitWritingMode: 'vertical-lr',
                         WebkitTextOrientation: 'sideways',
+                        transform: 'rotate(180deg)',
                       }}
                     >
-                      THÔNG TIN CHỈ MANG TÍNH CHẤT GIẢI TRÍ
+                      KHÔNG CỔ XÚY MÊ TÍN DỊ ĐOAN
                     </div>
 
                     {/* Vạch ngăn trang trí tinh tế */}
                     <div className="w-[1px] h-36 bg-gradient-to-b from-transparent via-amber-500/40 to-transparent shrink-0" />
 
-                    {/* Cột 2: Không cổ xúy mê tín dị đoan */}
+                    {/* Cột 2 (Câu kế, nằm phía trong): Thông tin chỉ mang tính chất giải trí */}
                     <div
                       className="text-[10px] 2xl:text-[11px] font-black text-amber-300 uppercase tracking-[0.14em] text-center group-hover:text-amber-100 transition-colors whitespace-nowrap"
                       style={{
@@ -71,9 +72,10 @@ export default function SideCouplets() {
                         textOrientation: 'sideways',
                         WebkitWritingMode: 'vertical-lr',
                         WebkitTextOrientation: 'sideways',
+                        transform: 'rotate(180deg)',
                       }}
                     >
-                      KHÔNG CỔ XÚY MÊ TÍN DỊ ĐOAN
+                      THÔNG TIN CHỈ MANG TÍNH CHẤT GIẢI TRÍ
                     </div>
                   </div>
 
@@ -114,25 +116,9 @@ export default function SideCouplets() {
                     <span>⚖️</span>
                   </div>
 
-                  {/* Thân câu đối: 2 cột đối song song, chữ lật nghiêng sang phải dễ đọc */}
+                  {/* Thân câu đối bên phải: "Tất cả thông tin..." lên trước (nằm ngoài mép phải), mới tới câu kia (nằm trong) */}
                   <div className="flex flex-row justify-center items-center gap-1.5 2xl:gap-2 py-1">
-                    {/* Cột 1: Tất cả thông tin không công kích */}
-                    <div
-                      className="text-[10px] 2xl:text-[11px] font-black text-amber-200 uppercase tracking-[0.14em] text-center group-hover:text-amber-100 transition-colors whitespace-nowrap"
-                      style={{
-                        writingMode: 'vertical-lr',
-                        textOrientation: 'sideways',
-                        WebkitWritingMode: 'vertical-lr',
-                        WebkitTextOrientation: 'sideways',
-                      }}
-                    >
-                      TẤT CẢ THÔNG TIN KHÔNG CÔNG KÍCH
-                    </div>
-
-                    {/* Vạch ngăn trang trí tinh tế */}
-                    <div className="w-[1px] h-36 bg-gradient-to-b from-transparent via-amber-500/40 to-transparent shrink-0" />
-
-                    {/* Cột 2: Bất kỳ cá nhân tổ chức nào */}
+                    {/* Cột trong (hướng vào tâm màn hình): Bất kỳ cá nhân tổ chức nào */}
                     <div
                       className="text-[10px] 2xl:text-[11px] font-black text-amber-300 uppercase tracking-[0.14em] text-center group-hover:text-amber-100 transition-colors whitespace-nowrap"
                       style={{
@@ -143,6 +129,22 @@ export default function SideCouplets() {
                       }}
                     >
                       BẤT KỲ CÁ NHÂN TỔ CHỨC NÀO
+                    </div>
+
+                    {/* Vạch ngăn trang trí tinh tế */}
+                    <div className="w-[1px] h-36 bg-gradient-to-b from-transparent via-amber-500/40 to-transparent shrink-0" />
+
+                    {/* Cột ngoài (lên trước, sát mép ngoài phải màn hình): Tất cả thông tin không công kích */}
+                    <div
+                      className="text-[10px] 2xl:text-[11px] font-black text-amber-200 uppercase tracking-[0.14em] text-center group-hover:text-amber-100 transition-colors whitespace-nowrap"
+                      style={{
+                        writingMode: 'vertical-lr',
+                        textOrientation: 'sideways',
+                        WebkitWritingMode: 'vertical-lr',
+                        WebkitTextOrientation: 'sideways',
+                      }}
+                    >
+                      TẤT CẢ THÔNG TIN KHÔNG CÔNG KÍCH
                     </div>
                   </div>
 

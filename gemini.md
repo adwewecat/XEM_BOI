@@ -73,6 +73,28 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 14: Chuẩn Hóa Thứ Tự & Hướng Quay Chữ 2 Dải Câu Đối Theo Đối Xứng Gương Phong Thủy
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  - "câu bên phải thì câu tất cả lên trước, mới tới câu kia"
+  - "còn câu bên trái thì lật ngược chữ lại. không cổ xúy nằm ngoài, mới tới câu kế và chữ quay ngược lại"
+- **Các giải pháp & nâng cấp đã hoàn tất (`components/SideCouplets.tsx`):**
+  1. **Bảng Bên Phải (Right Plaque):**
+     - Đặt câu *"TẤT CẢ THÔNG TIN KHÔNG CÔNG KÍCH"* lên vị trí cột ngoài cùng bên phải (sát mép ngoài màn hình, đọc trước).
+     - Đặt câu *"BẤT KỲ CÁ NHÂN TỔ CHỨC NÀO"* ở cột phía trong (hướng vào trung tâm màn hình, đọc kế).
+     - Giữ nguyên xoay chữ sang phải (`text-orientation: sideways`), đỉnh chữ hướng ra mép phải màn hình.
+  2. **Bảng Bên Trái (Left Plaque):**
+     - Đặt câu *"KHÔNG CỔ XÚY MÊ TÍN DỊ ĐOAN"* nằm ở cột ngoài cùng bên trái (sát mép ngoài màn hình, đọc trước).
+     - Đặt câu *"THÔNG TIN CHỈ MANG TÍNH CHẤT GIẢI TRÍ"* ở cột phía trong (hướng vào trung tâm màn hình, đọc kế).
+     - Lật ngược hướng chữ (`transform: rotate(180deg)` trên nền `vertical-lr`): Đỉnh chữ quay sang trái (hướng ra mép ngoài màn hình), đọc trôi chảy thuận mắt khi nhìn sang sườn trái.
+  3. **Hiệu Quả Thẩm Mỹ & Phong Thủy:**
+     - Hai dải câu đối đạt được sự đối xứng gương (Mirror Symmetry) tuyệt đối: Vế chính luôn ở cột ngoài, vế phụ ở cột trong; đỉnh chữ cả hai bên đều hướng ra viền ngoài màn hình, tạo cảm giác mở rộng không gian, trang nhã và tôn nghiêm.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 13: Tối Ưu Cân Đối 2 Dải Câu Đối (Chia 2 Cột Song Song, Lật Nghiêng Sang Phải Dễ Đọc & Bám Sát Màn Hình), Việt Hóa Toàn Diện Quyền Riêng Tư & Cuộn Thư
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**
