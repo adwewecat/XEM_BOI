@@ -3,8 +3,6 @@
  * 基于公开记录的出生日期，时辰为估算值（部分有文献记载）
  */
 
-import 'server-only';
-
 export interface FamousPerson {
   id: string;
   name: string;

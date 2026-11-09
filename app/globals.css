@@ -137,6 +137,43 @@ body {
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
 }
+.card-glass {
+  background: rgba(18, 25, 42, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 168, 67, 0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+[data-theme="light"] .card-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(184, 146, 42, 0.25);
+  box-shadow: 0 8px 24px rgba(184, 146, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.card-inner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+[data-theme="light"] .card-inner {
+  background: rgba(184, 146, 42, 0.04);
+  border: 1px solid rgba(184, 146, 42, 0.12);
+}
+.mystic-border-glow {
+  position: relative;
+}
+.mystic-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(212, 168, 67, 0.4), rgba(58, 120, 212, 0.2), rgba(212, 168, 67, 0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 .card-flat {
   background: var(--bg-card);
   border: 1px solid var(--bdr);
