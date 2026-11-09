@@ -73,6 +73,42 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 15: Nâng Cấp Trả Lời Trực Diện & Sửa Lỗi Font Bói Hữu Duyên, Hiệu Chỉnh Cuộn Thư, Tích Hợp Animation Huyền Ảo Giao Diện Tối & Việt Hóa Toàn Diện 100%
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. *Việt hóa toàn diện:* "chưa dịch 14 tinh hoa chính, kéo xuống dưới các mục đều chưa dịch, cả Khám Phá Nhanh Lá Số Danh Nhân cũng chưa dịch,." (kèm ảnh chụp màn hình).
+  2. *Thầy reo quẻ trả lời sát câu hỏi & sửa lỗi font:* "Thầy reo que xong, thì phải kết luận và trả lời sát với câu hỏi từ những gì reo quẻ ra, hiện tại đang không đi sát vào câu hỏi, chữ cũng khó đọc, bạn xem lại front chữ tiếng việt để dễ đọc nhé" (kèm ảnh minh họa câu hỏi về đi lại "Nay về có bị trắc trở gì không" nhưng quẻ bị nhận nhầm sang Phụ Mẫu và chữ bị gãy nét `biế n`, `Thâ n`...).
+  3. *Sửa lỗi chữ mở đầu cuộn thư bị che:* "Chữ mở đầu Tử Vi đấu số đang bị che đi 1 phần".
+  4. *Animation huyền ảo giao diện tối:* "về giao diện tối nên có animation các tròm sao xung quanh , rồi bát quái, rồi 12 con giáp,....v...v ,....... làm trở nên sinh động trong mắt người xem. thể hiện sự thích thú."
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Nâng Cấp Thuật Toán Dịch Lý & Trả Lời Trực Diện Sát Câu Hỏi (`lib/metaphysics/dongtam.ts` & `app/metaphysics/page.tsx`):**
+     - **Sửa triệt để lỗi nhận diện Dụng Thần:** Biểu thức chính quy trước đây kiểm tra `ông` bằng `.includes('ông')` dẫn đến từ `không` trong câu "có trắc trở gì không" bị nhận nhầm thành hỏi về người lớn tuổi (ông bà/Phụ Mẫu). Đã chuyển sang kiểm tra ranh giới từ chuẩn xác (`/(?:^|\s|[.,?!])(ông|bà|...)(?:\s|$|[.,?!])/i`).
+     - **Bộ nhận diện ý định đa tầng (Intent Recognition Engine):**
+       + *Xuất hành / Đi lại / Trở về / Bình an / Xe cộ / Trắc trở:* Lấy Thế Hào (người đi) & Ứng Hào (điểm đến).
+       + *Sức khỏe / Bệnh tật / Nằm viện / Cứu chữa:* Phân định chính xác đối tượng (Trưởng bối, Con cháu, Phu thê, Bản thân), phân tích tạng phủ ngũ hành và đưa ra ứng kỳ.
+       + *Công việc / Sự nghiệp / Thăng chức / Thi cử:* Lấy Quan Quỷ và Phụ Mẫu.
+       + *Tài lộc / Kinh doanh / Đòi nợ / Tiền bạc:* Lấy Thê Tài.
+       + *Tình cảm / Tình duyên / Hôn nhân / Quay lại:* Lấy Thê Tài, Quan Quỷ và Hào Ứng.
+     - **Khối "KẾT LUẬN TRỰC DIỆN":** Đưa ra câu trả lời trực tiếp, rõ ràng, dứt khoát ngay đầu kết quả (Ví dụ với câu "Nay về có bị trắc trở gì không": Quẻ Cách biến Phong khẳng định *HOÀN TOÀN BÌNH AN, KHÔNG CÓ TRẮC TRỞ LỚN, VỀ SAU CÀNG THUẬN LỢI HANH THÔNG*).
+     - **Khắc phục triệt để lỗi tách chữ tiếng Việt (`biế n`, `Thâ n`...):** Chuyển từ font serif nghiêng sang kiểu chữ sans-serif chuẩn mực (`font-sans text-zinc-100 font-normal leading-relaxed`), loại bỏ ký tự markdown thô và các thẻ trùng lặp tiêu đề.
+  2. **Hiệu Chỉnh Cuộn Thư Khởi Đầu (`components/ScrollIntro.tsx`):**
+     - Tối ưu kích thước chữ đại tự `TỬ VI ĐẨU SỐ` từ `clamp(36px, 6vw, 84px)` xuống `clamp(22px, 4vw, 50px)` và điều chỉnh khoảng cách chữ `letterSpacing`.
+     - Thu gọn padding hai bên cuộn thư, đảm bảo chữ luôn nằm gọn gàng 100% trong lòng giấy tuyên ngôn cổ, không bao giờ bị thanh cuốn gỗ che khuất trên mọi kích thước màn hình.
+  3. **Tích Hợp Animation Huyền Ảo Cho Giao Diện Tối (`components/StarField.tsx`):**
+     - **Bắc Đẩu Thất Tinh (Big Dipper):** Nối 7 ngôi sao Bắc Đẩu bằng nét đứt thanh nhã, phát sáng huyền ảo ở góc trời Đông Bắc.
+     - **Tử Vi Viên (Polaris & Emperor Crown):** Tinh tú đại diện cho chòm sao Tử Vi ở góc trời Tây Bắc.
+     - **Vòng Bát Quái & 12 Địa Chi (Celestial Dial):** Vòng hào quang thiên bàn xoay chậm trang trọng ở trung tâm nền vũ trụ, gồm 12 Địa Chi xoay thuận và 8 Quẻ Bát Quái xoay nghịch cùng đồ hình Thái Cực Âm Dương.
+     - **Sao Băng (Shooting Stars):** Thỉnh thoảng có dải sao băng vàng kim lướt nhẹ qua màn đêm, tạo cảm xúc huyền diệu, mê hoặc và sinh động.
+  4. **Việt Hóa Toàn Diện 100% Trang Chủ, Tàng Kinh Các & Danh Nhân:**
+     - `app/page.tsx`: Dịch toàn bộ 14 Chính Tinh, Tứ Hóa Phi Tinh, Triết lý Thiên Địa Nhân, Mệnh Bàn, thanh điều hướng và nhãn giao diện sang tiếng Việt.
+     - `app/library/page.tsx` & `app/library/[book]/page.tsx`: Dịch sạch danh mục cổ thư, tên tác giả, triều đại và mục lục chương sang tiếng Việt trang nhã.
+     - `lib/ziwei/famous.ts` & `components/FamousPersonCard.tsx`: Bản địa hóa toàn bộ 11 danh nhân lịch sử/công nghệ/kinh doanh/nghệ thuật (Mã Vân, Lý Gia Thành, Steve Jobs, Elon Musk...).
+  5. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 14: Chuẩn Hóa Thứ Tự & Hướng Quay Chữ 2 Dải Câu Đối Theo Đối Xứng Gương Phong Thủy
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

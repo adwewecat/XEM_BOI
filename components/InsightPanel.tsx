@@ -33,101 +33,101 @@ const TOPICS = [
 ] as const;
 
 const TOPIC_PROMPTS: Record<string, string> = {
-  overview: `请生成命格总览，按以下结构输出：
+  overview: `Xin hãy phân tích tổng quan mệnh cách theo cấu trúc sau:
 
-**【命格定性】**
-用一句话概括这个命盘的核心格局与命主气质。
+**【Định Tính Mệnh Cách】**
+Khái quát một câu về cốt lõi cách cục và khí chất bản mệnh đương số.
 
-**【主星解读】**
-命宫主星的核心特质，引用倪海厦原话或观点。
+**【Luận Giải Chính Tinh】**
+Đặc tính cốt lõi của các sao chính tinh tại Mệnh Cung theo hệ phái Thiên Kỷ của danh sư Nghê Hải Hà.
 
-**【三方四正】**
-财、官、迁三宫的联动分析及整体格局。
+**【Tam Phương Tứ Chính】**
+Phân tích liên hoàn giữa Tài Bạch, Quan Lộc, Thiên Di và Mệnh Cung để định hình toàn bộ cục diện.
 
-**【当前大限】**
-当下大限运势方向与最值得关注的事项。
+**【Đại Hạn Hiện Tại】**
+Xu thế vận hạn 10 năm hiện tại và những điểm trọng yếu cần lưu tâm nhất.
 
-**【优势与注意】**
-命盘天赋优势，以及需要注意的风险或功课。`,
+**【Ưu Thế & Lời Khuyên Tu Dưỡng】**
+Thiên phú bẩm sinh, thế mạnh cùng những nguy cơ và bài học cuộc đời cần tu dưỡng.`,
 
-  love: `请深度分析感情婚姻运，按以下结构输出：
+  love: `Xin hãy phân tích chuyên sâu vận trình tình cảm và hôn nhân theo cấu trúc sau:
 
-**【感情格局】**
-一句话定性感情命格。
+**【Cục Diện Tình Duyên】**
+Định tính một câu về duyên phận tình cảm trong đời.
 
-**【夫妻宫分析】**
-夫妻宫主星、四化，以及倪海厦体系的具体解读。
+**【Phân Tích Cung Phu Thê】**
+Các chính tinh, phụ tinh và Tứ Hóa tọa thủ tại cung Phu Thê theo quan điểm danh sư Nghê Hải Hà.
 
-**【三方联动】**
-相关宫位对感情的影响。
+**【Tam Phương Liên Động】**
+Tác động từ các cung vị liên đới tới đời sống tình cảm gia đạo.
 
-**【当前大限感情运】**
-当下10年感情走向与关键节点。
+**【Vận Trình Tình Duyên Đại Hạn】**
+Xu thế tình cảm trong 10 năm hiện tại và những mốc thời gian bước ngoặt.
 
-**【实际建议】**
-具体可行的感情建议。`,
+**【Lời Khuyên Ứng Xử】**
+Những lời khuyên hành sự thiết thực giúp hòa hợp và gìn giữ hạnh phúc.`,
 
-  career: `请深度分析事业运，按以下结构输出：
+  career: `Xin hãy phân tích chuyên sâu vận trình sự nghiệp và công danh theo cấu trúc sau:
 
-**【事业格局】**
-一句话定性事业命格，宜任职或宜创业。
+**【Cục Diện Sự Nghiệp】**
+Định tính một câu về con đường sự nghiệp (phù hợp làm công chức, chuyên môn hay tự lập khởi nghiệp).
 
-**【官禄宫分析】**
-官禄宫主星、四化，以及倪师对这种配置的判断。
+**【Phân Tích Cung Quan Lộc】**
+Các chính tinh và Tứ Hóa tại cung Quan Lộc theo bình giải của danh sư Nghê Hải Hà.
 
-**【财帛宫联动】**
-财运与事业的关系，财路来源分析。
+**【Liên Kết Cung Tài Bạch】**
+Mối quan hệ giữa sự nghiệp và nguồn thu tài chính, dòng tiền và cơ hội làm giàu.
 
-**【当前大限事业运】**
-当下10年事业走向。
+**【Vận Trình Sự Nghiệp Đại Hạn】**
+Định hướng phát triển công danh trong đại hạn 10 năm hiện tại.
 
-**【实际建议】**
-适合的方向、行业与策略。`,
+**【Lời Khuyên Chiến Lược】**
+Ngành nghề phù hợp nhất, thời điểm nên tiến hay thủ và sách lược hành sự.`,
 
-  wealth: `请深度分析财运，按以下结构输出：
+  wealth: `Xin hãy phân tích chuyên sâu vận trình tài lộc và tiền bạc theo cấu trúc sau:
 
-**【财运格局】**
-一句话定性财运模式，是主动财还是被动财。
+**【Cục Diện Tài Vận】**
+Định tính mô hình tài lộc (tiền chủ động từ tài năng, hay thụ động, tiền đầu cơ hay tích lũy bền vững).
 
-**【财帛宫分析】**
-财帛宫主星、四化，财富来源与流动模式。
+**【Phân Tích Cung Tài Bạch】**
+Chính tinh, phụ tinh và Tứ Hóa tại cung Tài Bạch, phương thức dòng tiền lưu chuyển.
 
-**【田宅宫（财库）】**
-积蓄能力与不动产运势分析。
+**【Cung Điền Trạch (Kho Chứa Tài Sản)】**
+Năng lực tích lũy tài sản, đất đai, nhà cửa và cơ hội bất động sản.
 
-**【当前大限财运】**
-当下财运走向与注意事项。
+**【Tài Vận Đại Hạn Hiện Tại】**
+Xu thế tài chính trong đại hạn 10 năm này và những điều cần phòng tránh rủi ro.
 
-**【理财建议】**
-具体的财务建议。`,
+**【Lời Khuyên Quản Lý Tài Chính】**
+Sách lược đầu tư và bảo toàn tài sản hiệu quả nhất.`,
 
-  health: `请分析健康运势，按以下结构输出：
+  health: `Xin hãy phân tích vận trình sức khỏe và thể chất theo cấu trúc sau:
 
-**【疾厄宫主星】**
-疾厄宫星曜与健康含义。
+**【Chính Tinh Cung Tật Ách】**
+Các sao tọa thủ tại cung Tật Ách và hàm nghĩa y lý phương Đông.
 
-**【主要风险】**
-结合倪海厦子午流注理论，分析主要健康隐患与需关注的部位。
+**【Nguy Cơ Sức Khỏe Trọng Yếu】**
+Ứng dụng lý thuyết Tử Ngọ Lưu Chú của danh y Nghê Hải Hà để chỉ rõ tạng phủ và cơ quan cần lưu tâm.
 
-**【大限健康走势】**
-当下健康趋势与关键时间段。
+**【Diễn Biến Sức Khỏe Đại Hạn】**
+Xu hướng sức khỏe trong 10 năm hiện tại và những giai đoạn thời gian nhạy cảm.
 
-**【预防建议】**
-具体注意事项与养生方向。`,
+**【Lời Khuyên Dưỡng Sinh】**
+Chỉ dẫn phòng ngừa bệnh tật, chế độ sinh hoạt và dưỡng sinh điều hòa khí huyết.`,
 
-  personality: `请深度解析性格特质，按以下结构输出：
+  personality: `Xin hãy giải mã chuyên sâu tính cách và tâm lý bản mệnh theo cấu trúc sau:
 
-**【命宫主星性格】**
-命宫主星的核心性格特质，引用倪师原话。
+**【Cốt Lõi Tính Cách Mệnh Cung】**
+Đặc điểm tính cách bẩm sinh sâu sắc nhất theo lời dạy của danh sư Nghê Hải Hà.
 
-**【三方性格综合】**
-财、官、迁三宫对性格的影响，全貌描绘。
+**【Tổng Hợp Tính Cách Tam Phương】**
+Ảnh hưởng đa chiều từ Tài Bạch, Quan Lộc, Thiên Di tạo nên bức tranh tâm lý hoàn chỉnh.
 
-**【人际关系模式】**
-与他人互动方式、待人处世风格。
+**【Phương Thức Đối Nhân Xử Thế】**
+Phong cách giao tiếp, ứng xử với gia đình, bạn bè và đối tác xã hội.
 
-**【优势与人生课题】**
-天赋优势，以及需要面对的人生功课。`,
+**【Thế Mạnh & Bài Học Cuộc Đời】**
+Ưu điểm cần phát huy tối đa và những khuyết điểm trong tâm tính cần chuyển hóa.`,
 };
 
 const PALACE_ROLES: Record<string, string> = {

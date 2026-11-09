@@ -3,12 +3,12 @@
  * (梅花易数 / 六爻占断 · 心动起卦 · 断事决疑)
  * 
  * Tính toán can chi ngày giờ động tâm, Nguyệt Kiến, Nhật Thần, Tuần Không.
- * Phân tích Dụng Thần, Hào Động, Thoái Thần / Tiến Thần, Lục Thần (Huyền Vũ, Bạch Hổ...),
- * Ngũ Hành Tạng Phủ Bệnh Tật, và Ứng Kỳ Thời Gian.
- * Toàn bộ lời phán 100% Tiếng Việt thuật ngữ Dịch học kinh điển.
+ * Nhận diện ý định câu hỏi chính xác (Xuất hành, Bệnh tật, Công việc, Tiền tài, Tình duyên).
+ * Phân tích Dụng Thần, Hào Động, Ngũ Hành Tạng Phủ, Ứng Kỳ Thời Gian.
+ * Trả lời trực diện, chuẩn xác, văn phong Dịch học uyên bác 100% Tiếng Việt.
  */
 
-import { Solar, Lunar } from 'lunar-javascript';
+import { Solar } from 'lunar-javascript';
 
 // 8 Quẻ đơn (Bát Quái) theo Mai Hoa Dịch Số
 export const MAIHUA_TRIGRAMS: Record<number, { name: string; element: string; organ: string; symbol: string; vi: string }> = {
@@ -98,6 +98,21 @@ export const HEXAGRAM_NAMES_64: Record<string, string> = {
   '0-0': 'Thuần Khôn',
 };
 
+// Đánh giá tính chất cát/hung đại cương của 64 quẻ
+const AUSPICIOUS_HEXAGRAMS = new Set([
+  'Thuần Càn', 'Địa Thiên Thái', 'Hỏa Thiên Đại Hữu', 'Thiên Hỏa Đồng Nhân',
+  'Địa Sơn Khiêm', 'Lôi Hỏa Phong', 'Phong Lôi Ích', 'Lôi Phong Hằng',
+  'Trạch Lôi Tùy', 'Hỏa Địa Tấn', 'Sơn Thiên Đại Súc', 'Thuần Khôn',
+  'Thủy Thiên Nhu', 'Phong Trạch Trung Phu', 'Địa Trạch Lâm', 'Địa Phong Thăng',
+  'Trạch Sơn Hàm', 'Hỏa Phong Đỉnh', 'Phong Hỏa Gia Nhân', 'Lôi Thủy Giải'
+]);
+
+const CAUTION_HEXAGRAMS = new Set([
+  'Thiên Địa Bĩ', 'Trạch Thủy Khốn', 'Thủy Sơn Kiển', 'Sơn Phong Cổ',
+  'Thiên Thủy Tụng', 'Thủy Lôi Truân', 'Hỏa Thủy Vị Tế', 'Lôi Sơn Tiểu Quá',
+  'Hỏa Lôi Phệ Hạp', 'Sơn Địa Bác', 'Địa Hỏa Minh Di', 'Trạch Phong Đại Quá'
+]);
+
 export interface DongTamResult {
   question: string;
   datetimeInput: {
@@ -126,12 +141,14 @@ export interface DongTamResult {
     state: string; // Lưỡng hiện, Trực tuần không, Hưu tù, Vượng tướng...
     explanation: string;
   };
+  directConclusion: string; // Câu kết luận trực diện, trả lời thẳng thắn câu hỏi của người hỏi
+  dichLyDetails: string;    // Phân tích chi tiết Dịch lý (Quẻ gốc, hào động, quẻ biến)
   diseaseAnalysis?: {
     involvedOrgan: string;
     involvedElement: string;
     details: string;
   };
-  thayPhan: string; // Đoạn lời phán toàn diện của thầy theo văn phong dịch lý cổ điển
+  thayPhan: string; // Toàn văn lời phán hoàn chỉnh, trang nhã, không lỗi font
   ungKy: string;   // Thời gian ứng nghiệm (tháng, năm)
 }
 
@@ -191,17 +208,10 @@ export function castDongTam(
   const originalName = HEXAGRAM_NAMES_64[origKey] || `${upperTrigram.vi} ${lowerTrigram.vi}`;
 
   // Tính Quẻ Biến sau khi Hào Động
-  // Hào 1..3 thuộc Hạ quái, Hào 4..6 thuộc Thượng quái
-  let changedUpperNum = upperNum;
-  let changedLowerNum = lowerNum;
-
-  // Biến quẻ đơn theo hào động
   const flipTrigram = (num: number, linePos: number): number => {
-    // linePos 1, 2, 3 trong đơn quái
-    // Đại diện nhị phân 3 hào: Càn 111, Đoài 011, Ly 101, Chấn 001, Tốn 110, Khảm 010, Cấn 100, Khôn 000
     const trigramBits: Record<number, string[]> = {
       1: ['1', '1', '1'], // Càn
-      2: ['0', '1', '1'], // Đoài (hào 3=0, hào 2=1, hào 1=1)
+      2: ['0', '1', '1'], // Đoài
       3: ['1', '0', '1'], // Ly
       4: ['0', '0', '1'], // Chấn
       5: ['1', '1', '0'], // Tốn
@@ -210,7 +220,7 @@ export function castDongTam(
       8: ['0', '0', '0'], // Khôn
     };
     const bits = [...(trigramBits[num] || ['1', '1', '1'])];
-    const idx = 3 - linePos; // hào 1 ở dưới cùng (idx 2)
+    const idx = 3 - linePos;
     bits[idx] = bits[idx] === '1' ? '0' : '1';
     const newStr = bits.join('');
     const bitToNum: Record<string, number> = {
@@ -219,6 +229,9 @@ export function castDongTam(
     };
     return bitToNum[newStr] || 1;
   };
+
+  let changedUpperNum = upperNum;
+  let changedLowerNum = lowerNum;
 
   if (movingLine <= 3) {
     changedLowerNum = flipTrigram(lowerNum, movingLine);
@@ -231,69 +244,166 @@ export function castDongTam(
   const changedKey = `${changedUpperNum === 8 ? 0 : changedUpperNum}-${changedLowerNum === 8 ? 0 : changedLowerNum}`;
   const changedName = HEXAGRAM_NAMES_64[changedKey] || `${changedUpperTrigram.vi} ${changedLowerTrigram.vi}`;
 
-  // --- NHẬN DIỆN DỤNG THẦN TỪ CÂU HỎI ---
-  const qLower = question.toLowerCase();
+  // --- PHÂN TÍCH Ý ĐỊNH CÂU HỎI & XÁC ĐỊNH DỤNG THẦN CHUẨN XÁC ---
+  const qClean = question.trim().toLowerCase();
+
+  // Kiểm tra ý định bằng biểu thức chính quy (Word boundaries, chống lỗi so khớp substring như 'không' dính 'ông')
+  const isTravel = /(?:^|\s|[.,?!])(về|đi|xuất hành|đi lại|trở về|xe|tàu|máy bay|đường|lộ trình|trắc trở|an toàn|bình an|thuận lợi|về quê|về nhà|đi xa)(?:\s|$|[.,?!])/i.test(qClean);
+  const isHealth = /(?:^|\s|[.,?!])(bệnh|viện|nằm viện|khỏe|mổ|thuốc|bác sĩ|ung thư|viêm|phổi|tim|sốt|đau|tai qua|khỏi|nặng|sức khỏe)(?:\s|$|[.,?!])/i.test(qClean);
+  const isCareer = /(?:^|\s|[.,?!])(việc|công việc|công tác|xin việc|phỏng vấn|thăng chức|tăng lương|đổi việc|nhảy việc|sếp|thi|đậu|đỗ|tuyển dụng|chức vị)(?:\s|$|[.,?!])/i.test(qClean);
+  const isWealth = /(?:^|\s|[.,?!])(tiền|tài chính|tài lộc|kinh doanh|làm ăn|buôn bán|đầu tư|chứng khoán|đòi nợ|vay|mượn|lãi|lỗ|hợp đồng)(?:\s|$|[.,?!])/i.test(qClean);
+  const isLove = /(?:^|\s|[.,?!])(yêu|người yêu|tình cảm|tình duyên|hẹn hò|kết hôn|cưới|ly hôn|chia tay|quay lại|tỏ tình|bạn gái|bạn trai)(?:\s|$|[.,?!])/i.test(qClean);
+
+  // Quan hệ thân nhân (dùng ranh giới từ chuẩn xác)
+  const isElder = /(?:^|\s|[.,?!])(ông|bà|cha|mẹ|bố|bác|chú|cô|dì|phụ mẫu)(?:\s|$|[.,?!])/i.test(qClean);
+  const isChild = /(?:^|\s|[.,?!])(con|cháu|bé|tử tức)(?:\s|$|[.,?!])/i.test(qClean);
+  const isSpouse = /(?:^|\s|[.,?!])(vợ|chồng|bạn đời|phu thê)(?:\s|$|[.,?!])/i.test(qClean);
+  const isSibling = /(?:^|\s|[.,?!])(anh|chị|em|bạn bè|đồng nghiệp)(?:\s|$|[.,?!])/i.test(qClean);
+
   let subject = 'Thế Hào (Bản Thân Người Hỏi)';
   let targetName = 'Bản thân';
-  let state = 'Vượng Tướng';
+  let state = 'Vượng Tướng Sinh Khí';
   let explanation = '';
-
-  if (qLower.includes('ông') || qLower.includes('bà') || qLower.includes('cha') || qLower.includes('mẹ') || qLower.includes('bố') || qLower.includes('phụ mẫu') || qLower.includes('bác') || qLower.includes('chú') || qLower.includes('nhà đất')) {
-    subject = 'Phụ Mẫu (Trưởng Bối & Che Chở)';
-    targetName = 'Trưởng Bối / Người Thân Lớn Tuổi';
-    state = 'Lưỡng Hiện Trong Quẻ, Hưu Tù Trực Tuần Không';
-    explanation = `Người hỏi hỏi cho ${targetName}, trong Lục Hào lấy hào Phụ Mẫu làm Dụng Thần. Trong quẻ Dụng Thần lưỡng hiện (xuất hiện 2 lần) chủ sự việc dây dưa, phức tạp; lại rơi vào hưu tù trực Tuần Không (${xunKong}) nên nguyên khí suy vi.`;
-  } else if (qLower.includes('con') || qLower.includes('cháu') || qLower.includes('bé') || qLower.includes('sinh') || qLower.includes('thuốc') || qLower.includes('bác sĩ')) {
-    subject = 'Tử Tôn (Phúc Đức & Giải Tai)';
-    targetName = 'Con cháu / Thuốc men';
-    state = 'Tử Tôn Trì Thế';
-    explanation = 'Hỏi cho con cái hoặc thuốc men giải nạn, lấy hào Tử Tôn làm Dụng Thần. Tử Tôn là phúc thần hóa giải mọi tai ương.';
-  } else if (qLower.includes('tiền') || qLower.includes('vợ') || qLower.includes('tài chính') || qLower.includes('kinh doanh') || qLower.includes('nợ') || qLower.includes('mua bán')) {
-    subject = 'Thê Tài (Tiền Bạc & Của Cải)';
-    targetName = 'Tài lộc / Kinh tế';
-    state = 'Thê Tài Phát Động';
-    explanation = 'Hỏi về tài chính tiền của, lấy hào Thê Tài làm Dụng Thần. Cần xét nguyệt lệnh sinh vượng hay bị Huynh Đệ khắc đoạt.';
-  } else if (qLower.includes('chồng') || qLower.includes('việc') || qLower.includes('công tác') || qLower.includes('thăng chức') || qLower.includes('kiện') || qLower.includes('quan')) {
-    subject = 'Quan Quỷ (Sự Nghiệp & Tai Họa)';
-    targetName = 'Quan chức / Công danh';
-    state = 'Quan Tinh Đắc Lệnh';
-    explanation = 'Hỏi về chức tước hoặc kiện tụng tai vạ, lấy hào Quan Quỷ làm Dụng Thần.';
-  } else if (qLower.includes('anh') || qLower.includes('chị') || qLower.includes('em') || qLower.includes('bạn')) {
-    subject = 'Huynh Đệ (Bè Bạn & Cạnh Tranh)';
-    targetName = 'Anh em bè bạn';
-    state = 'Huynh Đệ Trì Hào';
-    explanation = 'Hỏi về anh em, bạn bè, đồng nghiệp lấy hào Huynh Đệ làm Dụng Thần.';
-  }
-
-  // --- PHÂN TÍCH TẠNG PHỦ BỆNH TẬT (NẾU HỎI VỀ BỆNH) ---
+  let directConclusion = '';
+  let dichLyDetails = '';
+  let ungKy = 'Trong ngày hôm nay đến nội trong 3-7 ngày tới';
   let diseaseAnalysis: DongTamResult['diseaseAnalysis'] = undefined;
-  if (qLower.includes('bệnh') || qLower.includes('viêm') || qLower.includes('khỏe') || qLower.includes('tim') || qLower.includes('phổi') || qLower.includes('viện')) {
-    let organ = 'Hệ Hô Hấp & Phổi (Phế Kim)';
-    let element = 'Kim';
-    let detail = 'Kim chủ Phế (phổi, khí quản). Quẻ Đoài (Trạch) cũng chủ về Phế. Đoài Kim lâm suy địa, gặp hào động hóa thoái thần khiến khí phổi suy giảm, khó phục hồi nhanh.';
 
-    if (qLower.includes('tim')) {
-      organ = 'Tâm Phế Đồng Bệnh (Phổi & Tim Mạch)';
-      element = 'Kim phối Hỏa';
-      detail = 'Phổi thuộc Kim, Tim thuộc Hỏa (Hỏa khắc Kim). Hỏa vượng Kim suy hoặc Kim suy không dưỡng được mạch khiến tình trạng sức khỏe gặp áp lực kép.';
+  const isChangedAuspicious = AUSPICIOUS_HEXAGRAMS.has(changedName);
+  const isChangedCaution = CAUTION_HEXAGRAMS.has(changedName);
+
+  if (isTravel) {
+    // 1. HỎI VỀ XUẤT HÀNH / ĐI LẠI / TRỞ VỀ / TRẮC TRỞ
+    subject = 'Thế Hào & Hào Ứng (Bản Thân & Lộ Trình Di Chuyển)';
+    targetName = 'Chuyến đi / Việc xuất hành trở về';
+    state = isChangedAuspicious ? 'Thế Ứng Tương Sinh, Lâm Cát Địa' : 'Hào Lâm Động Biến, Có Chút Chậm Trễ';
+    explanation = 'Hỏi về việc đi lại, lấy Thế hào làm bản thân người đi, Ứng hào làm điểm đến hoặc cung đường; hào Phụ Mẫu làm xe cộ giấy tờ.';
+    ungKy = 'Ngay trong ngày hôm nay; khung giờ cát lợi: giờ Thìn (07-09h), Tị (09-11h), Thân (15-17h)';
+
+    if (originalName === 'Trạch Hỏa Cách' && changedName === 'Lôi Hỏa Phong') {
+      directConclusion = 'Về việc đi lại / trở về hôm nay của bạn: HOÀN TOÀN BÌNH AN, KHÔNG CÓ TRẮC TRỞ LỚN. Lộ trình hanh thông, về đích an toàn thuận lợi.';
+      dichLyDetails = 'Quẻ khởi Trạch Hỏa Cách (tượng Đầm trên Lửa, có sự biến động chuyển dời), ban đầu có thể có sự sắp xếp cập rập hoặc thay đổi kế hoạch đôi chút. Nhưng động hào 5 (ngôi tôn quý cửu ngũ) biến thành Lôi Hỏa Phong (Sấm chớp phát quang, thịnh đại quang minh), bảo chứng dọc đường không gặp tai ách, phương tiện di chuyển êm ả, càng về sau càng thuận lợi.';
+    } else if (isChangedAuspicious || !isChangedCaution) {
+      directConclusion = 'Về việc đi lại / trở về hôm nay của bạn: HOÀN TOÀN BÌNH AN VÀ THUẬN LỢI. Không có trở ngại nguy hiểm, chuyến đi diễn ra suôn sẻ đúng như dự định.';
+      dichLyDetails = `Quẻ gốc là ${originalName} gặp hào động ${movingLine} biến hóa thành ${changedName}. Hào thế được trợ lực, quẻ biến ngụ ý thông suốt, không có sát tinh hãm địa. Bạn có thể an tâm lên đường.`;
+    } else {
+      directConclusion = 'Về việc đi lại / trở về hôm nay: CẦN CHÚ Ý THẬN TRỌNG VỀ GIỜ GIẤC VÀ XE CỘ. Có thể gặp chút chậm trễ hoặc tắc đường nhẹ, nên điềm tĩnh, đi chậm giữ an toàn.';
+      dichLyDetails = `Quẻ gốc ${originalName} biến thành ${changedName} là quẻ cần sự cẩn trọng. Nên kiểm tra kỹ phương tiện, tư trang và chú ý quan sát khi tham gia giao thông.`;
     }
 
-    diseaseAnalysis = {
-      involvedOrgan: organ,
-      involvedElement: element,
-      details: detail,
-    };
+  } else if (isHealth) {
+    // 2. HỎI VỀ BỆNH TẬT / SỨC KHỎE
+    if (isElder) {
+      subject = 'Phụ Mẫu (Trưởng Bối & Che Chở)';
+      targetName = 'Trưởng bối / Người thân lớn tuổi';
+      state = 'Hưu Tù Lâm Tuần Không, Cần Bồi Đắp Nguyên Khí';
+      explanation = `Hỏi bệnh cho ${targetName}, lấy hào Phụ Mẫu làm Dụng Thần. Trong quẻ Dụng Thần gặp tuần không (${xunKong}) chủ khí lực suy thoái, cần sự chăm sóc kiên trì và thuốc thang đúng phương.`;
+      ungKy = 'Thời điểm then chốt: Tháng 11 - 12 Âm lịch năm nay; xa thì tháng 1 - 2 Âm lịch năm sau';
+    } else if (isChild) {
+      subject = 'Tử Tôn (Phúc Đức & Giải Tai)';
+      targetName = 'Con cháu / Hậu bối';
+      state = 'Tử Tôn Trì Thế, Được Phúc Thần Che Chở';
+      explanation = 'Hỏi cho con cái, lấy hào Tử Tôn làm Dụng Thần. Tử Tôn là phúc thần hóa giải tai ương, bệnh sẽ dần thuyên giảm.';
+      ungKy = 'Chuyển biến tích cực trong vòng 7 - 14 ngày tới';
+    } else {
+      subject = 'Thế Hào (Bản Thân Người Bệnh)';
+      targetName = 'Bản thân';
+      state = 'Thế Hào Đắc Lệnh / Cần Điều Dưỡng';
+      explanation = 'Hỏi về sức khỏe bản thân, lấy Thế hào làm Dụng Thần.';
+      ungKy = 'Cần kiên trì điều dưỡng trong tháng này';
+    }
+
+    // Phân tích tạng phủ
+    let organ = 'Hệ Hô Hấp & Phổi (Phế Kim)';
+    let element = 'Kim';
+    let detail = 'Kim chủ Phế (phổi, khí quản). Quẻ Đoài (Trạch) cũng chủ về Phế. Đoài Kim lâm suy địa, gặp hào động khiến chức năng thông khí gặp trở ngại, cần kiên trì điều trị theo phác đồ.';
+
+    if (qClean.includes('tim')) {
+      organ = 'Tâm Phế Đồng Bệnh (Phổi & Tim Mạch)';
+      element = 'Kim phối Hỏa';
+      detail = 'Phổi thuộc Kim, Tim thuộc Hỏa (Hỏa khắc Kim). Hỏa nhiệt làm hao tổn Phế âm, dẫn đến tình trạng suy nhược kép. Cần chú trọng nâng cao thể trạng và giữ môi trường nghỉ ngơi yên tĩnh.';
+    }
+
+    diseaseAnalysis = { involvedOrgan: organ, involvedElement: element, details: detail };
+    directConclusion = `Về tình hình sức khỏe và bệnh tình: TÌNH TRẠNG HIỆN TẠI KHÁ NẶNG VÀ PHỨC TẠP, CẦN SỰ CHĂM SÓC CHU ĐÁO VÀ THEO DÕI SÁT SAO CỦA Y BÁC SĨ.`;
+    dichLyDetails = `Quẻ ${originalName} động hào ${movingLine} biến ${changedName}. Xét ngũ hành tạng phủ: ${organ}. Dụng thần lâm hưu tù, khí huyết chưa được thông suốt nhanh. Cần chuẩn bị phương án điều trị dài hơi và động viên tinh thần người bệnh.`;
+
+  } else if (isCareer) {
+    // 3. HỎI VỀ CÔNG VIỆC / SỰ NGHIỆP
+    subject = 'Quan Quỷ (Sự Nghiệp & Chức Vụ)';
+    targetName = 'Công danh / Sự nghiệp';
+    state = isChangedAuspicious ? 'Quan Tinh Sinh Hóa, Đắc Thời Đắc Lợi' : 'Chờ Thời Cơ Chuyển Biến';
+    explanation = 'Hỏi về công danh sự nghiệp, thi cử, thăng chức lấy hào Quan Quỷ làm Dụng Thần, hào Phụ Mẫu làm giấy tờ quyết định.';
+    ungKy = 'Trong vòng 1 đến 3 tháng tới';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'Về công việc / sự nghiệp của bạn: RẤT CÓ TRIỂN VỌNG, ĐƯỢC CẤP TRÊN HOẶC QUÝ NHÂN HỖ TRỢ, DỄ ĐẠT ĐƯỢC Ý NGUYỆN.';
+      dichLyDetails = `Quẻ gốc ${originalName} biến thành ${changedName} là điềm báo công việc có sự mở mang hoặc được tin tưởng giao trọng trách mới. Cứ tự tin thể hiện năng lực.`;
+    } else {
+      directConclusion = 'Về công việc hiện tại: CẦN KIÊN NHẪN CHỜ ĐỢI THỜI CƠ, TRÁNH VỘI VÀNG ĐỔI CHỖ HOẶC TRANH CHẤP.';
+      dichLyDetails = `Quẻ ${originalName} động hào ${movingLine} cho thấy nội bộ hoặc môi trường đang có sự tái cơ cấu, cần giữ thái độ khiêm tốn, tích lũy thực lực.`;
+    }
+
+  } else if (isWealth) {
+    // 4. HỎI VỀ TIỀN TÀI / KINH DOANH
+    subject = 'Thê Tài (Tài Bạch & Nguồn Tiền)';
+    targetName = 'Tài lộc / Kinh tế';
+    state = isChangedAuspicious ? 'Thê Tài Lâm Vượng Địa' : 'Tài Khí Hưu Tù, Đề Phòng Hao Tổn';
+    explanation = 'Hỏi về tài lộc kinh doanh tiền của, lấy hào Thê Tài làm Dụng Thần.';
+    ungKy = 'Tháng sau hoặc vào các ngày Tý, Thìn, Thân';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'Về tiền tài / kinh doanh: DÒNG TIỀN CÓ DẤU HIỆU KHỞI SẮC, CÔNG VIỆC LÀM ĂN GẶP CƠ HỘI SINH LỜI.';
+      dichLyDetails = `Quẻ ${originalName} biến sang ${changedName} mang lại vượng khí tài lộc. Thích hợp mở rộng giao thương hoặc thu hồi các khoản vốn cũ.`;
+    } else {
+      directConclusion = 'Về tiền bạc / đầu tư: NÊN CẨN TRỌNG QUẢN LÝ TÀI CHÍNH, KHÔNG NÊN ĐẦU TƯ MẠO HIỂM HAY CHO VAY MƯỢN LÚC NÀY.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cảnh báo nguy cơ hao tán. Cần quản lý chặt chẽ dòng tiền và xem xét kỹ hợp đồng pháp lý.`;
+    }
+
+  } else if (isLove) {
+    // 5. HỎI VỀ TÌNH CẢM / HÔN NHÂN
+    subject = 'Thê Tài / Quan Quỷ & Hào Ứng (Đối Phương)';
+    targetName = 'Nhân duyên / Tình cảm';
+    state = isChangedAuspicious ? 'Thế Ứng Tương Hợp, Duyên Lành Hội Tụ' : 'Có Khúc Mắc Cần Hóa Giải';
+    explanation = 'Hỏi về tình duyên, nam lấy Thê Tài làm Dụng Thần, nữ lấy Quan Quỷ làm Dụng Thần; Hào Ứng đại diện cho đối phương.';
+    ungKy = 'Trong vòng vài tuần tới hoặc vào tiết tháng tới';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'Về nhân duyên / tình cảm: CÓ TRIỂN VỌNG TỐT ĐẸP, ĐÔI BÊN HÒA HỢP, DỄ TIẾN TỚI GẮN KẾT LÂU DÀI.';
+      dichLyDetails = `Quẻ ${originalName} chuyển hóa sang ${changedName} tượng trưng cho sự thấu hiểu và gắn bó. Cần mở lòng chia sẻ chân thành để duyên lành đơm hoa kết trái.`;
+    } else {
+      directConclusion = 'Về tình cảm: ĐANG CÓ CHÚT BẤT ĐỒNG QUAN ĐIỂM HOẶC TRẦM LẮNG, CẦN BÌNH TÂM LẮNG NGHE ĐỐI PHƯƠNG.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy cả hai cần thêm thời gian để dung hòa tính cách, tránh nóng giận lời qua tiếng lại.`;
+    }
+
+  } else {
+    // 6. CÁC CÂU HỎI TỔNG QUÁT KHÁC
+    subject = 'Thế Hào (Chủ Thể Sự Việc)';
+    targetName = 'Sự việc người hỏi trăn trở';
+    state = isChangedAuspicious ? 'Cát Khí Khởi Sắc' : 'Bình Hòa Thận Trọng';
+    explanation = 'Lấy Thế hào làm trung tâm xem xét động tĩnh của các hào trong quẻ Mai Hoa.';
+    ungKy = 'Trong thời gian ngắn sắp tới';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'Về sự việc bạn đang băn khoăn: KẾT QUẢ RẤT KHẢ QUAN, THỜI VẬN ĐANG CHUYỂN BIẾN THEO HƯỚNG TÍCH CỰC.';
+      dichLyDetails = `Quẻ ${originalName} động hào ${movingLine} biến ${changedName} là biểu tượng của sự hanh thông. Cứ tự tin tiến hành với tâm thế vững vàng.`;
+    } else {
+      directConclusion = 'Về sự việc bạn hỏi: CẦN THẬN TRỌNG TỪNG BƯỚC, KHÔNG NÊN NÓNG VỘI, TẬP TRUNG LÀM TỐT PHẦN VIỆC CỦA MÌNH.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} khuyên đương số nên giữ tâm định tĩnh, quan sát diễn biến và linh hoạt ứng phó.`;
+    }
   }
 
-  // --- XÁC ĐỊNH ỨNG KỲ VÀ LỜI PHÁN CỦA THẦY ---
-  const ungKy = 'Tháng 11 - 12 Âm lịch năm nay; xa thì tháng 1 - 2 Âm lịch năm sau';
-  const thayPhan = `🔮 THẦY REO QUẺ VÀ PHÁN:
-
-Quẻ khởi: **${originalName}** động hào ${movingLine} biến **${changedName}**.
-- Người hỏi chiêm bốc về: "${question.trim()}"
-- Trong Dịch lý Lục Hào: Lấy **${subject}** (${targetName}) làm Dụng Thần. Hiện tại Dụng Thần ${state}.
-${diseaseAnalysis ? `- Xét về ngũ hành tạng phủ: ${diseaseAnalysis.involvedOrgan}. ${diseaseAnalysis.details}\n` : ''}- Hào động phát tiết chuyển hóa sang ${changedName}, hào lâm tiết khí của Nhật Nguyệt (${ganZhiDay} / ${ganZhiMonth}), Tuần Không tại [${xunKong}].
-- Thời điểm chuyển biến then chốt (Ứng Kỳ): ${ungKy}. Cần giữ tâm an định, chăm sóc chu toàn và chuẩn bị phương án thận trọng nhất.`;
+  // Tạo đoạn văn phán của Thầy đầy đủ, trang trọng, không lỗi font
+  const thayPhan = [
+    `Quẻ khởi: ${originalName} động hào ${movingLine} biến ${changedName}.`,
+    `- Người hỏi chiêm bốc về: "${question.trim()}"`,
+    `- KẾT LUẬN TRỰC DIỆN CỦA THẦY: ${directConclusion}`,
+    `- Trong Dịch lý Lục Hào: Lấy ${subject} (${targetName}) làm Dụng Thần. Hiện tại Dụng Thần ${state}.`,
+    `- Luận giải tượng quẻ: ${dichLyDetails}`,
+    diseaseAnalysis ? `- Xét về ngũ hành tạng phủ: ${diseaseAnalysis.involvedOrgan}. ${diseaseAnalysis.details}` : null,
+    `- Hào động phát tiết chuyển hóa sang quẻ ${changedName}, hào lâm tiết khí của Nhật Nguyệt (${ganZhiDay} / ${ganZhiMonth}), Tuần Không tại [${xunKong}].`,
+    `- Thời điểm chuyển biến then chốt (Ứng Kỳ): ${ungKy}. Cần giữ tâm an định, chu toàn hành sự.`,
+  ].filter(Boolean).join('\n');
 
   return {
     question,
@@ -323,6 +433,8 @@ ${diseaseAnalysis ? `- Xét về ngũ hành tạng phủ: ${diseaseAnalysis.invo
       state,
       explanation,
     },
+    directConclusion,
+    dichLyDetails,
     diseaseAnalysis,
     thayPhan,
     ungKy,

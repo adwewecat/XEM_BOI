@@ -45,7 +45,7 @@ function ThemeToggle() {
       onClick={toggle}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.93 }}
-      aria-label={isDark ? '切换亮色主题' : '切换暗色主题'}
+      aria-label={isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
       className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
       style={{
         borderColor: isDark ? 'rgba(212,168,67,0.3)' : 'rgba(140,100,20,0.35)',
@@ -74,7 +74,7 @@ function ThemeToggle() {
           color: isDark ? 'rgba(212,180,100,0.85)' : 'rgba(110,72,8,0.8)',
           transition: 'color 0.35s ease',
         }}>
-        {isDark ? '暗色' : '亮色'}
+        {isDark ? 'Huyền Dạ' : 'Bạch Trú'}
       </span>
     </motion.button>
   );
@@ -249,30 +249,102 @@ function useColors(theme: Theme) {
   };
 }
 
-// ─── 四化简介数据 ─────────────────────────────────────────
-const SIHUA_BRIEF: Record<string, { attr: string; brief: string }> = {
-  '化禄': { attr: '吉化·增益', brief: '福星到宫，主财运与福气增益。所在宫位事物顺遂，能力增强，是命盘中最受欢迎的化星。' },
-  '化权': { attr: '吉化·权威', brief: '权力星到宫，主掌控与领导力。所在宫位主强势与决断，喜入官禄宫与命宫，主事业上的实权。' },
-  '化科': { attr: '吉化·名誉', brief: '科名星到宫，主声誉与贵人缘。所在宫位主文名与考运，有贵人扶持，宜学术、考试与公开场合。' },
-  '化忌': { attr: '凶化·阻碍', brief: '劫数星到宫，主执念与阻碍。所在宫位需特别关注，该宫人生课题将成为重要考验。' },
+// ─── Tứ Hóa Giới Thiệu (100% Tiếng Việt) ───────────────────
+const SIHUA_BRIEF: Record<string, { viName: string; attr: string; brief: string }> = {
+  '化禄': {
+    viName: 'Hóa Lộc (化禄)',
+    attr: 'Cát Hóa · Tăng Ích Tài Phúc',
+    brief: 'Chủ về tài lộc, cơ hội dồi dào, phúc khí tăng tiến và nhân duyên hanh thông. An tại cung nào thì phương diện nơi đó thuận lợi, khởi sắc tiền bạc, là sao cát hóa được chào đón nhất trên lá số.',
+  },
+  '化权': {
+    viName: 'Hóa Quyền (化权)',
+    attr: 'Cát Hóa · Quyền Uy & Lãnh Đạo',
+    brief: 'Chủ về thực quyền, quyền lực lãnh đạo, bản lĩnh và ý chí quyết đoán. Rất đắc vị khi nhập Mệnh Cung hoặc Quan Lộc Cung, biểu hiện quyền uy nắm giữ đại cục.',
+  },
+  '化科': {
+    viName: 'Hóa Khoa (化科)',
+    attr: 'Cát Hóa · Danh Dự & Khoa Bảng',
+    brief: 'Chủ về học vấn, thanh danh, thi cử đỗ đạt và quý nhân phù trợ. Hóa giải tai ương nhẹ nhàng, mang lại tiếng thơm, bằng cấp và sự kính trọng từ xã hội.',
+  },
+  '化忌': {
+    viName: 'Hóa Kỵ (化忌)',
+    attr: 'Hung Hóa · Trở Ngại & Khảo Nghiệm',
+    brief: 'Chủ về sự chấp niệm, khúc mắc, hao tổn hoặc trở lực thử thách. Đóng ở cung nào thì đời người phải dành nhiều tâm sức tu dưỡng, biến thách thức thành bài học trưởng thành.',
+  },
 };
 
-// ─── 主星简介数据 ─────────────────────────────────────────
-const STAR_BRIEF: Record<string, { attr: string; brief: string }> = {
-  '紫微': { attr: '土·帝王星', brief: '天皇贵星，统御众星。坐命者有孤傲之气，主权威显达，天生具备领导气质，适合独当一面的领导岗位。' },
-  '天机': { attr: '木·智慧星', brief: '益寿星，主智谋与变动。聪慧机灵，善于筹谋，心思细腻，宜从事策划、顾问、技术类工作。' },
-  '太阳': { attr: '火·官禄主', brief: '官禄主星，主声誉与名望。慷慨大度，重视公众形象，利官场与公职，男命力强，入庙时光明磊落。' },
-  '武曲': { attr: '金·财帛主', brief: '财帛主星，主财务与决断。意志坚定，行动果敢，适合财务、金融、军警类职业，孤克之星，利晚婚。' },
-  '天同': { attr: '水·福星', brief: '福德主星，主享乐与人缘。性情温和，人缘极好，注重生活品质，感情细腻，晚年运势佳。' },
-  '廉贞': { attr: '火·才艺星', brief: '次桃花星，主才艺与情欲。才华出众，感情丰富，适合艺术、政界，多才多艺但需防桃花是非。' },
-  '天府': { attr: '土·财库星', brief: '南斗主星，主财库与积蓄。稳重保守，理财能力强，是命盘的稳定力量，适合管理财务与行政。' },
-  '太阴': { attr: '水·田宅主', brief: '田宅主星，主财富与阴柔。细腻温柔，感受力强，女命尤佳，利不动产与积蓄，适合文艺或服务业。' },
-  '贪狼': { attr: '木水·桃花', brief: '桃花星，主欲望与才艺。多才多艺，欲望旺盛，社交活跃，宜从事艺术、公关、商业，人缘极好。' },
-  '巨门': { attr: '水·是非星', brief: '暗星，主口才与是非。口才出众，思辨能力强，适合律师、教育、媒体，注意口舌是非，以辩才立身。' },
-  '天相': { attr: '水·印星', brief: '印星，主辅佐与印绶。善于协调，重视礼节，正直守法，适合幕僚、行政、法律类工作，贵人运佳。' },
-  '天梁': { attr: '土·荫星', brief: '荫星，主老成与荫蔽。正直稳重，慈悲心强，老天爷会保佑，适合医疗、社会工作、宗教领域。' },
-  '七杀': { attr: '金火·将星', brief: '将星，主刚烈与开创。性格刚毅，行动力强，勇于挑战，适合创业、军警、竞争性行业，逢凶化吉。' },
-  '破军': { attr: '水·耗星', brief: '耗星，主变动与开拓。勇于突破，不惧改变，一生变动大但有魄力，适合开拓型工作，走别人没走过的路。' },
+// ─── 14 Chính Tinh Giới Thiệu (100% Tiếng Việt) ─────────────
+const STAR_BRIEF: Record<string, { viName: string; attr: string; brief: string }> = {
+  '紫微': {
+    viName: 'Tử Vi (紫微)',
+    attr: 'Thổ · Đế Vương Tinh',
+    brief: 'Đế tinh chí tôn, thống ngự vạn sao. Tọa Mệnh cốt cách cao quý, có khí chất lãnh đạo thiên bẩm, phong thái đĩnh đạc, phù hợp đảm đương vị trí đứng đầu gánh vác đại cuộc.',
+  },
+  '天机': {
+    viName: 'Thiên Cơ (天机)',
+    attr: 'Mộc · Trí Tuệ Tinh',
+    brief: 'Thiện tinh chủ mưu lược, quyền biến và trí tuệ mẫn tiệp. Tư duy linh hoạt, tính toán sâu sắc, giỏi phân tích hoạch định, phù hợp làm cố vấn chiến lược, chuyên gia công nghệ cao.',
+  },
+  '太阳': {
+    viName: 'Thái Dương (太阳)',
+    attr: 'Hỏa · Quan Lộc Chủ',
+    brief: 'Chủ về quang minh, danh vọng, phụng sự cộng đồng và sức ảnh hưởng. Tính tình hào sảng, phóng khoáng, thích hợp làm việc công ích, giáo dục, ngoại giao và chính trường.',
+  },
+  '武曲': {
+    viName: 'Vũ Khúc (武曲)',
+    attr: 'Kim · Tài Bạch Chủ',
+    brief: 'Tài tinh cương nghị, chủ về quản trị tài chính, hành động quyết liệt và thực tế. Kiên trì sắt đá, phù hợp ngành ngân hàng, kinh doanh thương mại, quân sự hoặc tài chính quy mô lớn.',
+  },
+  '天同': {
+    viName: 'Thiên Đồng (天同)',
+    attr: 'Thủy · Phúc Tinh',
+    brief: 'Phúc tinh chủ sự ôn hòa, an lạc, phúc thọ và nhân duyên thiện lành. Tính tình thuần hậu, biết hưởng thụ cuộc sống, càng về hậu vận càng tích lũy nhiều phúc báo an nhàn.',
+  },
+  '廉贞': {
+    viName: 'Liêm Trinh (廉贞)',
+    attr: 'Hỏa · Thứ Đào Hoa / Quan Tinh',
+    brief: 'Biểu tượng của tài nghệ, sự nhạy bén và tính cách kiên định. Giàu năng khiếu nghệ thuật hoặc chính trị ngoại giao, đa tài đa nghệ, sống có nguyên tắc và kỷ luật tự giác cao.',
+  },
+  '天府': {
+    viName: 'Thiên Phủ (天府)',
+    attr: 'Thổ · Lệnh Tinh / Tài Khố',
+    brief: 'Nam Đẩu chủ tinh, biểu tượng của kho tàng quốc gia và sự tích lũy vững chắc. Tính cách điềm đạm, bao dung, quản lý tiền bạc tuyệt vời, tạo nền tảng gia nghiệp hưng thịnh.',
+  },
+  '太阴': {
+    viName: 'Thái Âm (太阴)',
+    attr: 'Thủy · Điền Trạch Chủ',
+    brief: 'Chủ về phú quý âm nhu, bất động sản và đời sống nội tâm sâu sắc. Tính cách tinh tế, trầm tĩnh, giỏi tích lũy của cải lâu dài, cực kỳ đắc lợi với điền sản và nghệ thuật.',
+  },
+  '贪狼': {
+    viName: 'Tham Lang (贪狼)',
+    attr: 'Thủy Mộc · Chính Đào Hoa',
+    brief: 'Chủ về khát vọng, sự lôi cuốn, giao tiếp xã hội và khả năng học hỏi đa lĩnh vực. Năng động, thích khám phá, giỏi nắm bắt tâm lý, dễ thành công trong thương mại và sáng tạo.',
+  },
+  '巨门': {
+    viName: 'Cự Môn (巨门)',
+    attr: 'Thủy · Ám Tinh / Ngôn Luận',
+    brief: 'Chủ về khẩu tài hùng biện, tư duy phản biện và khả năng nghiên cứu tìm tòi chân lý. Rất thích hợp làm luật sư, giảng viên, diễn giả, truyền thông; lấy tài ăn nói để lập thân.',
+  },
+  '天相': {
+    viName: 'Thiên Tướng (天相)',
+    attr: 'Thủy · Ấn Tinh / Phò Tá',
+    brief: 'Chủ về sự chính trực, lòng trung thành, uy tín và sự phụng sự. Khéo léo điều phối, trọng lễ nghĩa và kỷ cương, là cánh tay phải đắc lực của người lãnh đạo lớn.',
+  },
+  '天梁': {
+    viName: 'Thiên Lương (天梁)',
+    attr: 'Thổ · Ấm Tinh / Thọ Tinh',
+    brief: 'Chủ về sự che chở của tiền nhân, sự thanh cao, thọ khang và cứu nhân độ thế. Lương thiện, bao dung, thường hóa hung thành cát, rất phù hợp ngành y dược, giáo dục, tâm linh.',
+  },
+  '七杀': {
+    viName: 'Thất Sát (七杀)',
+    attr: 'Kim Hỏa · Tướng Tinh',
+    brief: 'Chủ về sự dũng mãnh, cương liệt, ý chí khai sơn phá thạch. Dám nghĩ dám làm, không lùi bước trước thử thách, phù hợp vị trí tiên phong mở đường, khởi nghiệp độc lập.',
+  },
+  '破军': {
+    viName: 'Phá Quân (破军)',
+    attr: 'Thủy · Hao Tinh / Tiên Phong',
+    brief: 'Chủ về sự đột phá, biến động đổi mới và khả năng tái thiết toàn diện. Dũng cảm phá vỡ lối mòn cũ để tạo nên đế chế mới, thích hợp công việc khai phá và cách tân táo bạo.',
+  },
 };
 
 // ─── 功能视觉装饰 ────────────────────────────────────────
@@ -300,8 +372,8 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
             );
           })}
         </div>
-        <p className="text-[10px] tracking-widest transition-colors duration-300"
-          style={{ color: c.textFaint }}>倪海厦排盘法</p>
+        <p className="text-[11px] font-semibold tracking-widest transition-colors duration-300"
+          style={{ color: c.goldSolid }}>Phương Pháp An Sao Nghê Hải Hà</p>
       </div>
     );
   }
@@ -312,48 +384,83 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
     return (
       <div className="flex flex-col gap-4 h-full justify-center">
         {[
-          { group: '紫微系', stars: ['紫微', '天机', '太阳', '武曲', '天同', '廉贞'] },
-          { group: '天府系', stars: ['天府', '太阴', '贪狼', '巨门', '天相', '天梁', '七杀', '破军'] },
+          {
+            groupVi: 'Nhóm Tử Vi',
+            groupZh: '紫微系',
+            stars: [
+              { zh: '紫微', vi: 'Tử Vi' },
+              { zh: '天机', vi: 'Thiên Cơ' },
+              { zh: '太阳', vi: 'Thái Dương' },
+              { zh: '武曲', vi: 'Vũ Khúc' },
+              { zh: '天同', vi: 'Thiên Đồng' },
+              { zh: '廉贞', vi: 'Liêm Trinh' },
+            ],
+          },
+          {
+            groupVi: 'Nhóm Thiên Phủ',
+            groupZh: '天府系',
+            stars: [
+              { zh: '天府', vi: 'Thiên Phủ' },
+              { zh: '太阴', vi: 'Thái Âm' },
+              { zh: '贪狼', vi: 'Tham Lang' },
+              { zh: '巨门', vi: 'Cự Môn' },
+              { zh: '天相', vi: 'Thiên Tướng' },
+              { zh: '天梁', vi: 'Thiên Lương' },
+              { zh: '七杀', vi: 'Thất Sát' },
+              { zh: '破军', vi: 'Phá Quân' },
+            ],
+          },
         ].map(group => (
-          <div key={group.group}>
-            <div className="text-[11px] tracking-widest mb-2 transition-colors duration-300"
-              style={{ color: c.textFaint }}>{group.group}</div>
+          <div key={group.groupVi}>
+            <div className="text-[11px] font-bold tracking-widest mb-2 transition-colors duration-300"
+              style={{ color: c.textPrimary }}>
+              ✦ {group.groupVi} <span className="text-[9px] font-normal opacity-60">({group.groupZh})</span>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {group.stars.map(s => (
-                <motion.button key={s}
-                  onClick={() => setSel(sel === s ? null : s)}
+                <motion.button key={s.zh}
+                  onClick={() => setSel(sel === s.zh ? null : s.zh)}
                   whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.1 }}
-                  className="text-xs px-2 py-1 rounded-md cursor-pointer"
+                  className="text-xs px-2.5 py-1 rounded-md cursor-pointer flex flex-col items-center"
                   style={{
-                    border: `1px solid ${sel === s ? c.goldSolid : c.goldLine}`,
+                    border: `1px solid ${sel === s.zh ? c.goldSolid : c.goldLine}`,
                     color: c.goldSolid,
-                    background: sel === s ? `${c.goldLine}30` : 'transparent',
-                    fontWeight: sel === s ? 600 : 400,
+                    background: sel === s.zh ? `${c.goldLine}30` : 'transparent',
+                    fontWeight: sel === s.zh ? 700 : 500,
                   }}>
-                  {s}
+                  <span className="font-bold">{s.vi}</span>
+                  <span className="text-[8px] opacity-60 leading-none">{s.zh}</span>
                 </motion.button>
               ))}
             </div>
           </div>
         ))}
         <div>
-          <div className="text-[11px] tracking-widest mb-2 transition-colors duration-300"
-            style={{ color: c.textFaint }}>四化飞星</div>
+          <div className="text-[11px] font-bold tracking-widest mb-2 transition-colors duration-300"
+            style={{ color: c.textPrimary }}>
+            ✦ Tứ Hóa Phi Tinh <span className="text-[9px] font-normal opacity-60">(四化飞星)</span>
+          </div>
           <div className="flex gap-2 flex-wrap">
-            {[['化禄', 'rgba(52,211,153,0.7)'], ['化权', 'rgba(96,165,250,0.7)'], ['化科', 'rgba(250,204,21,0.7)'], ['化忌', 'rgba(248,113,113,0.7)']].map(([label, color]) => (
-              <motion.button key={label}
-                onClick={() => setSel(sel === label ? null : label)}
+            {[
+              ['化禄', 'Hóa Lộc', 'rgba(52,211,153,0.9)'],
+              ['化权', 'Hóa Quyền', 'rgba(96,165,250,0.9)'],
+              ['化科', 'Hóa Khoa', 'rgba(250,204,21,0.9)'],
+              ['化忌', 'Hóa Kỵ', 'rgba(248,113,113,0.9)'],
+            ].map(([zh, vi, color]) => (
+              <motion.button key={zh}
+                onClick={() => setSel(sel === zh ? null : zh)}
                 whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.1 }}
-                className="text-xs px-2.5 py-1 rounded-md cursor-pointer"
+                className="text-xs px-3 py-1 rounded-md cursor-pointer flex flex-col items-center"
                 style={{
                   border: `1px solid ${color}`,
                   color,
-                  background: sel === label ? `${color.replace('0.7', '0.15')}` : 'transparent',
-                  fontWeight: sel === label ? 600 : 400,
+                  background: sel === zh ? `${color.replace('0.9', '0.2')}` : 'transparent',
+                  fontWeight: sel === zh ? 700 : 500,
                 }}>
-                {label}
+                <span className="font-bold">{vi}</span>
+                <span className="text-[8px] opacity-70 leading-none">{zh}</span>
               </motion.button>
             ))}
           </div>
@@ -365,9 +472,9 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
               transition={{ duration: 0.2 }}
               className="rounded-xl p-4 mt-1.5"
               style={{ border: `1px solid ${c.goldLine}`, background: c.featureBg }}>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-sm font-semibold" style={{ color: c.goldSolid }}>{sel}</span>
-                <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ color: c.tagText, border: `1px solid ${c.goldLine}` }}>{selInfo.attr}</span>
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="text-sm font-bold" style={{ color: c.goldSolid }}>{selInfo.viName}</span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full font-semibold" style={{ color: c.tagText, border: `1px solid ${c.goldLine}` }}>{selInfo.attr}</span>
               </div>
               <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>{selInfo.brief}</p>
             </motion.div>
@@ -379,9 +486,9 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
 
   if (index === 2) {
     const msgs = [
-      { role: 'user', text: '我今年的事业运势如何？' },
-      { role: 'ai', text: '命宫天机化禄，今年大限走官禄宫，三方有左辅相助，事业有贵人提携，适合主动拓展…' },
-      { role: 'user', text: '什么时候感情运最好？' },
+      { role: 'user', text: 'Năm nay vận trình sự nghiệp của tôi thế nào?' },
+      { role: 'ai', text: 'Mệnh cung Thiên Cơ Hóa Lộc, năm nay đại hạn đáo Quan Lộc, tam phương có Tả Phụ tương trợ, sự nghiệp có quý nhân nâng đỡ, thích hợp chủ động mở rộng kinh doanh...' },
+      { role: 'user', text: 'Khi nào vận trình tình cảm duyên nợ khởi sắc nhất?' },
     ];
     return (
       <div className="flex flex-col gap-2 h-full justify-center">
@@ -407,9 +514,9 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
 
   if (index === 3) {
     const patterns = [
-      { name: '杀破狼格', desc: '开创进取之命', ok: true },
-      { name: '廉相格',   desc: '行政印绶之格', ok: true },
-      { name: '化忌入命', desc: '需关注心理课题', ok: false },
+      { name: 'Cách Sát Phá Tham', desc: 'Mệnh cách khai phá tiên phong, dám nghĩ dám làm', ok: true },
+      { name: 'Cách Liêm Trinh Thiên Tướng', desc: 'Cốt cách ấn thụ hành chính, tài năng lãnh đạo', ok: true },
+      { name: 'Hóa Kỵ Nhập Mệnh', desc: 'Cần chú ý tu dưỡng tâm tính, vượt qua bài học cuộc đời', ok: false },
     ];
     return (
       <div className="flex flex-col gap-3 h-full justify-center">
@@ -425,14 +532,14 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
             <div className="w-1.5 h-1.5 rounded-full flex-shrink-0"
               style={{ background: p.ok ? 'rgba(96,165,250,0.6)' : 'rgba(251,146,60,0.6)' }} />
             <div>
-              <div className="text-[11px] font-medium"
-                style={{ color: p.ok ? 'rgba(147,197,253,0.8)' : 'rgba(253,186,116,0.8)' }}>{p.name}</div>
+              <div className="text-[11px] font-bold"
+                style={{ color: p.ok ? 'rgba(147,197,253,0.9)' : 'rgba(253,186,116,0.9)' }}>{p.name}</div>
               <div className="text-[10px]" style={{ color: c.textMuted }}>{p.desc}</div>
             </div>
           </motion.div>
         ))}
-        <div className="text-[9px] mt-2 tracking-wider text-center" style={{ color: c.textFaint }}>
-          自动识别 11 种经典格局
+        <div className="text-[10px] mt-2 tracking-wider text-center font-semibold" style={{ color: c.goldSolid }}>
+          Tự Động Nhận Diện 50+ Cách Cục Kinh Điển
         </div>
       </div>
     );
@@ -493,7 +600,7 @@ export default function HomePage() {
               TỬ VI ĐẨU SỐ
             </div>
             <div className="text-[8px] opacity-60 tracking-[0.2em] -mt-0.5" style={{ color: c.textMuted }}>
-              紫微命盘 · THIÊN KỶ
+              MỆNH BÀN · THIÊN KỶ
             </div>
           </div>
         </div>
@@ -504,14 +611,14 @@ export default function HomePage() {
             onClick={() => router.push('/heming')}
             className="text-[11px] sm:text-xs px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-300"
             style={{ border: `1px solid ${c.navBorder}`, color: c.textMuted }}>
-            So Hợp Mệnh (合盘)
+            So Hợp Mệnh
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/chart')}
             className="text-[11px] sm:text-xs px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-300 font-semibold"
             style={{ border: `1px solid ${c.goldLine}`, color: c.goldSolid }}>
-            Lập Lá Số (起盘)
+            Lập Lá Số
           </motion.button>
         </div>
       </nav>
@@ -525,7 +632,7 @@ export default function HomePage() {
             className="flex items-center justify-center gap-3 mb-6">
             <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${c.goldLine})` }} />
             <span className="text-[11px] tracking-[0.3em] font-medium transition-colors duration-300" style={{ color: c.tagText }}>
-              TỬ VI ĐẨU SỐ · HỆ PHÁI THIÊN KỶ (紫微斗数 · 倪海厦体系)
+              TỬ VI ĐẨU SỐ · HỆ PHÁI THIÊN KỶ (DANH SƯ NGHÊ HẢI HÀ)
             </span>
             <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${c.goldLine})` }} />
           </motion.div>
@@ -542,8 +649,8 @@ export default function HomePage() {
               }}>
               TỬ VI ĐẨU SỐ
             </h1>
-            <div className="text-xs sm:text-sm tracking-[0.35em] uppercase mb-4" style={{ color: c.goldSolid, opacity: 0.8 }}>
-              紫微命盘 · THIÊN BÀN VẬN MỆNH
+            <div className="text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-bold" style={{ color: c.goldSolid, opacity: 0.9 }}>
+              THIÊN BÀN VẬN MỆNH · KHÁM PHÁ BẢN THÂN
             </div>
           </motion.div>
 
@@ -556,8 +663,8 @@ export default function HomePage() {
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.55 }}
             className="text-xs md:text-sm tracking-[0.2em] mb-5"
-            style={{ color: c.textMuted, opacity: 0.8 }}>
-            紫微为门 · 天地人为路 · 倪海厦为师 · Tri Thức Cổ Điển & Mệnh Lý
+            style={{ color: c.textMuted, opacity: 0.9 }}>
+            Khai Mở Mệnh Lý · Thấu Suốt Thiên Thời · Dưỡng Tâm Lập Mệnh
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.65 }}
@@ -576,7 +683,7 @@ export default function HomePage() {
               className="px-10 py-3.5 font-bold text-sm sm:text-base tracking-widest rounded-full shadow-lg flex flex-col items-center"
               style={{ background: c.ctaBg, color: c.ctaText }}>
               <span>🔮 KHỞI TẠO LÁ SỐ NGAY</span>
-              <span className="text-[10px] font-normal opacity-75">立即起盘 · Giải Mã Vận Mệnh</span>
+              <span className="text-[10px] font-normal opacity-85">An Sao Chuẩn Xác · Giải Mã Vận Mệnh</span>
             </motion.button>
           </motion.div>
 
@@ -586,6 +693,8 @@ export default function HomePage() {
             className="mt-10 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 max-w-[680px] mx-auto">
             {STARS.map((star, i) => {
               const viInfo = MAJOR_STARS_VI[star.name];
+              const starBrief = STAR_BRIEF[star.name];
+              const elementText = starBrief?.attr.split(' · ')[0] || '';
               return (
                 <motion.div key={star.name}
                   initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
@@ -595,8 +704,8 @@ export default function HomePage() {
                   <span className="text-[12px] font-bold tracking-tight leading-tight" style={{ color: c.starText }}>
                     {viInfo?.vi || star.name}
                   </span>
-                  <span className="text-[9px] opacity-60 leading-none mt-0.5" style={{ color: c.textMuted }}>
-                    {star.name}
+                  <span className="text-[9px] opacity-75 font-medium leading-none mt-0.5" style={{ color: c.textMuted }}>
+                    {elementText || star.name}
                   </span>
                 </motion.div>
               );
@@ -889,7 +998,7 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* ══ 天·地·人 三分理论 ════════════════════════════ */}
+      {/* ══ THIÊN · ĐỊA · NHÂN (TRIẾT LÝ MỆNH VẬN NGHÊ HẢI HÀ) ════════════════════════════ */}
       <section className="relative z-10 flex items-center px-6 md:px-10 lg:px-14 py-20"
         style={{ background: c.altSection, minHeight: '82svh' }}>
         <WeakBoundary line={c.navBorder} />
@@ -898,38 +1007,68 @@ export default function HomePage() {
             <div className="text-center mb-10">
               <div className="flex items-center justify-center gap-3 mb-6">
                 <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${c.goldLine})` }} />
-                <span className="text-[10px] tracking-[0.5em] uppercase" style={{ color: c.tagText }}>Ni Haixia · Philosophy</span>
+                <span className="text-[10px] tracking-[0.5em] uppercase font-bold" style={{ color: c.tagText }}>Triết Lý Mệnh Vận · Nghê Hải Hà</span>
                 <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${c.goldLine})` }} />
               </div>
               <h2 className={`grad-text ${theme === 'dark' ? 'grad-text-dark' : 'grad-text-light'} font-bold mb-5 tracking-tight`}
                 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>
-                天 · 地 · 人
+                THIÊN · ĐỊA · NHÂN
               </h2>
               <p className="max-w-2xl mx-auto text-sm leading-relaxed" style={{ color: c.textSecond }}>
-                倪海厦老师的核心命运观：命运从来不是人生的全部。<br />
-                他将影响人生的力量分为三个同等重要的维度。
+                Đạo lý cốt lõi của danh sư Nghê Hải Hà: Số mệnh chưa bao giờ là toàn bộ cuộc đời.<br />
+                Thầy đúc kết ba lực lượng ngang hàng cùng nhau kiến tạo nên trọn vẹn số phận một con người.
               </p>
             </div>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             {[
-              { glyph: '天', label: '先天命运', pct: '⅓', color: c.goldSolid, borderColor: c.goldLine, desc: '紫微斗数所揭示的，是一个人的先天命盘格局——出生时间决定的星曜布局、五行局数、命宫主星。这只是命运的三分之一，是人生的底色，而非全貌。', sub: '命盘 · 星曜 · 五行' },
-              { glyph: '地', label: '地理环境', pct: '⅓', color: 'rgba(96,165,250,0.9)', borderColor: 'rgba(96,165,250,0.3)', desc: '你所在的地理环境、城市、国家、风水格局，乃至家庭背景与社会结构，共同构成了命运的第二个维度。同一命盘，生在不同地方，际遇可以天壤之别。', sub: '地域 · 风水 · 环境' },
-              { glyph: '人', label: '人心意念', pct: '⅓', color: 'rgba(100,216,139,0.9)', borderColor: 'rgba(100,216,139,0.3)', desc: '个人的意志、心态、选择与行动，才是改变命运最主动的力量。倪师强调：了解命盘是为了更好地做人，而不是坐等命运安排。精进自己，是最强的破局之道。', sub: '意志 · 选择 · 行动' },
+              {
+                glyph: 'THIÊN',
+                zh: '天',
+                label: 'Tiên Thiên Mệnh Vận',
+                pct: '⅓',
+                color: c.goldSolid,
+                borderColor: c.goldLine,
+                desc: 'Lá số Tử Vi tiết lộ cách cục tiên thiên của mỗi người: Vị trí tinh diệu, Ngũ hành cục số, chính tinh Mệnh cung do thời khắc sinh quyết định. Đây chỉ là một phần ba định mệnh, là gam màu nền của cuộc đời chứ không phải là toàn bộ bức tranh.',
+                sub: 'Mệnh Bàn · Tinh Diệu · Ngũ Hành'
+              },
+              {
+                glyph: 'ĐỊA',
+                zh: '地',
+                label: 'Địa Lý Môi Trường',
+                pct: '⅓',
+                color: 'rgba(96,165,250,0.9)',
+                borderColor: 'rgba(96,165,250,0.3)',
+                desc: 'Môi trường địa lý, phong thủy nơi sinh sống, văn hóa vùng miền, gia thế và cấu trúc xã hội tạo nên chiều kích thứ hai của vận mệnh. Cùng một lá số, sinh ra ở hai vùng đất khác nhau thì cơ duyên và thành tựu sẽ có sự khác biệt rõ rệt.',
+                sub: 'Địa Vực · Phong Thủy · Hoàn Cảnh'
+              },
+              {
+                glyph: 'NHÂN',
+                zh: '人',
+                label: 'Nhân Tâm Niệm Niệm',
+                pct: '⅓',
+                color: 'rgba(100,216,139,0.9)',
+                borderColor: 'rgba(100,216,139,0.3)',
+                desc: 'Ý chí, tâm thái, sự lựa chọn và hành động của bản thân là sức mạnh chủ động mạnh mẽ nhất để chuyển hóa vận mệnh. Thầy Nghê Hải Hà luôn răn dạy: Thấu hiểu lá số là để tu dưỡng làm người tốt hơn, chứ không phải ngồi thụ động chờ số phận an bài.',
+                sub: 'Ý Chí · Chọn Lựa · Hành Động'
+              },
             ].map((item, i) => (
               <FadeIn key={item.glyph} delay={0.1 + i * 0.12}>
                 <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.1 }}
                   className="rounded-2xl p-7 h-full flex flex-col"
                   style={{ background: c.cardBg, border: `1px solid ${item.borderColor}`, boxShadow: c.cardShadow }}>
                   <div className="flex items-start justify-between mb-5">
-                    <div className="text-5xl font-bold leading-none" style={{ color: item.color }}>{item.glyph}</div>
+                    <div>
+                      <div className="text-3xl font-black leading-none tracking-tight" style={{ color: item.color }}>{item.glyph}</div>
+                      <div className="text-xs opacity-60 font-serif mt-1" style={{ color: item.color }}>({item.zh})</div>
+                    </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold" style={{ color: item.color }}>{item.pct}</div>
-                      <div className="text-[9px] mt-0.5 tracking-widest" style={{ color: c.textMuted }}>of life</div>
+                      <div className="text-[9px] mt-0.5 tracking-widest font-semibold" style={{ color: c.textMuted }}>vận mệnh đời người</div>
                     </div>
                   </div>
                   <div className="mb-3">
-                    <div className="text-sm font-medium mb-0.5" style={{ color: item.color }}>{item.label}</div>
+                    <div className="text-sm font-bold mb-0.5" style={{ color: item.color }}>{item.label}</div>
                     <div className="text-[10px] tracking-wider" style={{ color: c.textMuted }}>{item.sub}</div>
                   </div>
                   <div className="h-px mb-4" style={{ background: item.borderColor }} />
@@ -940,10 +1079,10 @@ export default function HomePage() {
           </div>
           <FadeIn delay={0.3}>
             <div className="mt-10 text-center">
-              <p className="text-sm leading-relaxed" style={{ color: c.textSecond }}>
-                「命运不是人生的全部，加上地理位置和人念，才是。」
+              <p className="text-sm md:text-base leading-relaxed font-medium italic" style={{ color: c.goldSolid }}>
+                &ldquo;Số mệnh không phải là toàn bộ cuộc đời; phải cộng thêm vị trí phong thủy địa lý và nhân tâm sở niệm, mới thực sự trọn vẹn.&rdquo;
               </p>
-              <p className="mt-2 text-[10px] tracking-widest" style={{ color: c.tagText }}>— 倪海厦</p>
+              <p className="mt-2 text-xs tracking-widest font-bold" style={{ color: c.tagText }}>— DANH SƯ NGHÊ HẢI HÀ (NI HAIXIA)</p>
             </div>
           </FadeIn>
         </div>

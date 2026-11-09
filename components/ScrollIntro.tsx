@@ -124,7 +124,7 @@ export default function ScrollIntro({ onComplete, skipLabel = 'BỎ QUA' }: Scro
                   height: '100%',
                   display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center',
-                  padding: '0 clamp(40px, 8vw, 120px)',
+                  padding: '0 clamp(16px, 3.5vw, 48px)',
                   fontFamily: '"STSong", "Songti SC", "SimSun", serif',
                 }}
               >
@@ -133,7 +133,7 @@ export default function ScrollIntro({ onComplete, skipLabel = 'BỎ QUA' }: Scro
                   fontSize: 'clamp(10px, 1.1vw, 12px)',
                   color: '#8b5d18',
                   letterSpacing: '0.45em',
-                  marginBottom: 'clamp(20px, 3vh, 36px)',
+                  marginBottom: 'clamp(16px, 2.5vh, 28px)',
                   fontFamily: '"STKaiti", "Kaiti SC", serif',
                   whiteSpace: 'nowrap',
                   opacity: 0.85,
@@ -145,19 +145,21 @@ export default function ScrollIntro({ onComplete, skipLabel = 'BỎ QUA' }: Scro
                 <div style={{
                   width: '60px', height: '1px',
                   background: 'linear-gradient(90deg, transparent, #a87a30, transparent)',
-                  marginBottom: 'clamp(16px, 2.5vh, 28px)',
+                  marginBottom: 'clamp(12px, 2vh, 22px)',
                 }} />
 
                 {/* Đại tự 「TỬ VI ĐẨU SỐ」 */}
                 <h1 style={{
-                  fontSize: 'clamp(36px, 6vw, 84px)',
+                  fontSize: 'clamp(22px, 4vw, 50px)',
                   fontWeight: 800,
                   color: '#1a1208',
-                  letterSpacing: 'clamp(0.12em, 0.2vw, 0.25em)',
-                  lineHeight: 1.1,
+                  letterSpacing: 'clamp(0.06em, 0.12vw, 0.15em)',
+                  lineHeight: 1.15,
                   margin: 0,
                   textShadow: '0 1px 0 rgba(255,250,235,0.3)',
                   whiteSpace: 'nowrap',
+                  textAlign: 'center',
+                  maxWidth: '100%',
                 }}>
                   TỬ VI ĐẨU SỐ
                 </h1>

@@ -3,6 +3,11 @@ import { motion } from 'framer-motion';
 import type { FamousPerson } from '@/lib/ziwei/famous';
 
 const CATEGORY_COLORS: Record<string, { vi: string; color: string }> = {
+  'Thương Nghiệp': { vi: 'Thương Nghiệp', color: '#4ade80' },
+  'Văn Nghệ': { vi: 'Văn Nghệ', color: '#c084fc' },
+  'Công Nghệ': { vi: 'Công Nghệ', color: '#60a5fa' },
+  'Thể Thao': { vi: 'Thể Thao', color: '#fb923c' },
+  'Lịch Sử': { vi: 'Lịch Sử', color: '#facc15' },
   '商业': { vi: 'Thương Nghiệp', color: '#4ade80' },
   '文艺': { vi: 'Văn Nghệ', color: '#c084fc' },
   '科技': { vi: 'Công Nghệ', color: '#60a5fa' },
@@ -28,12 +33,11 @@ export default function FamousPersonCard({ person }: { person: FamousPerson }) {
       <div className="text-[10px] tracking-wide mb-3 flex items-center justify-between" style={{ color: 'var(--t-faint)' }}>
         <div className="flex items-center gap-1.5">
           <span style={{ color: catColor, opacity: 0.9, fontSize: '13px' }}>★</span>
-          <span className="font-bold text-amber-400">LÁ SỐ DANH NHÂN</span>
-          <span className="text-[9px] opacity-60">(名人命盘)</span>
+          <span className="font-bold text-amber-400">LÁ SỐ DANH NHÂN MẪU</span>
         </div>
-        <span className="text-[9px] px-2 py-0.5 rounded-full font-medium"
+        <span className="text-[9px] px-2 py-0.5 rounded-full font-bold"
           style={{ color: catColor, background: catColor + '18', border: `1px solid ${catColor}40` }}>
-          {cat.vi} · {person.category}
+          {cat.vi}
         </span>
       </div>
 

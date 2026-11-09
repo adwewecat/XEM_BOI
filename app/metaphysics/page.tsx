@@ -394,14 +394,28 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
-                  {/* Lời luận giải nguyên bản */}
-                  <div className="p-5 rounded-xl bg-amber-500/5 border border-amber-500/20 mb-6">
-                    <div className="text-xs font-bold text-amber-300 mb-2 flex items-center gap-2">
-                      <span>🎴</span> THẦY REO QUẺ VÀ PHÁN:
+                  {/* KẾT LUẬN TRỰC DIỆN CỦA THẦY */}
+                  <div className="p-5 rounded-xl bg-gradient-to-r from-amber-950/40 via-zinc-900 to-amber-950/30 border-2 border-amber-500/40 mb-6 shadow-lg shadow-amber-950/20">
+                    <div className="text-xs font-bold text-amber-400 mb-2 flex items-center gap-2 uppercase tracking-wider">
+                      <span className="text-base">🎯</span> KẾT LUẬN TRỰC DIỆN CHO CÂU HỎI CỦA BẠN:
                     </div>
-                    <p className="text-sm sm:text-base font-serif text-zinc-100 leading-loose italic whitespace-pre-line">
-                      "{dongTamResult.thayPhan}"
-                    </p>
+                    <div className="text-base sm:text-lg font-bold text-amber-100 leading-relaxed font-sans">
+                      {dongTamResult.directConclusion || dongTamResult.thayPhan.split('\n')[2] || 'Hành sự thuận hòa, an định tâm trí.'}
+                    </div>
+                  </div>
+
+                  {/* LỜI THẦY PHÁN & LUẬN GIẢI DỊCH LÝ CHI TIẾT */}
+                  <div className="p-5 rounded-xl bg-zinc-900/90 border border-zinc-800 mb-6">
+                    <div className="text-xs font-bold text-amber-300 mb-3 flex items-center gap-2">
+                      <span>📜</span> TOÀN VĂN LUẬN GIẢI QUẺ DỊCH:
+                    </div>
+                    <div className="space-y-2.5 text-sm sm:text-base font-sans text-zinc-200 leading-relaxed font-normal">
+                      {dongTamResult.thayPhan.split('\n').map((line, idx) => (
+                        <p key={idx} className={line.startsWith('- KẾT LUẬN') ? 'hidden' : 'leading-relaxed'}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Chi tiết Dụng Thần & Dịch Lý */}
