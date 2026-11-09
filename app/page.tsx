@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'fra
 import StarField from '@/components/StarField';
 import { useTheme, type Theme } from '@/components/ThemeProvider';
 import AnnouncementModal from '@/components/AnnouncementModal';
+import { MAJOR_STARS_VI } from '@/lib/ziwei/vietnamese';
 
 // ─── 滚动入场 wrapper ────────────────────────────────────
 function FadeIn({
@@ -484,9 +485,17 @@ export default function HomePage() {
         style={{
           background: c.navBg,
         }}>
-        <div className="text-[11px] sm:text-xs tracking-[0.3em] sm:tracking-[0.4em] font-medium transition-colors duration-300 flex-shrink-0"
-          style={{ color: c.goldSolid }}>
-          紫微命盘
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-base">🔮</span>
+          <div>
+            <div className="text-[12px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] font-bold transition-colors duration-300"
+              style={{ color: c.goldSolid }}>
+              TỬ VI ĐẨU SỐ
+            </div>
+            <div className="text-[8px] opacity-60 tracking-[0.2em] -mt-0.5" style={{ color: c.textMuted }}>
+              紫微命盘 · THIÊN KỶ
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
           <ThemeToggle />
@@ -495,14 +504,14 @@ export default function HomePage() {
             onClick={() => router.push('/heming')}
             className="text-[11px] sm:text-xs px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-300"
             style={{ border: `1px solid ${c.navBorder}`, color: c.textMuted }}>
-            合盘
+            So Hợp Mệnh (合盘)
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/chart')}
-            className="text-[11px] sm:text-xs px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-300"
+            className="text-[11px] sm:text-xs px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full transition-all duration-300 font-semibold"
             style={{ border: `1px solid ${c.goldLine}`, color: c.goldSolid }}>
-            立即起盘
+            Lập Lá Số (起盘)
           </motion.button>
         </div>
       </nav>
@@ -513,10 +522,10 @@ export default function HomePage() {
           {/* 标签行 */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex items-center justify-center gap-3 mb-8">
+            className="flex items-center justify-center gap-3 mb-6">
             <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${c.goldLine})` }} />
-            <span className="text-[11px] tracking-[0.45em] transition-colors duration-300" style={{ color: c.tagText }}>
-              紫微斗数 · 倪海厦体系
+            <span className="text-[11px] tracking-[0.3em] font-medium transition-colors duration-300" style={{ color: c.tagText }}>
+              TỬ VI ĐẨU SỐ · HỆ PHÁI THIÊN KỶ (紫微斗数 · 倪海厦体系)
             </span>
             <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${c.goldLine})` }} />
           </motion.div>
@@ -526,32 +535,35 @@ export default function HomePage() {
             transition={{ duration: 0.9, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ position: 'relative', display: 'inline-block' }}>
             <h1
-              className={`grad-text ${theme === 'dark' ? 'grad-text-dark' : 'grad-text-light'} font-bold leading-none mb-5`}
+              className={`grad-text ${theme === 'dark' ? 'grad-text-dark' : 'grad-text-light'} font-extrabold leading-none mb-3`}
               style={{
-                fontSize: 'clamp(56px, 10vw, 124px)',
-                letterSpacing: '0.07em',
+                fontSize: 'clamp(44px, 8vw, 96px)',
+                letterSpacing: '0.04em',
               }}>
-              紫微命盘
+              TỬ VI ĐẨU SỐ
             </h1>
+            <div className="text-xs sm:text-sm tracking-[0.35em] uppercase mb-4" style={{ color: c.goldSolid, opacity: 0.8 }}>
+              紫微命盘 · THIÊN BÀN VẬN MỆNH
+            </div>
           </motion.div>
 
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.45 }}
-            className="text-base md:text-lg tracking-[0.18em] mb-2"
-            style={{ color: c.textSecond, fontWeight: 500 }}>
-            紫微为门 · 天地人为路 · 倪海厦为师
+            className="text-base md:text-lg tracking-[0.12em] mb-1.5"
+            style={{ color: c.textSecond, fontWeight: 600 }}>
+            Tử Vi Vi Môn · Thiên Địa Nhân Vi Lộ · Nghê Hải Hà Vi Sư
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.55 }}
-            className="text-xs md:text-sm tracking-[0.3em] mb-6"
-            style={{ color: c.textMuted, opacity: 0.85 }}>
-            AI 答疑 · 知行合一
+            className="text-xs md:text-sm tracking-[0.2em] mb-5"
+            style={{ color: c.textMuted, opacity: 0.8 }}>
+            紫微为门 · 天地人为路 · 倪海厦为师 · Tri Thức Cổ Điển & Mệnh Lý
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.65 }}
-            className="text-sm max-w-xl mx-auto leading-relaxed mb-10"
+            className="text-sm max-w-xl mx-auto leading-relaxed mb-8"
             style={{ color: c.textMuted }}>
-            输入出生年月日时，生成专属紫微斗数命盘 — 后续天纪、地纪、人纪学习模块陆续开放。
+            Nhập ngày tháng năm và thời khắc sinh, tự động hiệu chỉnh Giờ Chân Thái Dương (True Solar Time) theo 63 tỉnh thành để khởi tạo lá số Tử Vi 12 cung hoàn chỉnh.
           </motion.p>
 
           {/* CTA */}
@@ -561,25 +573,34 @@ export default function HomePage() {
             <motion.button
               whileHover={{ y: -2, filter: 'brightness(1.06)' }} whileTap={{ scale: 0.97 }}
               onClick={() => router.push('/chart')}
-              className="px-12 py-4 font-semibold text-base tracking-widest rounded-full"
+              className="px-10 py-3.5 font-bold text-sm sm:text-base tracking-widest rounded-full shadow-lg flex flex-col items-center"
               style={{ background: c.ctaBg, color: c.ctaText }}>
-              立即起盘
+              <span>🔮 KHỞI TẠO LÁ SỐ NGAY</span>
+              <span className="text-[10px] font-normal opacity-75">立即起盘 · Giải Mã Vận Mệnh</span>
             </motion.button>
           </motion.div>
 
           {/* 十四主星 */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ delay: 1.05, duration: 0.8 }}
-            className="mt-12 grid grid-cols-7 gap-1.5 max-w-[540px] mx-auto">
-            {STARS.map((star, i) => (
-              <motion.div key={star.name}
-                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.05 + i * 0.03, duration: 0.35 }}
-                className="flex items-center justify-center px-2 py-1 rounded-full"
-                style={{ background: c.starBg, border: `1px solid ${c.starBorder}` }}>
-                <span className="text-[11px] tracking-wide" style={{ color: c.starText }}>{star.name}</span>
-              </motion.div>
-            ))}
+            className="mt-10 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 max-w-[680px] mx-auto">
+            {STARS.map((star, i) => {
+              const viInfo = MAJOR_STARS_VI[star.name];
+              return (
+                <motion.div key={star.name}
+                  initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.05 + i * 0.03, duration: 0.35 }}
+                  className="flex flex-col items-center justify-center px-2 py-1.5 rounded-xl border"
+                  style={{ background: c.starBg, borderColor: c.starBorder }}>
+                  <span className="text-[12px] font-bold tracking-tight leading-tight" style={{ color: c.starText }}>
+                    {viInfo?.vi || star.name}
+                  </span>
+                  <span className="text-[9px] opacity-60 leading-none mt-0.5" style={{ color: c.textMuted }}>
+                    {star.name}
+                  </span>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </motion.div>
 

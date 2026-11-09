@@ -13,6 +13,7 @@ import { generateChart } from '@/lib/ziwei/algorithm';
 import { FAMOUS_PERSONS, type FamousPerson } from '@/lib/ziwei/famous';
 import type { BirthInfo, ZiweiChart, Palace } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
+import { PALACE_VI, getStarName, BRANCHES_VI, STEMS_VI, BRIGHTNESS_VI } from '@/lib/ziwei/vietnamese';
 import { useTheme } from '@/components/ThemeProvider';
 
 export default function ChartPage() {
@@ -325,7 +326,7 @@ export default function ChartPage() {
                     : 'text-stone-400 hover:text-stone-200'
                 }`}
               >
-                🔍 Cung {selectedPalace.name}
+                🔍 Cung {PALACE_VI[selectedPalace.name]?.short || selectedPalace.name}
               </button>
             )}
           </div>
@@ -363,45 +364,65 @@ export default function ChartPage() {
                 className="card-glass rounded-xl p-4 space-y-3"
               >
                 <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: 'var(--bdr)' }}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-amber-500">Cung {selectedPalace.name}</span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25">
-                      Địa chi: {BRANCHES[selectedPalace.branch]}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-bold text-amber-500">
+                        {PALACE_VI[selectedPalace.name]?.vi || selectedPalace.name}
+                      </span>
+                      <span className="text-[10px] opacity-60">({selectedPalace.name})</span>
+                    </div>
+                    <div className="text-[11px] text-stone-400 mt-0.5">
+                      {PALACE_VI[selectedPalace.name]?.short} · Cung {BRANCHES_VI[selectedPalace.branch]} ({BRANCHES[selectedPalace.branch]})
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/25 font-semibold">
+                      Can {STEMS_VI[selectedPalace.stem]} ({STEMS[selectedPalace.stem]})
                     </span>
                   </div>
-                  <span className="text-xs" style={{ color: 'var(--tx-3)' }}>
-                    Can: {STEMS[selectedPalace.stem]}
-                  </span>
                 </div>
 
                 {/* Danh Sách Sao Trong Cung */}
                 <div>
-                  <span className="text-[11px] font-semibold block mb-1.5" style={{ color: 'var(--tx-2)' }}>★ Các Sao Toạ Thủ:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedPalace.stars.map((s, idx) => (
-                      <span
-                        key={`${s.name}-${idx}`}
-                        className={`text-xs px-2 py-1 rounded border font-medium ${
-                          s.type === 'major'
-                            ? 'bg-amber-500/15 border-amber-500/35 text-amber-400 font-bold'
-                            : s.type === 'lucky'
-                            ? 'bg-sky-500/15 border-sky-500/35 text-sky-400'
-                            : s.type === 'sha'
-                            ? 'bg-red-500/15 border-red-500/35 text-red-400'
-                            : 'bg-stone-500/10 border-stone-500/25 text-stone-300'
-                        }`}
-                      >
-                        {s.name} {s.brightnessRaw ? `(${s.brightnessRaw})` : ''}
-                      </span>
-                    ))}
+                  <span className="text-[11px] font-semibold block mb-2" style={{ color: 'var(--tx-2)' }}>
+                    ★ Các Tinh Diệu Toạ Thủ:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPalace.stars.map((s, idx) => {
+                      const st = getStarName(s.name);
+                      const brightVi = s.brightnessRaw ? BRIGHTNESS_VI[s.brightnessRaw] || s.brightnessRaw : '';
+
+                      return (
+                        <div
+                          key={`${s.name}-${idx}`}
+                          className={`text-xs px-2.5 py-1.5 rounded-lg border flex flex-col items-center leading-tight ${
+                            s.type === 'major'
+                              ? 'bg-amber-500/15 border-amber-500/35 text-amber-400 font-bold'
+                              : s.type === 'lucky'
+                              ? 'bg-sky-500/15 border-sky-500/35 text-sky-400'
+                              : s.type === 'sha'
+                              ? 'bg-red-500/15 border-red-500/35 text-red-400'
+                              : 'bg-stone-500/10 border-stone-500/25 text-stone-300'
+                          }`}
+                        >
+                          <div className="flex items-baseline gap-1">
+                            <span>{st.vi}</span>
+                            {brightVi && <span className="text-[9px] opacity-80 font-normal">[{brightVi}]</span>}
+                          </div>
+                          <span className="text-[8px] opacity-50 font-normal mt-0.5">
+                            {st.zh}{s.brightnessRaw ? `(${s.brightnessRaw})` : ''}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Đại Hạn Cung */}
                 {selectedPalace.daXianAge && (
-                  <div className="text-xs p-2.5 rounded-lg card-inner" style={{ color: 'var(--tx-2)' }}>
-                    <span className="font-semibold text-amber-500">Đại Hạn: </span>
-                    {selectedPalace.daXianAge[0]} - {selectedPalace.daXianAge[1]} tuổi
+                  <div className="text-xs p-2.5 rounded-lg card-inner flex items-center justify-between" style={{ color: 'var(--tx-2)' }}>
+                    <span className="font-semibold text-amber-500">Đại Hạn:</span>
+                    <span className="font-bold">{selectedPalace.daXianAge[0]} - {selectedPalace.daXianAge[1]} tuổi</span>
                   </div>
                 )}
               </motion.div>

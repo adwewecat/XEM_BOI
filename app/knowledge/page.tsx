@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { ALL_STARS, ALL_TOPICS, getKnowledge, STAR_BRIEF_SEO, STAR_TO_SLUG } from '@/lib/seo/knowledge';
 import { TOPIC_LABEL } from '@/lib/ziwei/db-analysis';
+import { getStarName, PALACE_VI, TOPIC_VI } from '@/lib/ziwei/vietnamese';
 
 export const metadata = {
   title: '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
@@ -21,14 +22,14 @@ export default function KnowledgeHomePage() {
       {/* 顶栏 */}
       <div className="px-6 py-4 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
-        <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 首页
+        <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.1em', textDecoration: 'none' }}>
+          ← Trang Chủ (首页)
         </Link>
-        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em' }}>
-          倪师方法论 · 知识库
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em', fontWeight: 600 }}>
+          VẠN TINH CÁC · KHO TRI THỨC TỬ VI
         </div>
-        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          古籍 →
+        <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.1em', textDecoration: 'none' }}>
+          Tàng Kinh Các (古籍) →
         </Link>
       </div>
 
@@ -39,89 +40,107 @@ export default function KnowledgeHomePage() {
           <span style={{ fontSize: '11px', color: 'var(--ac)', letterSpacing: '0.4em' }}>KNOWLEDGE BASE</span>
           <div style={{ height: '1px', width: '48px', background: 'linear-gradient(to left, transparent, rgba(184,146,42,0.4))' }} />
         </div>
-        <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.15em', marginBottom: '12px' }}>
-          紫微斗数知识库
+        <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, color: 'var(--tx-0)', letterSpacing: '0.05em', marginBottom: '8px' }}>
+          VẠN TINH CÁC · TRI THỨC TỬ VI
         </h1>
-        <p style={{ fontSize: '14px', color: 'var(--tx-2)', letterSpacing: '0.08em', maxWidth: '600px', margin: '0 auto', lineHeight: 1.7 }}>
-          14 主星 × 13 宫位 = <strong style={{ color: 'var(--ac)' }}>{ALL_STARS.length * ALL_TOPICS.length}</strong> 项专题<br />
-          基于倪海厦《天纪》体系编纂 · 含古籍引证
+        <div style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', marginBottom: '12px', opacity: 0.8 }}>
+          紫微斗数知识库 · PHÁI THIÊN KỶ
+        </div>
+        <p style={{ fontSize: '14px', color: 'var(--tx-2)', letterSpacing: '0.04em', maxWidth: '640px', margin: '0 auto', lineHeight: 1.7 }}>
+          14 Chính Tinh × 13 Cung Vị = <strong style={{ color: 'var(--ac)' }}>{ALL_STARS.length * ALL_TOPICS.length}</strong> Chuyên Đề Luận Giải Chi Tiết<br />
+          Biên soạn chuẩn theo giáo trình 《Thiên Kỷ》 của danh sư Nghê Hải Hà & Cổ tịch Toàn Thư.
         </p>
       </div>
 
       {/* 14 主星卡片 */}
       <div className="max-w-5xl mx-auto px-6 pb-20">
-        <div style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.3em', textAlign: 'center', marginBottom: '24px' }}>
-          十四主星
+        <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em', textAlign: 'center', marginBottom: '24px', fontWeight: 600 }}>
+          THẬP TỨ CHÍNH TINH (十四主星)
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          {ALL_STARS.map(star => (
-            <Link
-              key={star}
-              href={`/knowledge/${STAR_TO_SLUG[star]}/overview`}
-              style={{
-                display: 'block',
-                padding: '14px 10px',
-                background: 'var(--bg-card)',
-                border: '1px solid rgba(184,146,42,0.2)',
-                borderRadius: '10px',
-                textDecoration: 'none',
-                textAlign: 'center',
-                transition: 'all 0.2s',
-              }}
-              className="hover:shadow-md hover:border-amber-400"
-            >
-              <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.15em' }}>
-                {star}
-              </div>
-            </Link>
-          ))}
+          {ALL_STARS.map(star => {
+            const starVi = getStarName(star);
+            return (
+              <Link
+                key={star}
+                href={`/knowledge/${STAR_TO_SLUG[star]}/overview`}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  padding: '12px 8px',
+                  background: 'var(--bg-card)',
+                  border: '1px solid rgba(184,146,42,0.2)',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  textAlign: 'center',
+                  transition: 'all 0.2s',
+                }}
+                className="hover:shadow-md hover:border-amber-400"
+              >
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.05em' }}>
+                  {starVi.vi}
+                </div>
+                <div style={{ fontSize: '10px', color: 'var(--tx-3)', opacity: 0.65, marginTop: '2px' }}>
+                  {starVi.zh}
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         {/* 详细列表（每个主星 + 简介 + 进入按钮） */}
         <div className="mt-14 space-y-4">
-          {ALL_STARS.map(star => (
-            <div key={star} style={{
-              background: 'var(--bg-card)',
-              border: '1px solid rgba(184,146,42,0.18)',
-              borderRadius: '12px',
-              padding: '18px 22px',
-            }}>
-              <div className="flex items-baseline gap-3 mb-2">
-                <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.1em' }}>
-                  {star}星
-                </span>
-                <span style={{ fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.15em' }}>
-                  ZI WEI · 14 STARS
-                </span>
+          {ALL_STARS.map(star => {
+            const starVi = getStarName(star);
+            return (
+              <div key={star} style={{
+                background: 'var(--bg-card)',
+                border: '1px solid rgba(184,146,42,0.18)',
+                borderRadius: '12px',
+                padding: '18px 22px',
+              }}>
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--tx-0)', letterSpacing: '0.05em' }}>
+                    Sao {starVi.vi}
+                  </span>
+                  <span style={{ fontSize: '12px', color: 'var(--tx-3)', opacity: 0.7 }}>
+                    ({starVi.zh}星 · ZI WEI 14 STARS)
+                  </span>
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--tx-2)', lineHeight: 1.7, marginBottom: '14px' }}>
+                  {STAR_DESCRIPTIONS_QUICK[star] || ''}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_TOPICS.map(t => {
+                    const k = getKnowledge(star, t);
+                    if (!k.exists) return null;
+                    const pShort = PALACE_VI[k.palaceName]?.short || k.palaceName;
+                    const topicTitle = TOPIC_VI[t]?.title || TOPIC_LABEL[t];
+
+                    return (
+                      <Link
+                        key={t}
+                        href={`/knowledge/${STAR_TO_SLUG[star]}/${t}`}
+                        style={{
+                          fontSize: '11px',
+                          padding: '4px 12px',
+                          background: 'rgba(184,146,42,0.08)',
+                          border: '1px solid rgba(184,146,42,0.2)',
+                          borderRadius: '999px',
+                          color: 'var(--tx-2)',
+                          textDecoration: 'none',
+                        }}
+                        className="hover:border-amber-400 hover:text-amber-400 transition-colors"
+                      >
+                        Cung {pShort} · {topicTitle}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--tx-2)', lineHeight: 1.7, marginBottom: '12px' }}>
-                {STAR_DESCRIPTIONS_QUICK[star] || ''}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {ALL_TOPICS.map(t => {
-                  const k = getKnowledge(star, t);
-                  if (!k.exists) return null;
-                  return (
-                    <Link
-                      key={t}
-                      href={`/knowledge/${STAR_TO_SLUG[star]}/${t}`}
-                      style={{
-                        fontSize: '11px',
-                        padding: '4px 10px',
-                        background: 'rgba(184,146,42,0.06)',
-                        border: '1px solid rgba(184,146,42,0.15)',
-                        borderRadius: '999px',
-                        color: 'var(--tx-2)',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      入{k.palaceName} · {TOPIC_LABEL[t]}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

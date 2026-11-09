@@ -6,6 +6,7 @@ import { SHICHEN } from '@/lib/ziwei/constants';
 import { useTheme } from '@/components/ThemeProvider';
 import { PROVINCES } from '@/lib/ziwei/cities';
 import { formToBirthInfo, calcTrueSolarBranch } from '@/lib/ziwei/share';
+import { BRANCHES_VI } from '@/lib/ziwei/vietnamese';
 
 export interface BirthFormState {
   name: string;
@@ -83,18 +84,18 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
   const offsetMin = Math.round((form.longitude - 120) * 4);
   const shichenInfo = SHICHEN[branch];
 
-  // ─── 校验逻辑 ───────────────────────────────────────────
+  // ─── 校验逻辑 (Validation Logic) ───────────────────────────
   const y = parseInt(form.year) || 0;
   const m = parseInt(form.month) || 0;
   const d = parseInt(form.day) || 0;
 
   const errors = {
-    year: !form.year ? '请选择出生年份'
-      : y < 1900 || y > 2026 ? '年份范围：1900–2026'
+    year: !form.year ? 'Vui lòng chọn năm sinh'
+      : y < 1900 || y > 2026 ? 'Phạm vi năm: 1900–2026'
       : '',
-    month: !form.month ? '请选择月份' : '',
-    day: !form.day ? '请选择日期'
-      : form.year && form.month && !isValidDate(y, m, d) ? `${m}月没有${d}日`
+    month: !form.month ? 'Vui lòng chọn tháng' : '',
+    day: !form.day ? 'Vui lòng chọn ngày'
+      : form.year && form.month && !isValidDate(y, m, d) ? `Tháng ${m} không có ngày ${d}`
       : '',
   };
   const hasError = Object.values(errors).some(Boolean);
@@ -112,10 +113,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
   const showSummary = steps[0] && steps[2] && !hasError;
   const summaryText = showSummary
     ? [
-        `${y}年${m}月${d}日`,
+        `Ngày ${d}/${m}/${y}`,
         form.city || (form.province ? form.province : ''),
-        form.unknownTime ? '时辰不详' : `${SHICHEN_NAMES[branch]}时`,
-        form.gender === 'male' ? '男' : '女',
+        form.unknownTime ? 'Giờ sinh: Tùy định' : `Giờ ${BRANCHES_VI[branch]} (${SHICHEN_NAMES[branch]}时)`,
+        form.gender === 'male' ? 'Nam mệnh (男)' : 'Nữ mệnh (女)',
       ].filter(Boolean).join(' · ')
     : '';
 
@@ -203,8 +204,11 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
       style={{ background: bg, border: `1px solid ${border}`, borderRadius: '24px', padding: '28px', backdropFilter: 'blur(20px)' }}
     >
       {/* 标题 */}
-      <h3 style={{ color: goldText, fontSize: '12px', letterSpacing: '0.4em', textAlign: 'center', marginBottom: '20px', fontWeight: 500 }}>
-        ── 输入生辰八字 ──
+      <h3 style={{ color: goldText, fontSize: '13px', letterSpacing: '0.25em', textAlign: 'center', marginBottom: '20px', fontWeight: 600 }}>
+        ── NHẬP BÁT TỰ & THỜI KHẮC SINH ──
+        <span style={{ display: 'block', fontSize: '9px', fontWeight: 400, opacity: 0.5, letterSpacing: '0.3em', marginTop: '2px' }}>
+          输入生辰八字 · BÁT TỰ TIÊN THIÊN
+        </span>
       </h3>
 
       {/* ── 进度条 ── */}
@@ -221,10 +225,13 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 姓名 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>姓名（可选）</label>
+        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+          <span>Họ và Tên</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Tùy chọn · 姓名)</span>
+        </label>
         <input
           type="text"
-          placeholder="请输入姓名"
+          placeholder="Nhập họ và tên người xem (Ví dụ: Nguyễn Văn An)..."
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
           style={inputStyle}
@@ -235,7 +242,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生日期 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生日期（公历）</label>
+        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+          <span>Ngày Sinh Dương Lịch</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Công Lịch · 公历)</span>
+        </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
           <div>
             <select
@@ -244,9 +254,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('year') && errors.year ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">年份</option>
+              <option value="">Năm (年)</option>
               {Array.from({ length: 127 }, (_, i) => 2026 - i).map(yr => (
-                <option key={yr} value={String(yr)}>{yr}</option>
+                <option key={yr} value={String(yr)}>Năm {yr}</option>
               ))}
             </select>
             <FieldError msg={showErr('year') ? errors.year : ''} />
@@ -258,9 +268,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('month') && errors.month ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">月份</option>
+              <option value="">Tháng (月)</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map(mo => (
-                <option key={mo} value={String(mo)}>{mo} 月</option>
+                <option key={mo} value={String(mo)}>Tháng {mo}</option>
               ))}
             </select>
             <FieldError msg={showErr('month') ? errors.month : ''} />
@@ -272,9 +282,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('day') && errors.day ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">日期</option>
+              <option value="">Ngày (日)</option>
               {Array.from({ length: 31 }, (_, i) => i + 1).map(dy => (
-                <option key={dy} value={String(dy)}>{dy} 日</option>
+                <option key={dy} value={String(dy)}>Ngày {dy}</option>
               ))}
             </select>
             <FieldError msg={showErr('day') ? errors.day : ''} />
@@ -284,7 +294,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生地点 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生地点（用于真太阳时校正）</label>
+        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+          <span>Nơi Sinh</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Tự động tính Giờ Chân Thái Dương · 出生地点)</span>
+        </label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <select
             value={form.province}
@@ -293,7 +306,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onFocus={e => { e.target.style.borderColor = focusBorder; }}
             onBlur={e => { e.target.style.borderColor = inputBorder; }}
           >
-            <option value="">省份 / 直辖市</option>
+            <option value="">Chọn Quốc gia / Vùng / Tỉnh thành</option>
             {PROVINCES.map(p => (
               <option key={p.name} value={p.name}>{p.name}</option>
             ))}
@@ -306,7 +319,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onFocus={e => { e.target.style.borderColor = focusBorder; }}
             onBlur={e => { e.target.style.borderColor = inputBorder; }}
           >
-            <option value="">{form.province ? '城市' : '先选省份'}</option>
+            <option value="">{form.province ? 'Chọn Tỉnh / Thành / Quận' : 'Chọn tỉnh trước'}</option>
             {cityList.map(c => (
               <option key={c.name} value={c.name}>{c.name}</option>
             ))}
@@ -319,9 +332,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{ fontSize: '10px', color: isDark ? 'rgba(180,210,235,0.85)' : 'rgba(100,70,10,0.5)', marginTop: '5px' }}
+              style={{ fontSize: '11px', color: isDark ? 'rgba(180,210,235,0.85)' : 'rgba(100,70,10,0.5)', marginTop: '5px' }}
             >
-              {form.city || '（请选择城市）'} · 经度 {form.longitude.toFixed(1)}°E · 时差 {offsetMin > 0 ? '+' : ''}{offsetMin} 分钟
+              📍 {form.city || '（Vui lòng chọn địa điểm）'} · Kinh độ {form.longitude.toFixed(1)}°E · Chênh lệch {offsetMin > 0 ? '+' : ''}{offsetMin} phút
             </motion.p>
           ) : (
             <motion.p
@@ -329,9 +342,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{ fontSize: '10px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)', marginTop: '5px' }}
+              style={{ fontSize: '11px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)', marginTop: '5px' }}
             >
-              * 倪海厦批命用真太阳时，建议填写出生地以自动校正时辰
+              * Thuật toán tự động bù trừ Giờ Chân Thái Dương (True Solar Time) theo kinh độ nơi sinh
             </motion.p>
           )}
         </AnimatePresence>
@@ -339,7 +352,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生时间 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生时间（北京时间）</label>
+        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+          <span>Giờ Sinh</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Giờ trên đồng hồ · 出生时间)</span>
+        </label>
         <div style={{ borderRadius: '14px', padding: '12px', background: panelBg, border: `1px solid ${panelBorder}`, opacity: form.unknownTime ? 0.45 : 1, pointerEvents: form.unknownTime ? 'none' : 'auto', transition: 'opacity 0.2s' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
             <select
@@ -348,7 +364,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={inputStyle}
             >
               {Array.from({ length: 24 }, (_, i) => i).map(h => (
-                <option key={h} value={String(h)}>{h.toString().padStart(2, '0')} 时</option>
+                <option key={h} value={String(h)}>{h.toString().padStart(2, '0')} Giờ</option>
               ))}
             </select>
             <select
@@ -357,19 +373,22 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={inputStyle}
             >
               {Array.from({ length: 60 }, (_, i) => i).map(min => (
-                <option key={min} value={String(min)}>{min.toString().padStart(2, '0')} 分</option>
+                <option key={min} value={String(min)}>{min.toString().padStart(2, '0')} Phút</option>
               ))}
             </select>
           </div>
           {/* 真太阳时结果 */}
           <div style={{ textAlign: 'center', padding: '4px 0' }}>
-            <span style={{ fontSize: '10px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)' }}>真太阳时 → </span>
-            <span style={{ fontSize: '15px', color: goldText, fontWeight: 600, letterSpacing: '0.08em' }}>
-              {SHICHEN_NAMES[branch]}时
+            <span style={{ fontSize: '11px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)' }}>Giờ Chân Thái Dương → </span>
+            <span style={{ fontSize: '15px', color: goldText, fontWeight: 700, letterSpacing: '0.05em' }}>
+              Giờ {BRANCHES_VI[branch]}
+            </span>
+            <span style={{ fontSize: '11px', opacity: 0.6, marginLeft: '4px' }}>
+              ({SHICHEN_NAMES[branch]}时)
             </span>
             {shichenInfo && (
-              <span style={{ fontSize: '10px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)', marginLeft: '4px' }}>
-                （{shichenInfo.range}）
+              <span style={{ fontSize: '11px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)', marginLeft: '6px' }}>
+                [{shichenInfo.range}]
               </span>
             )}
           </div>
@@ -381,15 +400,18 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onChange={e => setForm({ ...form, unknownTime: e.target.checked })}
             style={{ width: '14px', height: '14px', borderRadius: '4px', cursor: 'pointer' }}
           />
-          <span style={{ fontSize: '10px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)' }}>
-            不知道出生时间，以子时（23:00–01:00）起盘
+          <span style={{ fontSize: '11px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)' }}>
+            Không rõ giờ sinh, mặc định an theo giờ Tý (23:00–01:00 · 时辰不详)
           </span>
         </label>
       </div>
 
       {/* ── 性别 ── */}
       <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>性别</label>
+        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+          <span>Giới Tính</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Quyết định thuận nghịch Đại Hạn · 性别)</span>
+        </label>
         <div style={{ display: 'flex', gap: '10px' }}>
           {(['male', 'female'] as const).map(g => {
             const active = form.gender === g;
@@ -403,18 +425,23 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
                 whileTap={{ scale: 0.97 }}
                 style={{
                   flex: 1,
-                  padding: '11px',
+                  padding: '10px',
                   borderRadius: '14px',
                   fontSize: '13px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   border: `1px solid ${active ? `rgba(${accent},0.6)` : inputBorder}`,
                   background: active ? `rgba(${accent},0.08)` : inputBg,
                   color: active ? `rgba(${accent},0.9)` : (isDark ? 'rgba(190,205,225,0.7)' : 'rgba(100,80,40,0.4)'),
                   transition: 'all 0.2s',
                   cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
                 }}
               >
-                {isMale ? '♂ 男' : '♀ 女'}
+                <span>{isMale ? '♂ Nam Mệnh' : '♀ Nữ Mệnh'}</span>
+                <span style={{ fontSize: '9px', opacity: 0.6 }}>{isMale ? '男命 (Dương)' : '女命 (Âm)'}</span>
               </motion.button>
             );
           })}
@@ -460,7 +487,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
           borderRadius: '16px',
           fontSize: '13px',
           fontWeight: 600,
-          letterSpacing: '0.15em',
+          letterSpacing: '0.12em',
           border: 'none',
           cursor: loading ? 'not-allowed' : 'pointer',
           background: loading
@@ -480,9 +507,14 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
               style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%' }}
             />
-            紫微起盘中…
+            Đang an sao lập lá số... (起盘中)
           </span>
-        ) : '立即起盘 · 解命运密码'}
+        ) : (
+          <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.25 }}>
+            <span style={{ fontSize: '13px', fontWeight: 700 }}>🔮 KHỞI TẠO LÁ SỐ · GIẢI MÃ VẬN MỆNH</span>
+            <span style={{ fontSize: '9px', fontWeight: 400, opacity: 0.75, marginTop: '2px' }}>立即起盘 · Mệnh Lý Thiên Kỷ</span>
+          </span>
+        )}
       </motion.button>}
     </motion.form>
   );

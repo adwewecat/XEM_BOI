@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ZiweiChart, Palace, Star } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
+import { BRANCHES_VI, getJuName, getPalaceName } from '@/lib/ziwei/vietnamese';
 import PalaceCell from './PalaceCell';
 import TimeNav, { type TimeView, getYearStemIndex, buildSiHuaOverlay } from './TimeNav';
 
@@ -104,11 +105,12 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-3"
       >
-        <div className="text-[10px] tracking-[0.5em] uppercase mb-1" style={{ color: 'var(--t-faint)' }}>
-          Zi Wei Dou Shu
+        <div className="text-[10px] tracking-[0.4em] uppercase mb-1" style={{ color: 'var(--tx-3)' }}>
+          HỆ THỐNG MỆNH BÀN TỬ VI ĐẨU SỐ
         </div>
-        <h2 className="text-sm tracking-[0.25em] font-medium" style={{ color: 'var(--t-gold)' }}>
-          {chart.birthInfo.name ? `${chart.birthInfo.name} · ` : ''}紫微斗数命盘
+        <h2 className="text-base sm:text-lg tracking-[0.15em] font-extrabold" style={{ color: 'var(--ac)' }}>
+          {chart.birthInfo.name ? `${chart.birthInfo.name} · ` : ''}LÁ SỐ TỬ VI
+          <span className="text-xs font-normal opacity-50 ml-2">（紫微斗数命盘）</span>
         </h2>
       </motion.div>
 
@@ -145,42 +147,59 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
           );
         })}
 
-        {/* 中央信息区 */}
+        {/* 中央信息区 (Thiên Bàn) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col items-center justify-center p-4 gap-3"
-          style={{ gridRow: '2 / 4', gridColumn: '2 / 4', background: 'var(--t-bg)' }}
+          className="flex flex-col items-center justify-center p-3 sm:p-4 gap-2 sm:gap-3 card-inner rounded-xl"
+          style={{ gridRow: '2 / 4', gridColumn: '2 / 4' }}
         >
-          <div className="text-5xl select-none leading-none" style={{ color: 'var(--t-gold)', opacity: 0.12, filter: 'drop-shadow(0 0 12px rgba(180,120,30,0.15))' }}>
+          <div className="text-4xl sm:text-5xl select-none leading-none opacity-20" style={{ color: 'var(--ac)' }}>
             ☯
           </div>
 
           <div className="text-center space-y-1">
-            <div className="text-[9px] tracking-[0.3em] font-medium" style={{ color: 'var(--t-gold)' }}>紫微斗数</div>
-            <div className="text-[10px] space-y-0.5" style={{ color: 'var(--t-faint)' }}>
-              <div>命宫 <span style={{ color: 'var(--t-gold)', opacity: 0.7 }}>{BRANCHES[chart.mingGongBranch]}</span></div>
-              <div>身宫 <span className="text-sky-500/70">{BRANCHES[chart.shenGongBranch]}</span></div>
-              <div className="text-[9px]" style={{ color: 'var(--t-gold)', opacity: 0.75 }}>{chart.wuxingJuName}</div>
+            <div className="text-[10px] tracking-[0.2em] font-extrabold uppercase" style={{ color: 'var(--ac)' }}>
+              THIÊN BÀN TỬ VI
+              <span className="block text-[8px] font-normal opacity-50 font-serif">紫微斗数</span>
+            </div>
+            <div className="text-[11px] space-y-1 font-medium" style={{ color: 'var(--tx-2)' }}>
+              <div>
+                Mệnh cư: <span className="font-bold text-amber-400">{BRANCHES_VI[chart.mingGongBranch]}</span>
+                <span className="text-[8px] opacity-40 ml-1">({BRANCHES[chart.mingGongBranch]})</span>
+              </div>
+              <div>
+                Thân cư: <span className="font-bold text-sky-400">{BRANCHES_VI[chart.shenGongBranch]}</span>
+                <span className="text-[8px] opacity-40 ml-1">({BRANCHES[chart.shenGongBranch]})</span>
+              </div>
+              <div className="text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400">
+                {getJuName(chart.wuxingJuName)}
+                <span className="text-[8px] opacity-50 block">{chart.wuxingJuName}</span>
+              </div>
             </div>
           </div>
 
           {chart.currentDaXianIndex >= 0 && (() => {
             const dx = chart.daXians[chart.currentDaXianIndex];
+            const pInfo = getPalaceName(dx.palaceName);
             return (
-              <div className="border border-purple-500/30 rounded-lg px-3 py-1.5 text-center"
-                style={{ background: 'rgba(147,51,234,0.06)' }}>
-                <div className="text-[8px] text-purple-500/80 mb-0.5 tracking-wider">当前大限</div>
-                <div className="text-[12px] text-purple-400 font-medium tabular-nums">{dx.startAge}–{dx.endAge}岁</div>
-                <div className="text-[9px] text-purple-500/60">{dx.palaceName}</div>
+              <div className="border border-purple-500/30 rounded-lg px-2.5 py-1 text-center"
+                style={{ background: 'rgba(147,51,234,0.1)' }}>
+                <div className="text-[8px] text-purple-400 font-semibold tracking-wider">
+                  Đại Hạn Hiện Tại <span className="opacity-50">(当前大限)</span>
+                </div>
+                <div className="text-[12px] text-purple-300 font-bold tabular-nums">{dx.startAge}–{dx.endAge} tuổi</div>
+                <div className="text-[9px] text-purple-400">
+                  Cung {pInfo.vi} <span className="opacity-40">({pInfo.zh})</span>
+                </div>
               </div>
             );
           })()}
 
-          <div className="text-[8px] text-center leading-relaxed font-mono" style={{ color: 'var(--t-faint)', opacity: 0.75 }}>
-            {chart.lunarInfo.lunarYear}·{chart.lunarInfo.isLeapMonth ? '闰' : ''}
-            {chart.lunarInfo.lunarMonth}·{chart.lunarInfo.lunarDay}
+          <div className="text-[9px] text-center leading-relaxed font-mono" style={{ color: 'var(--tx-3)', opacity: 0.85 }}>
+            <span className="block">Âm Lịch: {chart.lunarInfo.lunarYear} · {chart.lunarInfo.isLeapMonth ? 'Nhuận ' : ''}Tháng {chart.lunarInfo.lunarMonth} · Ngày {chart.lunarInfo.lunarDay}</span>
+            <span className="text-[8px] opacity-40">农历: {chart.lunarInfo.lunarYear}年{chart.lunarInfo.isLeapMonth ? '闰' : ''}{chart.lunarInfo.lunarMonth}月{chart.lunarInfo.lunarDay}日</span>
           </div>
         </motion.div>
 

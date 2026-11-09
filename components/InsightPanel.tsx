@@ -23,12 +23,12 @@ interface InsightPanelProps {
 }
 
 const TOPICS = [
-  { key: 'overview',     label: '命格' },
-  { key: 'love',        label: '感情' },
-  { key: 'career',      label: '事业' },
-  { key: 'wealth',      label: '财运' },
-  { key: 'health',      label: '健康' },
-  { key: 'personality', label: '性格' },
+  { key: 'overview',     label: 'Mệnh Cách', zh: '命格' },
+  { key: 'love',        label: 'Tình Duyên', zh: '感情' },
+  { key: 'career',      label: 'Sự Nghiệp', zh: '事业' },
+  { key: 'wealth',      label: 'Tài Lộc', zh: '财运' },
+  { key: 'health',      label: 'Sức Khỏe', zh: '健康' },
+  { key: 'personality', label: 'Tính Cách', zh: '性格' },
 ] as const;
 
 const TOPIC_PROMPTS: Record<string, string> = {
@@ -130,18 +130,18 @@ const TOPIC_PROMPTS: Record<string, string> = {
 };
 
 const PALACE_ROLES: Record<string, string> = {
-  '命宫':   '自我、性格、先天格局',
-  '兄弟宫': '兄弟关系、合伙人',
-  '夫妻宫': '感情关系、婚姻状态',
-  '子女宫': '子女缘分、下属关系',
-  '财帛宫': '财运来源、收入方式',
-  '疾厄宫': '身体健康、意外',
-  '迁移宫': '外出机遇、人际格局',
-  '交友宫': '朋友圈、贵人、小人',
-  '官禄宫': '事业成就、社会地位',
-  '田宅宫': '不动产、家庭环境',
-  '福德宫': '精神享受、内心福分',
-  '父母宫': '父母关系、文书契约',
+  '命宫':   'Bản Mệnh · Tính cách & Tiên thiên cách cục',
+  '兄弟宫': 'Huynh Đệ · Anh em, tri kỷ, đối tác hợp tác',
+  '夫妻宫': 'Phu Thê · Tình duyên, hôn nhân, phối ngẫu',
+  '子女宫': 'Tử Tức · Con cái, hậu tự, nhân viên cấp dưới',
+  '财帛宫': 'Tài Bạch · Tiền tài, nguồn thu, tài chính',
+  '疾厄宫': 'Tật Ách · Thể chất, sức khỏe, tạng phủ',
+  '迁移宫': 'Thiên Di · Xuất ngoại, cơ duyên bên ngoài',
+  '交友宫': 'Nô Bộc · Bạn bè, cấp dưới, quý nhân xã hội',
+  '官禄宫': 'Quan Lộc · Sự nghiệp, chức vị, học vấn',
+  '田宅宫': 'Điền Trạch · Bất động sản, đất đai, nhà cửa',
+  '福德宫': 'Phúc Đức · Đời sống tinh thần, phúc thọ',
+  '父母宫': 'Phụ Mẫu · Cha mẹ, trưởng bối, bảo bọc',
 };
 
 /** Render AI markdown: **【Title】** → gold header, **bold** → strong */
@@ -359,14 +359,15 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
                 key={t.key}
                 onClick={() => handleTopicClick(t.key)}
                 disabled={loading}
-                className="py-1.5 text-[10px] font-medium rounded-lg transition-all duration-150 disabled:opacity-40"
+                className="py-1 px-0.5 text-center rounded-lg transition-all duration-150 disabled:opacity-40 flex flex-col items-center justify-center"
                 style={{
-                  background: isActive ? 'rgba(212,168,67,0.12)' : 'transparent',
-                  border: `1px solid ${isActive ? 'rgba(212,168,67,0.3)' : 'var(--t-border)'}`,
+                  background: isActive ? 'rgba(212,168,67,0.15)' : 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(212,168,67,0.4)' : 'var(--t-border)'}`,
                   color: isActive ? 'var(--t-gold)' : 'var(--t-faint)',
                 }}
               >
-                {t.label}
+                <span className="text-[10px] font-semibold tracking-tight">{t.label}</span>
+                <span className="text-[8px] opacity-60 leading-none mt-0.5">{t.zh}</span>
               </button>
             );
           })}
@@ -380,7 +381,9 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="text-4xl mb-3" style={{ color: 'var(--t-gold)', opacity: 0.1 }}>✦</div>
-            <p className="text-[10px] animate-pulse" style={{ color: 'var(--t-faint)' }}>命格解读生成中…</p>
+            <p className="text-[11px] animate-pulse" style={{ color: 'var(--t-faint)' }}>
+              Đang phân tích & giải mã mệnh cách... (命格解读生成中)
+            </p>
           </div>
         )}
 
@@ -419,11 +422,12 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
                 animate={{ opacity: 1, y: 0 }}
               >
                 <div
-                  className="text-[9px] tracking-widest mb-2 flex items-center gap-1.5"
+                  className="text-[10px] tracking-wide mb-2 flex items-center gap-1.5"
                   style={{ color: 'var(--t-faint)' }}
                 >
-                  <span style={{ color: 'var(--t-gold)', opacity: 0.4 }}>✦</span>
-                  命理解读
+                  <span style={{ color: 'var(--t-gold)', opacity: 0.6 }}>✦</span>
+                  <span className="font-semibold text-amber-500/90">LUẬN GIẢI MỆNH LÝ</span>
+                  <span className="text-[8px] opacity-60">· 倪海厦 命理解读</span>
                 </div>
                 <AiContent text={msg.content} streaming={loading && isLastMsg} />
               </motion.div>
@@ -440,7 +444,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="继续追问，如：今年适合换工作吗？"
+            placeholder="Hỏi tiếp chiêm nghiệm, ví dụ: Năm nay có nên đổi việc làm ăn không?"
             disabled={loading}
             className="flex-1 rounded-lg px-3 py-2 text-[11px] focus:outline-none transition-colors"
             style={{
@@ -452,14 +456,15 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
           <button
             onClick={handleSend}
             disabled={loading || !input.trim()}
-            className="px-3 py-2 rounded-lg text-[11px] font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3.5 py-2 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex flex-col items-center justify-center leading-tight"
             style={{
-              background: 'rgba(212,168,67,0.15)',
-              border: '1px solid rgba(212,168,67,0.25)',
+              background: 'rgba(212,168,67,0.18)',
+              border: '1px solid rgba(212,168,67,0.35)',
               color: 'var(--t-gold)',
             }}
           >
-            {loading ? '…' : '追问'}
+            <span>{loading ? '…' : 'Hỏi Tiếp'}</span>
+            {!loading && <span className="text-[8px] opacity-60">追问</span>}
           </button>
         </div>
       </div>

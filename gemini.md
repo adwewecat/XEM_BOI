@@ -73,6 +73,43 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 3: Bản Địa Hóa Tiếng Việt Toàn Diện (Song Ngữ Hán - Việt Chuẩn Thuật Ngữ Tử Vi)
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu:** Dịch toàn bộ giao diện và dữ liệu sang Tiếng Việt chuẩn mực thuật ngữ mệnh lý Tử Vi Đẩu Số phương Đông; tiếng Việt làm ngôn ngữ chính (to rõ), tiếng Trung làm phụ đề nhỏ bên dưới để đối chiếu nguyên bản cổ tịch.
+- **Các việc đã làm:**
+  1. **Xây dựng từ điển chuyển ngữ toàn diện `lib/ziwei/vietnamese.ts`:**
+     - 12 Cung vị (`PALACE_VI`: Mệnh, Huynh Đệ, Phu Thê, Tử Tức, Tài Bạch, Tật Ách, Thiên Di, Nô Bộc, Quan Lộc, Điền Trạch, Phúc Đức, Phụ Mẫu, Thân Cung).
+     - 14 Chính tinh (`MAJOR_STARS_VI`: Tử Vi, Thiên Cơ, Thái Dương, Vũ Khúc, Thiên Đồng, Liêm Trinh, Thiên Phủ, Thái Âm, Tham Lang, Cự Môn, Thiên Tướng, Thiên Lương, Thất Sát, Phá Quân).
+     - 50+ Phụ tinh, Lục cát, Lục sát, Tạp diệu (`MINOR_STARS_VI`: Tả Phụ, Hữu Bật, Văn Xương, Văn Khúc, Khôi, Việt, Lộc Tồn, Thiên Mã, Kình Dương, Đà La, Hỏa Tinh, Linh Tinh, Không, Kiếp...).
+     - Tứ Hóa (`SIHUA_VI`: Hóa Lộc, Hóa Quyền, Hóa Khoa, Hóa Kỵ).
+     - Độ sáng miếu hãm (`BRIGHTNESS_VI`: Miếu, Vượng, Đắc, Lợi, Bình, Bất, Nhàn, Hãm).
+     - Thiên Can & Địa Chi (`STEMS_VI`, `BRANCHES_VI`), Ngũ Hành Cục (`JU_VI`).
+     - 34+ Cách cục kinh điển Tử Vi (`PATTERN_VI`: Quân Thần Khánh Hội, Tử Phủ Đồng Cung, Phủ Tướng Triều Viên, Sát Phá Tham, Cơ Nguyệt Đồng Lương, Thạch Trung Ẩn Ngọc, Dương Lương Xương Lộc...).
+     - 13 Phương diện luận giải cuộc đời (`TOPIC_VI`: Mệnh cách, Tính cách, Tình duyên, Sự nghiệp, Tài vận, Sức khỏe, v.v.).
+  2. **Bản địa hóa `components/PalaceCell.tsx` & `components/ChartBoard.tsx`:**
+     - Tên cung to rõ tiếng Việt kèm tên gốc tiếng Trung nhỏ bên dưới.
+     - Sao chính tinh, phụ tinh, tứ hóa, độ sáng hiển thị song ngữ trực quan.
+     - Ô trung tâm (Thiên Bàn) hiển thị Ngũ Hành Cục, Cung Mệnh, Cung Thân song ngữ.
+  3. **Bản địa hóa `components/BirthForm.tsx`:**
+     - Chuyển toàn bộ form nhập liệu sang tiếng Việt: Họ tên, Ngày sinh Dương Lịch, Năm sinh, Tháng sinh, Ngày sinh.
+     - Hiển thị Giờ Chân Thái Dương (True Solar Time) theo 12 Địa Chi Việt Nam (Giờ Tý, Sửu, Dần, Mão...).
+     - Checkbox "Không rõ giờ sinh (lấy giờ Tý)", chọn giới tính Nam/Nữ, nút khởi tạo lá số "🔮 KHỞI TẠO LÁ SỐ · GIẢI MÃ VẬN MỆNH".
+  4. **Bản địa hóa `components/PatternsCard.tsx`:**
+     - Hiển thị tên cách cục tiếng Việt to rõ kèm Hán tự gốc và câu phú tóm lược.
+     - Nhãn điều kiện: Bắt buộc (必须), Gia cát (加分), Phá cách (破格), Xuất xứ cổ tịch.
+  5. **Bản địa hóa `components/InsightPanel.tsx`:**
+     - 6 Tab luận giải: Mệnh Cách, Tình Duyên, Sự Nghiệp, Tài Lộc, Sức Khỏe, Tính Cách.
+     - Khung nhập câu hỏi chiêm nghiệm và nút "Hỏi Tiếp (追问)".
+  6. **Bản địa hóa `components/ShareModal.tsx` & `components/ShareCardCanvas.tsx`:**
+     - Thiết kế lại ảnh xuất PNG 680x420 chuẩn đẹp với 12 cung tiếng Việt, sao chính tinh, đại hạn và triết lý Thiên Kỷ.
+  7. **Bản địa hóa các trang vệ tinh:**
+     - Trang chủ `/` (`app/page.tsx`), So hợp mệnh `/heming` (`app/heming/page.tsx`), Vạn Tinh Các `/knowledge` (`app/knowledge/page.tsx`), Tàng Kinh Các `/library` (`app/library/page.tsx`).
+  8. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 suite bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch production thành công 37 trang tĩnh.
+     - Đẩy mã nguồn lên kho Git remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 2: Nâng cấp UI/UX Huyền Ảo, Thêm 63 Tỉnh Thành VN, Tích Hợp 1-Click START & Toàn Bộ Tính Năng
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Các việc đã làm:**
