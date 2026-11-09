@@ -3,6 +3,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import StarField from '@/components/StarField';
+import SideCouplets from '@/components/SideCouplets';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_URL } from '@/lib/site';
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <StarField />
           <Navbar />
+          <SideCouplets />
           <div suppressHydrationWarning className="relative z-10 flex-1">
             {children}
           </div>

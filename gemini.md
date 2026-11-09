@@ -73,6 +73,32 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 12: Tích Hợp 2 Dải Câu Đối Phong Thủy & Tuyên Bố Miễn Trừ Trách Nhiệm Pháp Lý Xuyên Suốt Mọi Trang
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  - "giao diện có thêm 2 câu đối 2 bên, bạn có thể sửa để không bị vi phạm mê tín dị đoan nhé. miễn trừ trách nhiệm pháp lí liên quan,. 2 câu đối này sẽ ở 2 bên màn hình xuyên suốt qua các tab chức năng"
+  - Câu 1: "Thông tin chỉ mang tính chất giải trí , không cổ xúy mê tín dị đoan"
+  - Câu 2: "Tất cả thông tin không công kích bất kỳ cá nhân tổ chức nào"
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Tạo Component Toàn Cục `components/SideCouplets.tsx`:**
+     - Thiết kế theo phong cách Liễn / Câu Đối Cổ Phong Thư Pháp Đông Phương kết hợp kính mờ Dark Glass hiện đại:
+       + Khung thẻ câu đối lụa đỏ sẫm viền vàng kim hoàng gia (`from-red-950/85 via-zinc-950/90 to-red-950/85`, border vàng amber `border-amber-500/40`, viền phát sáng dịu mắt).
+       + Đỉnh câu đối đính khuy đồng biểu tượng: 📜 (Văn hóa) bên trái & ⚖️ (Pháp lý) bên phải.
+       + Đáy câu đối khắc dấu ấn triện đỏ son: `GIẢI TRÍ` (bên trái) và `TRUNG LẬP` (bên phải) cùng đuôi tua rua cát tường.
+     - **Vế Trái (Câu 1):** *"Thông tin chỉ mang tính chất giải trí • Không cổ xúy mê tín dị đoan"* viết dọc trang trọng (`writing-mode: vertical-rl`).
+     - **Vế Phải (Câu 2):** *"Tất cả thông tin không công kích bất kỳ cá nhân tổ chức nào"* viết dọc cân đối.
+     - Có nút thu gọn tiện lợi ở mép trái giúp người dùng có thể ẩn/hiện câu đối linh hoạt nếu cần mở rộng không gian làm việc.
+     - Tích hợp Tooltip và Modal Chi Tiết khi người dùng nhấp vào, hiển thị đầy đủ văn bản tuyên bố miễn trừ trách nhiệm pháp lý, tuân thủ pháp luật Việt Nam.
+  2. **Hiển thị Responsive Thông Minh:**
+     - Màn hình Desktop (>= 1280px): Hiển thị 2 dải câu đối 2 bên sườn màn hình cân xứng, trang trọng, cố định xuyên suốt khi cuộn trang và khi chuyển qua bất kỳ tab nào (`/`, `/chart`, `/metaphysics`, `/library`, `/knowledge`, `/heming`).
+     - Màn hình Di động & Tablet (< 1280px): Tự động chuyển thành thanh thông báo pháp lý chân trang (Sticky Disclaimer Bar) thanh lịch và không che khuất lá số tử vi.
+  3. **Tích hợp xuyên suốt hệ thống (`app/layout.tsx`):**
+     - Đặt `<SideCouplets />` trong `RootLayout` để hiện diện bền vững trên toàn bộ mọi route và tab chức năng.
+  4. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 11: Tự Động Đồng Bộ Dữ Liệu Xuyên Suốt Hệ Thống, Tính Năng Trạch Nhật (Xem Ngày Lành Dữ) & Việt Hóa Toàn Diện Tàng Kinh Các
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**
