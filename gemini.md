@@ -73,6 +73,32 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 5: Tối Ưu Triệt Để Hiển Thị Tiếng Việt (To Rõ, Đậm Nét) & Xóa Bỏ Hoàn Toàn Tình Trạng Chữ Trung Quốc Lấp Mất
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Vấn đề người dùng phản hồi:** "ĐANG BỊ ngược, chữ trung quốc quá nhiều, bạn dịch sang tiếng việt, và tiếng việt phải to, chứ nó đang bị chữ trung quốc lấp mất" (kèm ảnh chụp lá số bị rối rắm bởi chữ Hán chen chúc trong từng ô cung và phần luận giải cách cục vẫn là tiếng Trung).
+- **Các giải pháp & nâng cấp đột phá đã thực hiện:**
+  1. **Tối ưu triệt để 12 ô cung Tử Vi (`PalaceCell.tsx`):**
+     - **Bỏ hoàn toàn chữ Hán rác đi kèm ở 50+ phụ tinh, cát tinh, sát tinh:** Trước đây mỗi ô cung nhồi nhét tới 30-40 chữ Hán (`Tam Thai 三台`, `Thiên Tài 天才`, `Kình Dương 擎羊`...) làm ô cung bị bóp nghẹt. Nay đã gỡ bỏ hoàn toàn chữ Hán trong ô, chuyển sang **100% TIẾNG VIỆT TO RÕ, ĐẬM ĐÀ** (`text-[10.5px] font-semibold`), màu sắc phân định rõ rệt (Cát tinh xanh trời `sky-300`, Sát tinh đỏ hồng `rose-300`).
+     - **Chính Tinh to vượt trội:** Tên 14 chính tinh nâng lên cỡ `text-[15px] font-black text-amber-300 drop-shadow-sm`, độ sáng `[Miếu]`, `[Vượng]`, `[Đắc]`, `[Hãm]` vàng rực rõ nét, huy hiệu Tứ Hóa `(Lộc)`, `(Quyền)`, `(Khoa)`, `(Kỵ)` to rõ.
+     - **Tên Cung vị & Can Chi:** Nâng lên `text-[13.5px] font-black text-amber-200`, Can chi `Nhâm Ngọ`, `Quý Mùi` to rõ, xóa bỏ sự lấn át của chữ Hán.
+  2. **Việt hóa toàn diện Bộ Nhận Diện Cách Cục (`PatternsCard.tsx` & `ChartSummary.tsx`):**
+     - Xây dựng từ điển diễn giải `PATTERN_DESCRIPTIONS_VI` và hàm `getPatternDescriptionVi`: Chuyển ngữ 100% diễn giải của hơn 50 cách cục kinh điển (Cơ Nguyệt Đồng Lương, Sát Phá Tham, Vũ Khúc Thất Sát, v.v.) từ tiếng Trung sang Tiếng Việt chuẩn mực mệnh lý, hành văn sâu sắc.
+     - Viết bộ lọc dịch tự động `translateCondition`: Dịch toàn bộ các điều kiện *Bắt buộc*, *Gia cát*, *Phá cách* từ chữ Hán sang Tiếng Việt thuần túy.
+     - Dịch toàn bộ nguồn gốc xuất xứ cổ thư sang Tiếng Việt (`Tử Vi Đẩu Số Toàn Thư`, `Tử Vi Cốt Tủy Phú`...).
+  3. **Làm sạch Thiên Bàn và Chú Thích Bàn Cờ (`ChartBoard.tsx`):**
+     - Xóa bỏ chữ Hán rác `紫微斗数` và dòng lịch âm tiếng Trung `农历: 1995年...` ở Thiên Bàn trung tâm.
+     - Mệnh cư, Thân cư, Ngũ hành cục, Đại hạn hiển thị 100% Tiếng Việt to đẹp.
+     - Dưới chân bàn cờ: Dịch sạch thanh Tứ Hóa sang `Hóa Lộc (禄)`, `Hóa Quyền (权)`, `Hóa Khoa (科)`, `Hóa Kỵ (忌)` và dòng hướng dẫn `👉 Nhấp vào ô cung để xem Tam Phương Tứ Chính`.
+  4. **Khắc phục lỗi trùng lặp thanh điều hướng thời gian:**
+     - Xóa bỏ thẻ `<TimeNav>` bị lặp 2 lần trên trang `/chart`.
+  5. **Tích hợp Bộ máy luận giải bản mệnh Tiếng Việt tự động (`generateLocalInsight`):**
+     - Luận giải chuyên sâu 6 phương diện: Mệnh Cách, Tình Duyên, Sự Nghiệp, Tài Lộc, Sức Khỏe, Tính Cách theo giáo trình Thiên Kỷ Nghê Hải Hà, hoạt động 100% offline không cần API AI ngoài.
+  6. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch production thành công 37 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 4: Sửa triệt để lỗi "Bấm Start là tự tắt", Hoàn thiện toàn bộ Song Ngữ Tiếng Việt
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Vấn đề người dùng phản hồi:** "Bấm start là tự tắt" khi nhấp đúp vào `START.bat` hoặc `START.cmd`.

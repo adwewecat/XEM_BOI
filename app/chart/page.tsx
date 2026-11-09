@@ -264,17 +264,6 @@ export default function ChartPage() {
         </div>
       </div>
 
-      {/* Điều Hướng Thời Gian (Bản Mệnh / Đại Hạn / Lưu Niên) */}
-      <div className="mb-4">
-        <TimeNav
-          chart={chart}
-          view={view}
-          liunianYear={liunianYear}
-          onViewChange={setView}
-          onYearChange={setLiunianYear}
-        />
-      </div>
-
       {/* Khu Vực Hiển Thị Chính: 2 Cột (Lá Số & Luận Giải / Cách Cục) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Cột Trái: Bảng 12 Cung Lá Số Tử Vi (ChartBoard) */}
@@ -297,24 +286,24 @@ export default function ChartPage() {
             <button
               type="button"
               onClick={() => setRightTab('patterns')}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
                 rightTab === 'patterns'
-                  ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
+                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              🏆 Cách Cục
+              🏆 Cách Cục Cổ Tịch
             </button>
             <button
               type="button"
               onClick={() => setRightTab('insights')}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
                 rightTab === 'insights'
-                  ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+                  ? 'bg-sky-500/25 text-sky-300 border border-sky-500/40 shadow-sm'
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              📖 Luận 13 Hướng
+              📖 Luận Giải Mệnh Số
             </button>
             {selectedPalace && (
               <button

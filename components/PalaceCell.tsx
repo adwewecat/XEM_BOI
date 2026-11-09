@@ -41,7 +41,7 @@ const SiHuaBadge = ({
   return (
     <span
       className={clsx(
-        'inline-flex items-center text-[8px] px-1 rounded-full border leading-none py-0.5 font-bold ml-1 flex-shrink-0',
+        'inline-flex items-center text-[8.5px] px-1.5 py-0.5 rounded-full border leading-none font-black ml-1 flex-shrink-0 shadow-sm',
         SIHUA_STYLES[siHua] || SIHUA_STYLES[shInfo.zh] || 'text-amber-400 bg-amber-500/10 border-amber-500/30',
         overlay && 'border-dashed opacity-80',
         onClick && 'cursor-pointer hover:opacity-100',
@@ -49,9 +49,8 @@ const SiHuaBadge = ({
       onClick={onClick}
       title={`${shInfo.vi} (${shInfo.zh})`}
     >
-      {overlay && label && <span className="mr-0.5 opacity-70">{label === '限' ? 'Hạn' : 'Niên'}</span>}
+      {overlay && label && <span className="mr-0.5 opacity-75">{label === '限' ? 'Hạn' : 'Niên'}</span>}
       <span>{shInfo.short}</span>
-      <span className="text-[7px] opacity-60 ml-0.5">[{shInfo.zh}]</span>
     </span>
   );
 };
@@ -110,40 +109,40 @@ export default function PalaceCell({
       {/* Tên Cung & Huy hiệu Mệnh/Thân */}
       <div className="flex items-center justify-between mb-1 pr-10">
         <div className="flex items-baseline gap-1">
-          <span className={clsx('text-[11px] sm:text-xs font-bold tracking-tight',
-            isMingGong ? 'text-amber-400' : isShenGong ? 'text-sky-400' : 'text-stone-200'
+          <span className={clsx('text-[12px] sm:text-[13.5px] font-black tracking-tight',
+            isMingGong ? 'text-amber-300' : isShenGong ? 'text-sky-300' : 'text-stone-100'
           )}>
             {palaceInfo.vi}
           </span>
-          <span className="text-[8px] opacity-40 font-serif" style={{ color: 'var(--tx-3)' }}>
-            {palaceInfo.zh}
+          <span className="text-[8px] opacity-25 font-serif" style={{ color: 'var(--tx-3)' }}>
+            ({palaceInfo.zh})
           </span>
         </div>
         <div className="flex items-center gap-1">
           {isMingGong && (
-            <span className="text-[8px] font-bold text-amber-400 border border-amber-500/40 bg-amber-500/10 px-1 rounded leading-tight">
-              Mệnh <span className="text-[7px] opacity-60">命</span>
+            <span className="text-[9px] font-black text-amber-300 border border-amber-500/50 bg-amber-500/20 px-1.5 py-0.5 rounded leading-tight shadow-sm">
+              MỆNH
             </span>
           )}
           {isShenGong && (
-            <span className="text-[8px] font-bold text-sky-400 border border-sky-500/40 bg-sky-500/10 px-1 rounded leading-tight">
-              Thân <span className="text-[7px] opacity-60">身</span>
+            <span className="text-[9px] font-black text-sky-300 border border-sky-500/50 bg-sky-500/20 px-1.5 py-0.5 rounded leading-tight shadow-sm">
+              THÂN
             </span>
           )}
         </div>
       </div>
 
       {/* Can Chi Cung */}
-      <div className="flex items-center gap-1 text-[9px] mb-1.5 font-mono" style={{ color: 'var(--tx-3)', opacity: 0.85 }}>
-        <span className="font-semibold text-amber-500/90">{ganzhiInfo.vi}</span>
-        <span className="text-[8px] opacity-40">({ganzhiInfo.zh})</span>
+      <div className="flex items-center gap-1 text-[9.5px] mb-1 font-mono" style={{ color: 'var(--tx-3)', opacity: 0.9 }}>
+        <span className="font-bold text-amber-400/90">{ganzhiInfo.vi}</span>
+        <span className="text-[7.5px] opacity-25">({ganzhiInfo.zh})</span>
       </div>
 
-      {/* Chính Tinh (Thập Tứ Chính Tinh) */}
+      {/* Chính Tinh (Thập Tứ Chính Tinh - TO RÕ NỔI BẬT) */}
       <div className="flex flex-col gap-0.5 flex-1 mb-1">
         {majorStars.length === 0 && (
-          <span className="text-[10px] italic" style={{ color: 'var(--tx-3)', opacity: 0.6 }}>
-            Vô Chính Diệu <span className="text-[8px] opacity-40">(空宫)</span>
+          <span className="text-[11px] font-medium italic text-stone-400/70">
+            Vô Chính Diệu
           </span>
         )}
         {majorStars.map((star) => {
@@ -153,20 +152,21 @@ export default function PalaceCell({
           return (
             <div
               key={star.name}
-              className="flex items-baseline flex-wrap gap-0.5 cursor-pointer hover:brightness-125 transition-all"
+              className="flex items-baseline flex-wrap gap-1 cursor-pointer hover:brightness-125 transition-all py-0.5"
               onClick={e => { e.stopPropagation(); onStarClick?.(star); }}
+              title={`Sao ${starInfo.vi} (${starInfo.zh}) - Nhấp để xem luận giải`}
             >
               <span className={clsx(
-                'text-[12px] sm:text-[13px] leading-tight font-extrabold tracking-tight',
-                star.brightness === 'bright' ? 'text-amber-300' : star.brightness === 'dim' ? 'text-amber-700/80' : 'text-amber-400',
+                'text-[13px] sm:text-[15px] leading-tight font-black tracking-tight drop-shadow-sm',
+                star.brightness === 'bright' ? 'text-amber-300' : star.brightness === 'dim' ? 'text-amber-600' : 'text-amber-400',
               )}>
                 {starInfo.vi}
               </span>
-              <span className="text-[8px] opacity-40 text-stone-400 mr-0.5">
-                {starInfo.zh}
+              <span className="text-[7.5px] opacity-25 text-stone-400">
+                ({starInfo.zh})
               </span>
               {brightnessVi && (
-                <span className="text-[8px] font-serif text-amber-500/90 font-semibold">
+                <span className="text-[9.5px] font-extrabold text-amber-400 font-serif ml-0.5">
                   [{brightnessVi}]
                 </span>
               )}
@@ -187,16 +187,20 @@ export default function PalaceCell({
         })}
       </div>
 
-      {/* Cát Tinh (Phụ Tinh) */}
+      {/* Cát Tinh (Phụ Tinh - 100% TIẾNG VIỆT TO RÕ SÁNG ĐẸP) */}
       {luckyStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mt-0.5">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
           {luckyStars.map(s => {
             const sInfo = getStarName(s.name);
             const overlaySiHua = overlayStarSiHua?.[s.name];
             return (
-              <span key={s.name} className="inline-flex items-baseline text-[9px] text-sky-400/90 leading-tight">
-                <span className="font-medium">{sInfo.vi}</span>
-                <span className="text-[7px] opacity-40 ml-0.5">{sInfo.zh}</span>
+              <span
+                key={s.name}
+                className="inline-flex items-baseline text-[10px] sm:text-[10.5px] text-sky-300 hover:text-sky-100 leading-tight transition-colors cursor-pointer"
+                title={`Sao ${sInfo.vi} (${sInfo.zh})`}
+                onClick={e => { e.stopPropagation(); onStarClick?.(s); }}
+              >
+                <span className="font-semibold">{sInfo.vi}</span>
                 {s.siHua && <SiHuaBadge siHua={s.siHua} />}
                 {overlaySiHua && (
                   <SiHuaBadge
@@ -215,15 +219,19 @@ export default function PalaceCell({
         </div>
       )}
 
-      {/* Sát Tinh (Hung Tinh) */}
+      {/* Sát Tinh (Hung Tinh - 100% TIẾNG VIỆT TO RÕ) */}
       {shaStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mt-0.5">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
           {shaStars.map(s => {
             const sInfo = getStarName(s.name);
             return (
-              <span key={s.name} className="inline-flex items-baseline text-[9px] text-rose-400/90 leading-tight">
-                <span className="font-medium">{sInfo.vi}</span>
-                <span className="text-[7px] opacity-40 ml-0.5">{sInfo.zh}</span>
+              <span
+                key={s.name}
+                className="inline-flex items-baseline text-[10px] sm:text-[10.5px] text-rose-300 hover:text-rose-100 leading-tight transition-colors cursor-pointer"
+                title={`Sao ${sInfo.vi} (${sInfo.zh})`}
+                onClick={e => { e.stopPropagation(); onStarClick?.(s); }}
+              >
+                <span className="font-semibold">{sInfo.vi}</span>
                 {s.siHua && <SiHuaBadge siHua={s.siHua} />}
               </span>
             );

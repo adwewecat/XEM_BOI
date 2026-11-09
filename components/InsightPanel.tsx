@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ZiweiChart, Palace } from '@/lib/ziwei/types';
 import type { TimeView } from './TimeNav';
+import { generateLocalInsight } from '@/lib/ziwei/vietnamese';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -310,9 +311,10 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
           } catch { /* skip */ }
         }
       }
-    } catch (e) {
-      const missing = e instanceof Error && e.message === 'api-missing';
-      setMessages(prev => [...prev, { role: 'assistant', content: missing ? '开源版不含 AI 解读接口（/api/interpret），需要你自己实现后才能用，详见 README「快速开始」。排盘本身不需要任何 API Key。' : '解读失败，请稍后重试。' }]);
+    } catch {
+      // Khi không có kết nối AI hoặc chạy offline, sinh luận giải chi tiết tiếng Việt tự động
+      const fallbackText = generateLocalInsight(chart, activeTopic, messagesRef.current[messagesRef.current.length - 1]?.content);
+      setMessages(prev => [...prev, { role: 'assistant', content: fallbackText }]);
     } finally {
       setLoading(false);
       loadingRef.current = false;
@@ -427,7 +429,8 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
                 >
                   <span style={{ color: 'var(--t-gold)', opacity: 0.6 }}>✦</span>
                   <span className="font-semibold text-amber-500/90">LUẬN GIẢI MỆNH LÝ</span>
-                  <span className="text-[8px] opacity-60">· 倪海厦 命理解读</span>
+                  <span className="text-[9px] text-amber-400 font-bold">Nghê Hải Hà (倪海厦)</span>
+                  <span className="text-[8px] opacity-40 ml-1">· Luận Giải Thiên Kỷ</span>
                 </div>
                 <AiContent text={msg.content} streaming={loading && isLastMsg} />
               </motion.div>

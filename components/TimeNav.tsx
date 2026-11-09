@@ -86,8 +86,8 @@ export default function TimeNav({
           active={view === 'mingpan'}
           onClick={() => onViewChange('mingpan')}
         >
-          <span>Bản Mệnh</span>
-          <span className="text-[8px] opacity-40 ml-1">本命</span>
+          <span className="font-bold text-[11px] sm:text-xs">Bản Mệnh</span>
+          <span className="text-[8px] opacity-30 ml-1">本命</span>
         </TabButton>
 
         {/* Đại Hạn (大限) */}
@@ -95,8 +95,8 @@ export default function TimeNav({
           active={view === 'daxian'}
           onClick={() => onViewChange('daxian')}
         >
-          <span>{currentDx ? `Đại Hạn ${currentDx.startAge}–${currentDx.endAge}t` : 'Đại Hạn'}</span>
-          <span className="text-[8px] opacity-40 ml-1">大限</span>
+          <span className="font-bold text-[11px] sm:text-xs">{currentDx ? `Đại Hạn ${currentDx.startAge}–${currentDx.endAge} tuổi` : 'Đại Hạn'}</span>
+          <span className="text-[8px] opacity-30 ml-1">大限</span>
         </TabButton>
 
         {/* Lưu Niên (流年) — 含年份切换 */}
@@ -113,11 +113,11 @@ export default function TimeNav({
         >
           <button
             onClick={() => onViewChange('liunian')}
-            className="text-[10px] font-medium flex-1 text-center"
+            className="text-[11px] sm:text-xs font-bold flex-1 text-center"
             style={{ color: view === 'liunian' ? 'var(--t-gold)' : 'var(--t-faint)' }}
           >
             <span>Lưu Niên</span>
-            <span className="text-[8px] opacity-40 ml-1">流年</span>
+            <span className="text-[8px] opacity-30 ml-1">流年</span>
           </button>
           {/* 年份 +/- */}
           <div className="flex items-center gap-0.5">

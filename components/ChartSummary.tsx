@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import type { ZiweiChart } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
 import { detectPatterns, getMingGongSummary } from '@/lib/ziwei/patterns';
-import { getStarName, PALACE_VI, BRANCHES_VI, STEMS_VI, getPatternVi, getJuName, getSiHua } from '@/lib/ziwei/vietnamese';
+import { getStarName, PALACE_VI, BRANCHES_VI, STEMS_VI, getPatternVi, getJuName, getSiHua, getPatternDescriptionVi, translateCondition, translatePatternSource } from '@/lib/ziwei/vietnamese';
 
 interface ChartSummaryProps {
   chart: ZiweiChart;
@@ -178,10 +178,12 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
               {patterns.length} cách cục (格局)
             </span>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {patterns.map((p, i) => {
               const st = PatternLevelStyle[p.level];
               const pat = getPatternVi(p.name);
+              const descVi = getPatternDescriptionVi(p.name, p.description);
+
               return (
                 <motion.div
                   key={i}
@@ -191,47 +193,47 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
                   className="card-inner rounded-lg p-3"
                 >
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${st.dot}`} />
-                    <span className={`text-[12px] font-bold ${st.label}`}>{pat.vi}</span>
-                    <span className="text-[9px] opacity-60">({pat.zh})</span>
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${st.dot}`} />
+                    <span className={`text-[13px] font-black ${st.label}`}>{pat.vi}</span>
+                    <span className="text-[10px] opacity-60">({pat.zh})</span>
                     <div className="flex gap-1 ml-auto">
                       {p.palaces.slice(0, 2).map(pa => (
-                        <span key={pa} className={`text-[8px] px-1.5 py-px rounded-full border ${st.badge}`}>
-                          {PALACE_VI[pa]?.short || pa.replace('宫', '')}
+                        <span key={pa} className={`text-[9px] px-1.5 py-px rounded border font-semibold ${st.badge}`}>
+                          Cung {PALACE_VI[pa]?.short || pa.replace('宫', '')}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <p className="text-[10px] leading-relaxed pl-3.5" style={{ color: 'var(--t-text2)' }}>
-                    {p.description}
+                  <p className="text-[11px] leading-relaxed pl-3.5 mb-1.5 text-stone-200">
+                    {descVi}
                   </p>
 
                   {p.conditions && (
-                    <div className="mt-2 pl-3.5 space-y-0.5">
+                    <div className="mt-2 pl-3.5 space-y-1">
                       {p.conditions.required.length > 0 && (
-                        <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-semibold" style={{ color: 'var(--t-gold)' }}>Bắt buộc (必须):</span>
-                          <span> · {p.conditions.required.join('、')}</span>
+                        <div className="text-[10px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.9 }}>
+                          <span className="font-bold text-amber-400">Bắt buộc:</span>
+                          <span className="text-stone-300"> {p.conditions.required.map(translateCondition).join(' · ')}</span>
                         </div>
                       )}
                       {p.conditions.bonus && p.conditions.bonus.length > 0 && (
-                        <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-semibold text-emerald-400">Gia cát (加分):</span>
-                          <span> · {p.conditions.bonus.join('、')}</span>
+                        <div className="text-[10px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.9 }}>
+                          <span className="font-bold text-emerald-400">Gia cát:</span>
+                          <span className="text-emerald-300"> {p.conditions.bonus.map(translateCondition).join(' · ')}</span>
                         </div>
                       )}
                       {p.conditions.breaking && p.conditions.breaking.length > 0 && (
-                        <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-semibold text-orange-400">Phá cách (破格):</span>
-                          <span> · {p.conditions.breaking.join('、')}</span>
+                        <div className="text-[10px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.9 }}>
+                          <span className="font-bold text-orange-400">Phá cách:</span>
+                          <span className="text-orange-300"> {p.conditions.breaking.map(translateCondition).join(' · ')}</span>
                         </div>
                       )}
                     </div>
                   )}
 
                   {p.source && (
-                    <div className="text-[9px] mt-1.5 pl-3.5" style={{ color: 'var(--t-faint)', opacity: 0.5 }}>
-                      出处 · {p.source}
+                    <div className="text-[10px] mt-1.5 pl-3.5 text-stone-400 italic">
+                      📜 Xuất xứ: {translatePatternSource(p.source)}
                     </div>
                   )}
                 </motion.div>
@@ -242,7 +244,7 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
         </motion.div>
       )}
 
-      {/* ── 大限运程 ── */}
+      {/* ── Vận Trình Đại Hạn ── */}
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -250,8 +252,8 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
       >
       <div className="card-glass rounded-xl p-4">
         <div className="text-[10px] tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--t-faint)' }}>
-          <span className="text-purple-500/60">◎</span>
-          大限运程
+          <span className="text-purple-400">◎</span>
+          <span className="font-bold text-purple-400">VẬN TRÌNH ĐẠI HẠN (大限运程)</span>
         </div>
         <div className="grid grid-cols-3 gap-2">
           {chart.daXians.slice(0, 9).map((dx, i) => {

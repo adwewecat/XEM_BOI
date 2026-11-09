@@ -184,12 +184,28 @@ const siHuaLabels: Record<string, string> = {
   '忌': 'Hóa Kỵ (化忌)',
 };
 
+const ELEMENT_MAP: Record<string, string> = {
+  '金': 'Kim', '木': 'Mộc', '水': 'Thủy', '火': 'Hỏa', '土': 'Thổ',
+};
+const NATURE_MAP: Record<string, string> = {
+  '吉星': 'Cát Tinh', '凶星': 'Hung Tinh', '中性': 'Trung Tính', '中性偏吉': 'Trung Tính Cát', '凶中带吉': 'Hung Đới Cát',
+};
+const KEYWORD_MAP: Record<string, string> = {
+  '帝王': 'Đế Vương', '尊贵': 'Tôn Quý', '独立': 'Độc Lập', '智慧': 'Trí Tuệ', '机变': 'Cơ Biến', '谋略': 'Mưu Lược',
+  '阳刚': 'Dương Cương', '官贵': 'Quan Quý', '慷慨': 'Hào Phóng', '财富': 'Tài Phú', '刚毅': 'Cương Nghị', '果断': 'Quyết Đoán',
+  '温和': 'Ôn Hòa', '享福': 'Hưởng Phúc', '随缘': 'Tùy Duyên', '才艺': 'Tài Nghệ', '刑囚': 'Hình Tù', '桃花': 'Đào Hoa',
+  '财库': 'Tài Khố', '稳重': 'Trầm Ổn', '保守': 'Thủ Cựu', '柔美': 'Nhu Mỹ', '阴柔': 'Âm Nhu', '欲望': 'Dục Vọng',
+  '多才': 'Đa Tài', '口舌': 'Khẩu Thiệt', '是非': 'Thị Phi', '善辩': 'Thiện Biện', '辅佐': 'Phò Tá', '行政': 'Hành Chính',
+  '印绶': 'Ấn Thụ', '荫护': 'Ấm Hộ', '医药': 'Y Dược', '长辈': 'Trưởng Bối', '将星': 'Tướng Tinh', '孤克': 'Cô Khắc',
+  '开创': 'Khai Sáng', '变动': 'Biến Động', '破坏': 'Phá Toái',
+};
+
 export default function StarDetailPanel({ star, palaceName, onClose }: StarDetailPanelProps) {
   const desc = star ? STAR_DESCRIPTIONS[star.name] : null;
   const detail = star ? STAR_DETAIL[star.name] : null;
   const typeConfig = star ? levelConfig[star.type] : null;
   const starNameInfo = star ? getStarName(star.name) : { vi: '', zh: '' };
-  const palaceVi = palaceName ? (PALACE_VI[palaceName] ? `${PALACE_VI[palaceName]} (${palaceName})` : palaceName) : '';
+  const palaceVi = palaceName ? (PALACE_VI[palaceName] ? `${PALACE_VI[palaceName].vi} (${palaceName})` : palaceName) : '';
 
   return (
     <AnimatePresence>
@@ -227,12 +243,12 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
             {desc && (
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  `Ngũ Hành · ${desc.element}`,
-                  `Đặc tính · ${desc.nature}`,
+                  `Ngũ Hành · ${ELEMENT_MAP[desc.element] || desc.element} (${desc.element})`,
+                  `Đặc tính · ${NATURE_MAP[desc.nature] || desc.nature}`,
                   ...(palaceVi ? [`Toạ thủ · ${palaceVi}`] : []),
                   ...(star.brightness ? [star.brightness === 'bright' ? 'Miếu Vượng (庙旺)' : star.brightness === 'dim' ? 'Lạc Hãm (落陷)' : 'Bình Hòa (平和)'] : []),
                 ].map(tag => (
-                  <div key={tag} className="text-[10px] px-2 py-1 rounded-full"
+                  <div key={tag} className="text-[10px] px-2 py-1 rounded-full font-semibold"
                     style={{
                       border: '1px solid var(--t-border)',
                       color: tag.includes('Miếu') ? '#eab308' : tag.includes('Hãm') ? '#ef4444' : 'var(--t-text2)',
@@ -246,14 +262,18 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
             {/* Đặc tính tinh diệu */}
             {desc && (
               <div>
-                <div className="text-[10px] tracking-widest mb-1.5" style={{ color: 'var(--t-faint)' }}>ĐẶC TÍNH TINH DIỆU (星曜特质)</div>
+                <div className="text-[10px] font-bold tracking-widest mb-1.5 text-amber-400">ĐẶC TÍNH TINH DIỆU (星曜特质)</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {desc.keywords.split('·').map(k => (
-                    <span key={k} className="text-[11px] px-2 py-0.5 rounded-full"
-                      style={{ color: 'var(--t-gold)', border: '1px solid rgba(212,168,67,0.2)', background: 'rgba(212,168,67,0.06)' }}>
-                      {k.trim()}
-                    </span>
-                  ))}
+                  {desc.keywords.split('·').map(k => {
+                    const trimmed = k.trim();
+                    const viKw = KEYWORD_MAP[trimmed] || trimmed;
+                    return (
+                      <span key={k} className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-sm"
+                        style={{ color: 'var(--t-gold)', border: '1px solid rgba(212,168,67,0.3)', background: 'rgba(212,168,67,0.08)' }}>
+                        {viKw} <span className="text-[8.5px] opacity-40 font-normal">({trimmed})</span>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}

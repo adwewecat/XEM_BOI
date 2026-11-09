@@ -1,4 +1,4 @@
-﻿Set-Location $PSScriptRoot
+Set-Location $PSScriptRoot
 Write-Host "=====================================================================" -ForegroundColor Yellow
 Write-Host "   🔮 TU VI DAU SO (PHAI THIEN KY) - HE THONG AN SAO VA LAP LA SO" -ForegroundColor Cyan
 Write-Host "=====================================================================" -ForegroundColor Yellow
@@ -33,3 +33,4 @@ Write-Host ""
 
 npm.cmd run dev
 Read-Host "May chu da dung lai. Nhan Enter de thoat..."
+

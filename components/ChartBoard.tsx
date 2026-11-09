@@ -159,23 +159,19 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
             ☯
           </div>
 
-          <div className="text-center space-y-1">
-            <div className="text-[10px] tracking-[0.2em] font-extrabold uppercase" style={{ color: 'var(--ac)' }}>
+          <div className="text-center space-y-1.5">
+            <div className="text-[11px] tracking-[0.25em] font-black uppercase text-amber-400">
               THIÊN BÀN TỬ VI
-              <span className="block text-[8px] font-normal opacity-50 font-serif">紫微斗数</span>
             </div>
-            <div className="text-[11px] space-y-1 font-medium" style={{ color: 'var(--tx-2)' }}>
+            <div className="text-[12px] space-y-1 font-semibold" style={{ color: 'var(--tx-2)' }}>
               <div>
-                Mệnh cư: <span className="font-bold text-amber-400">{BRANCHES_VI[chart.mingGongBranch]}</span>
-                <span className="text-[8px] opacity-40 ml-1">({BRANCHES[chart.mingGongBranch]})</span>
+                Mệnh cư: <span className="font-black text-amber-300 text-xs sm:text-sm">{BRANCHES_VI[chart.mingGongBranch]}</span>
               </div>
               <div>
-                Thân cư: <span className="font-bold text-sky-400">{BRANCHES_VI[chart.shenGongBranch]}</span>
-                <span className="text-[8px] opacity-40 ml-1">({BRANCHES[chart.shenGongBranch]})</span>
+                Thân cư: <span className="font-black text-sky-300 text-xs sm:text-sm">{BRANCHES_VI[chart.shenGongBranch]}</span>
               </div>
-              <div className="text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400">
+              <div className="text-[11px] font-black px-2.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/15 text-amber-300 inline-block shadow-sm">
                 {getJuName(chart.wuxingJuName)}
-                <span className="text-[8px] opacity-50 block">{chart.wuxingJuName}</span>
               </div>
             </div>
           </div>
@@ -184,22 +180,21 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
             const dx = chart.daXians[chart.currentDaXianIndex];
             const pInfo = getPalaceName(dx.palaceName);
             return (
-              <div className="border border-purple-500/30 rounded-lg px-2.5 py-1 text-center"
-                style={{ background: 'rgba(147,51,234,0.1)' }}>
-                <div className="text-[8px] text-purple-400 font-semibold tracking-wider">
-                  Đại Hạn Hiện Tại <span className="opacity-50">(当前大限)</span>
+              <div className="border border-purple-500/40 rounded-lg px-3 py-1.5 text-center shadow-sm"
+                style={{ background: 'rgba(147,51,234,0.15)' }}>
+                <div className="text-[9px] text-purple-300 font-bold tracking-wider">
+                  Đại Hạn Hiện Tại
                 </div>
-                <div className="text-[12px] text-purple-300 font-bold tabular-nums">{dx.startAge}–{dx.endAge} tuổi</div>
-                <div className="text-[9px] text-purple-400">
-                  Cung {pInfo.vi} <span className="opacity-40">({pInfo.zh})</span>
+                <div className="text-[13px] text-purple-200 font-black tabular-nums">{dx.startAge}–{dx.endAge} tuổi</div>
+                <div className="text-[10px] text-purple-300 font-semibold">
+                  Cung {pInfo.vi}
                 </div>
               </div>
             );
           })()}
 
-          <div className="text-[9px] text-center leading-relaxed font-mono" style={{ color: 'var(--tx-3)', opacity: 0.85 }}>
-            <span className="block">Âm Lịch: {chart.lunarInfo.lunarYear} · {chart.lunarInfo.isLeapMonth ? 'Nhuận ' : ''}Tháng {chart.lunarInfo.lunarMonth} · Ngày {chart.lunarInfo.lunarDay}</span>
-            <span className="text-[8px] opacity-40">农历: {chart.lunarInfo.lunarYear}年{chart.lunarInfo.isLeapMonth ? '闰' : ''}{chart.lunarInfo.lunarMonth}月{chart.lunarInfo.lunarDay}日</span>
+          <div className="text-[10px] text-center leading-relaxed font-mono" style={{ color: 'var(--tx-3)', opacity: 0.9 }}>
+            <span className="block font-medium">Âm Lịch: {chart.lunarInfo.lunarYear} · {chart.lunarInfo.isLeapMonth ? 'Nhuận ' : ''}Tháng {chart.lunarInfo.lunarMonth} · Ngày {chart.lunarInfo.lunarDay}</span>
           </div>
         </motion.div>
 
@@ -280,23 +275,23 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
         </AnimatePresence>
       </div>
 
-      {/* 图例 */}
+      {/* Chú thích Tứ Hóa & Hướng Dẫn */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7 }}
-        className="mt-3 flex items-center justify-center gap-2 text-[9px] flex-wrap"
+        className="mt-3 flex items-center justify-center gap-2 text-[10px] flex-wrap"
       >
         {[
-          { h: '化禄', c: 'text-emerald-500 border-emerald-500/30' },
-          { h: '化权', c: 'text-blue-500 border-blue-500/30' },
-          { h: '化科', c: 'text-yellow-500 border-yellow-500/30' },
-          { h: '化忌', c: 'text-red-500 border-red-500/30' },
+          { h: 'Hóa Lộc (禄)', c: 'text-emerald-300 border-emerald-500/40 bg-emerald-500/15' },
+          { h: 'Hóa Quyền (权)', c: 'text-blue-300 border-blue-500/40 bg-blue-500/15' },
+          { h: 'Hóa Khoa (科)', c: 'text-yellow-300 border-yellow-500/40 bg-yellow-500/15' },
+          { h: 'Hóa Kỵ (忌)', c: 'text-rose-300 border-rose-500/40 bg-rose-500/15' },
         ].map(({ h, c }) => (
-          <span key={h} className={`border px-1.5 py-0.5 rounded-full font-medium ${c}`}>{h}</span>
+          <span key={h} className={`border px-2 py-0.5 rounded-full font-bold shadow-sm ${c}`}>{h}</span>
         ))}
-        <span className="px-1.5 py-0.5 rounded-full" style={{ color: 'var(--t-faint)', border: '1px solid var(--t-border)' }}>
-          点击宫位看三方四正
+        <span className="px-2.5 py-0.5 rounded-full text-stone-300 font-semibold border border-stone-700 bg-white/5">
+          👉 Nhấp vào ô cung để xem Tam Phương Tứ Chính
         </span>
       </motion.div>
     </div>
