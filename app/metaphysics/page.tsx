@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { calculateBazi, BaziResult } from '@/lib/metaphysics/bazi';
 import { castIChingCoins, DivinationResult, getHexagramByBinary } from '@/lib/metaphysics/iching';
 import { castDongTam, DongTamResult } from '@/lib/metaphysics/dongtam';
+import { drawTarotSpread, TarotSpreadResult } from '@/lib/metaphysics/tarot';
+import VisualBaguaHexagram from '@/components/metaphysics/VisualBaguaHexagram';
+import VisualTarotCard from '@/components/metaphysics/VisualTarotCard';
 import {
   calculateLifePath,
   calculateDestinyNumber,
@@ -16,7 +19,7 @@ import {
 } from '@/lib/metaphysics/numerology';
 
 export default function MetaphysicsPage() {
-  const [activeTab, setActiveTab] = useState<'bazi' | 'dongtam' | 'iching' | 'numerology'>('dongtam');
+  const [activeTab, setActiveTab] = useState<'bazi' | 'dongtam' | 'iching' | 'numerology' | 'tarot'>('dongtam');
 
   // --- STATE CHO BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) ---
   const [dongTamQuestion, setDongTamQuestion] = useState(
@@ -50,6 +53,22 @@ export default function MetaphysicsPage() {
     const min = String(now.getMinutes()).padStart(2, '0');
     setDongTamDate(`${y}-${m}-${d}`);
     setDongTamTime(`${h}:${min}`);
+  };
+
+  // --- STATE CHO BÀI TAROT ---
+  const [tarotType, setTarotType] = useState<'three_cards' | 'single' | 'love'>('three_cards');
+  const [tarotQuestion, setTarotQuestion] = useState('Hướng đi sắp tới trong sự nghiệp và tài chính của tôi thế nào?');
+  const [tarotResult, setTarotResult] = useState<TarotSpreadResult>(() =>
+    drawTarotSpread('three_cards', 'Hướng đi sắp tới trong sự nghiệp và tài chính của tôi thế nào?')
+  );
+  const [isTarotDrawing, setIsTarotDrawing] = useState(false);
+
+  const handleDrawTarot = () => {
+    setIsTarotDrawing(true);
+    setTimeout(() => {
+      setTarotResult(drawTarotSpread(tarotType, tarotQuestion));
+      setIsTarotDrawing(false);
+    }, 500);
   };
 
   // --- STATE CHO BÁT TỰ TỨ TRỤ ---
@@ -176,6 +195,18 @@ export default function MetaphysicsPage() {
             >
               <span>🔯</span>
               <span>Thần Số & Hoàng Đạo</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('tarot')}
+              className={`px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'tarot'
+                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
+                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
+              }`}
+            >
+              <span>🃏</span>
+              <span>Bài Tarot (22 Ẩn Chính)</span>
             </button>
           </div>
         </div>
@@ -551,6 +582,19 @@ export default function MetaphysicsPage() {
                   </div>
                 </div>
 
+                {/* ĐỒ HỌA BÁT QUÁI & HÀO ĐỘNG & NGŨ HÀNH TẠNG PHỦ */}
+                <VisualBaguaHexagram
+                  originalName={dongTamResult.hexagram.originalName}
+                  originalUpper={dongTamResult.hexagram.originalUpper}
+                  originalLower={dongTamResult.hexagram.originalLower}
+                  movingLine={dongTamResult.hexagram.movingLine}
+                  changedName={dongTamResult.hexagram.changedName}
+                  changedUpper={dongTamResult.hexagram.changedUpper}
+                  changedLower={dongTamResult.hexagram.changedLower}
+                  highlightOrgan={dongTamResult.diseaseAnalysis?.involvedOrgan}
+                  highlightElement={dongTamResult.diseaseAnalysis?.involvedElement}
+                />
+
                 {/* BẢNG CHI TIẾT KỸ THUẬT DỊCH LÝ LỤC HÀO */}
                 <div className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/70 space-y-4">
                   <div className="text-sm font-black text-amber-200 flex items-center gap-2">
@@ -721,6 +765,17 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* ĐỒ HỌA BÁT QUÁI & HÀO ĐỘNG KINH DỊCH */}
+                <VisualBaguaHexagram
+                  originalName={divination.originalHexagram.name}
+                  originalUpper={divination.originalHexagram.upperTrigram}
+                  originalLower={divination.originalHexagram.lowerTrigram}
+                  movingLine={divination.movingLines[0] || 1}
+                  changedName={divination.changedHexagram.name}
+                  changedUpper={divination.changedHexagram.upperTrigram}
+                  changedLower={divination.changedHexagram.lowerTrigram}
+                />
 
                 {/* Luận Giải 4 Phương Diện */}
                 <div className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/70 space-y-4">
@@ -940,6 +995,110 @@ export default function MetaphysicsPage() {
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+        {/* TAB 5: BÀI TAROT PHƯƠNG TÂY */}
+        {activeTab === 'tarot' && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
+            {/* Header Form Trải Bài Tarot */}
+            <div className="card-glass p-6 rounded-2xl border border-amber-500/40 bg-zinc-950/80 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🃏</span>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-amber-300 uppercase tracking-wider">
+                      CHIÊM ĐOÁN BÀI TAROT PHƯƠNG TÂY (RIDER-WAITE-SMITH)
+                    </h3>
+                    <p className="text-xs text-zinc-400">
+                      22 Lá Ẩn Chính (Major Arcana) · Biểu Tượng Chiêm Tinh & Tiềm Thức Vũ Trụ
+                    </p>
+                  </div>
+                </div>
+                <div className="px-2.5 py-1 rounded text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  78 Lá Kinh Điển
+                </div>
+              </div>
+
+              {/* Chọn kiểu trải bài */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-300 block">
+                  Chọn Phương Thức Trải Bài:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { type: 'three_cards', label: '3 Lá: Quá Khứ - Hiện Tại - Tương Lai', desc: 'Nhìn thấu dòng chảy vận mệnh' },
+                    { type: 'single', label: '1 Lá: Vấn Đáp Nhanh & Chỉ Dẫn', desc: 'Thông điệp ngày mới / Có-Không' },
+                    { type: 'love', label: '3 Lá: Tình Duyên & Hòa Hợp', desc: 'Bạn - Đối phương - Tương lai' },
+                  ].map((item) => (
+                    <button
+                      key={item.type}
+                      type="button"
+                      onClick={() => setTarotType(item.type as any)}
+                      className={`p-3 rounded-xl border text-left transition-all ${
+                        tarotType === item.type
+                          ? 'bg-amber-500/20 border-amber-400 text-amber-200 shadow-md shadow-amber-500/10'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{item.label}</div>
+                      <div className="text-[10px] text-zinc-400 mt-0.5">{item.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Câu hỏi */}
+              <div className="space-y-1.5 pt-1">
+                <label className="text-xs font-bold text-zinc-300 block">
+                  Câu hỏi / Vấn đề bạn muốn vũ trụ hồi đáp:
+                </label>
+                <input
+                  type="text"
+                  value={tarotQuestion}
+                  onChange={(e) => setTarotQuestion(e.target.value)}
+                  placeholder="Ví dụ: Công việc sắp tới thế nào? Có nên chuyển việc không?"
+                  className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-xl px-4 py-2.5 text-sm text-zinc-100 font-semibold focus:outline-none"
+                />
+              </div>
+
+              {/* Nút bấm rút bài */}
+              <div className="pt-2 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleDrawTarot}
+                  disabled={isTarotDrawing}
+                  className="px-8 py-3 rounded-xl font-black text-sm bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-zinc-950 shadow-xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <span>{isTarotDrawing ? '🌀' : '🃏'}</span>
+                  <span>{isTarotDrawing ? 'ĐANG XÀO VÀ RÚT BÀI...' : 'XÀO BÀI & RÚT BÀI TAROT'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* KẾT QUẢ TRẢI BÀI TAROT */}
+            {tarotResult && (
+              <div className="space-y-6">
+                {/* Banner Tổng Hợp Lời Khuyên Vũ Trụ */}
+                <div className="card-glass p-5 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-r from-zinc-950 via-amber-950/30 to-zinc-950 shadow-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <span>✨</span> THÔNG ĐIỆP TỔNG HÒA VŨ TRỤ ({tarotResult.spreadTitle})
+                    </span>
+                    <span className="text-[10px] font-mono text-zinc-400">{tarotResult.timestamp}</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-serif">
+                    {tarotResult.overallSynthesis}
+                  </p>
+                </div>
+
+                {/* Grid hiển thị các lá bài */}
+                <div className={`grid grid-cols-1 ${tarotResult.cards.length === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-3'} gap-4`}>
+                  {tarotResult.cards.map((c, i) => (
+                    <VisualTarotCard key={i} drawnCard={c} index={i} />
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </div>

@@ -73,6 +73,37 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 8: Tích Hợp Đồ Họa Trực Quan Bát Quái - Ngũ Hành, Module Tarot 22 Lá Ẩn Chính & Việt Hóa Toàn Diện Trang Chủ
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. Khi bói hoặc giải đoán, hãy vẽ trực quan các yếu tố tương ứng (sao, Bát Quái âm dương, hào động, ngũ hành tạng phủ...).
+  2. Tham khảo thêm nhiều luồng trên GitHub và các nguồn mở uy tín để mở rộng phong phú các phương pháp thuật số Đông - Tây, đặc biệt là hệ thống bói bài Tarot chuẩn quốc tế.
+  3. Hoàn thiện dịch sạch toàn bộ tiếng Trung còn sót trên Trang chủ sang Tiếng Việt to rõ, trang trọng, đậm chất văn hóa.
+- **Các giải pháp & nâng cấp đã thực hiện:**
+  1. **Đồ họa trực quan Bát Quái & Hào Động & Ngũ Hành Tạng Phủ (`components/metaphysics/VisualBaguaHexagram.tsx`):**
+     - Vẽ 6 hào Quẻ Chủ (Quẻ Gốc) và Quẻ Biến chuẩn quy cách Kinh Dịch: Hào Dương (Liền nét, vàng kim `amber-400`), Hào Âm (Đứt đoạn ở giữa, bạc sáng `zinc-300`).
+     - Hào Động được viền phát sáng (pulsing glow), đổi màu đỏ hồng rực rỡ và có ký hiệu biến hóa `(Động → Biến)`.
+     - Hiển thị Bát Quái đồ tượng (Càn ☰, Đoài ☱, Ly ☲, Chấn ☳, Tốn ☴, Khảm ☵, Cấn ☶, Khôn ☷) kèm bản chất ngũ hành, vị thế Thượng quái / Hạ quái.
+     - Mô hình tương tác Ngũ Hành Tạng Phủ: Kim (Phổi/Đại tràng), Mộc (Gan/Đởm), Thủy (Thận/Bàng quang), Hỏa (Tim/Tiểu tràng), Thổ (Tỳ/Vị). Tự động khoanh vùng phát sáng cơ quan tạng phủ bị ảnh hưởng theo câu hỏi và dịch tượng.
+  2. **Xây dựng Module Tarot 22 Lá Ẩn Chính Chuẩn Rider-Waite-Smith (`lib/metaphysics/tarot.ts` & `components/metaphysics/VisualTarotCard.tsx`):**
+     - Toàn bộ 22 lá Ẩn Chính (Major Arcana): 0. The Fool (Chàng Khờ) đến XXI. The World (Thế Giới), đối ứng chuẩn xác chòm sao chiêm tinh và nguyên tố hoàng đạo.
+     - Cơ chế Xuôi (Upright) và Ngược (Reversed) chân thực, giải đoán chi tiết Ý nghĩa, Biểu tượng, Lời khuyên vũ trụ và Dự báo hành động.
+     - 3 phương thức trải bài kinh điển:
+       + *3 Lá Thời Gian:* Quá Khứ — Hiện Tại — Tương Lai.
+       + *1 Lá Định Hướng:* Vấn đáp nhanh Có/Không và thông điệp vũ trụ dẫn lối.
+       + *3 Lá Tình Duyên:* Bản thân — Đối phương — Chiều hướng tương lai đôi lứa.
+     - Giao diện thẻ bài huyền bí Tarot với viền vàng nghệ thuật, chữ số La Mã, hiệu ứng xoay ngược nếu bốc trúng lá ngược, thẻ bài phát sáng lung linh.
+  3. **Tích hợp Đồ họa vào Module Bói Hữu Duyên & Kinh Dịch (`app/metaphysics/page.tsx`):**
+     - Đặt component trực quan Bát Quái ngay bên dưới kết quả phán quẻ của Thầy để người xem nhìn rõ Quẻ Gốc (Trạch Sơn Hàm), Hào Động (Hào 5), Quẻ Biến (Lôi Sơn Tiểu Quá) và vùng tạng phủ Phổi/Tim bị tổn thương.
+     - Bổ sung tab "🃏 Bài Tarot (22 Ẩn Chính)" với giao diện trải bài sống động, hiệu ứng xào bài và lời khuyên tổng hòa vũ trụ.
+  4. **Việt Hóa 100% Trang Chủ (`app/page.tsx`):**
+     - Dịch sạch toàn bộ triết lý Mệnh · Vận · Quan, 4 đại học trình (Thiên Kỷ, Địa Kỷ, Nhân Kỷ), tiểu sử và giáo huấn cốt lõi của danh sư Nghê Hải Hà, mục so kèo hợp mệnh và chân trang.
+  5. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 suite bài kiểm tra hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công toàn bộ hệ thống.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 7: Sửa Triệt Để Lỗi Hydration, Nâng Cấp Giải Đoán Lá Số Nội Bộ & Tích Hợp Module Bói Hữu Duyên Theo Giờ Động Tâm
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**
