@@ -189,7 +189,7 @@ export default function AnnouncementModal() {
                   boxShadow: '0 4px 12px rgba(184,146,42,0.3)',
                 }}
               >
-                Đã Hiểu · Bắt Đầu Khám Phá (我知道了)
+                Đã Hiểu · Bắt Đầu Khám Phá →
               </button>
             </div>
           </motion.div>

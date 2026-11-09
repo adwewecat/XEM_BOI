@@ -73,6 +73,34 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-09] - Đợt 13: Tối Ưu Cân Đối 2 Dải Câu Đối (Chia 2 Cột Song Song, Lật Nghiêng Sang Phải Dễ Đọc & Bám Sát Màn Hình), Việt Hóa Toàn Diện Quyền Riêng Tư & Cuộn Thư
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  - "2 câu đối bị lỗi cân đối rồi, nó đang bị không ở trên, nào lướt xuống nó cũng phải xuống, chứ nó đang không tấy hết được câu, cũng không biết viết gì . bạn lật ngược chữ qua phải dễ đọc nhé"
+  - Kèm ảnh chụp màn hình minh họa câu đối bị cắt mất nửa dưới và chữ bị xếp chồng từng chữ cái khó đọc.
+- **Phân tích kỹ thuật & Giải pháp đã thực hiện:**
+  1. **Cân đối vị trí & Bám sát màn hình (`fixed top-24`):**
+     - Đổi từ căn giữa `top-1/2 -translate-y-1/2` (dễ bị tràn 2 đầu khi màn hình thấp) sang neo cố định tại đỉnh: `fixed left-3 2xl:left-5 top-24` và `fixed right-3 2xl:right-5 top-24` (ngay sát bên dưới thanh điều hướng Navbar).
+     - Khi người dùng cuộn trang xuống dưới ("nào lướt xuống nó cũng phải xuống"), hai dải câu đối luôn bám sát cố định theo tầm mắt người dùng, không bao giờ bị lệch hay che khuất.
+  2. **Chia 2 Cột Đối Song Song Trong Mỗi Liễn (Chống Tràn Chiều Cao 100%):**
+     - Thay vì dồn cả câu dài 66 ký tự vào 1 cột duy nhất (khiến chiều cao vượt quá 850px gây cắt cụt chân liễn), mỗi biển liễn được chia làm 2 cột đối song song cân xứng:
+       + **Liễn Trái (Câu 1):** Cột 1 (*THÔNG TIN CHỈ MANG TÍNH CHẤT GIẢI TRÍ*) + Cột 2 (*KHÔNG CỔ XÚY MÊ TÍN DỊ ĐOAN*).
+       + **Liễn Phải (Câu 2):** Cột 1 (*TẤT CẢ THÔNG TIN KHÔNG CÔNG KÍCH*) + Cột 2 (*BẤT KỲ CÁ NHÂN TỔ CHỨC NÀO*).
+     - Chiều cao liễn giảm từ 850px xuống chỉ còn ~300px, đảm bảo hiển thị trọn vẹn 100% tất cả các từ trên mọi kích thước màn hình từ laptop nhỏ (chiều cao 480px–768px) đến màn hình 2K/4K.
+  3. **Lật Chữ Nghiêng Sang Phải Dễ Đọc (`text-orientation: sideways`):**
+     - Áp dụng `writingMode: 'vertical-lr', textOrientation: 'sideways'` chuẩn CSS Writing Modes Level 3.
+     - Các dòng chữ Latinh được xoay 90 độ theo chiều kim đồng hồ (đỉnh chữ quay sang phải), đọc mượt mà từ trên xuống dưới theo thứ tự đọc tự nhiên của người Việt, loại bỏ hoàn toàn lỗi từng chữ cái bị dựng đứng xếp chồng kiểu cột totem.
+  4. **Việt Hóa Toàn Diện Trang Quyền Riêng Tư (`app/privacy/page.tsx`):**
+     - Dịch sạch toàn bộ nội dung từ tiếng Trung sang tiếng Việt học thuật, chuẩn mực pháp lý về lưu trữ dữ liệu cục bộ (Local Storage), bảo mật thông tin và miễn trừ trách nhiệm.
+  5. **Hoàn Thiện Các Nhãn Giao Diện Còn Sót:**
+     - `components/ScrollIntro.tsx`: Nút bỏ qua đổi thành `BỎ QUA`, tiêu đề cuộn thư `TỬ VI ĐẨU SỐ`, triện son `THIÊN KỶ CHI ẤN`.
+     - `components/AnnouncementModal.tsx`: Nút hoàn tất đổi thành `Đã Hiểu · Bắt Đầu Khám Phá →`.
+  6. **Kiểm tra chất lượng & Build:**
+     - `npm run typecheck`: 0 lỗi TypeScript.
+     - `npm test`: 17/17 bài test hồi quy vượt qua 100%.
+     - `next build`: Biên dịch thành công 234/234 trang tĩnh.
+     - Đẩy mã nguồn mới nhất lên GitHub remote `https://github.com/adwewecat/XEM_BOI.git`.
+
 ### [2026-11-09] - Đợt 12: Tích Hợp 2 Dải Câu Đối Phong Thủy & Tuyên Bố Miễn Trừ Trách Nhiệm Pháp Lý Xuyên Suốt Mọi Trang
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**
