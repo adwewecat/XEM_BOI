@@ -73,6 +73,34 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-10] - Đợt 16: Tăng Độ Sáng Nổi Bật Cho Background, Thêm Module Bói Chỉ Tay (Palmistry) & Tích Hợp Thematic Background Animation Huyền Ảo Theo Từng Chủ Đề
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. *Tham khảo web `https://xemboimienphi.com/`:* "tham khảo thêm ở web trên, thấy có animation khá đẹp, bạn cho giao diện mình chỗ background sáng lên nổi lên 1 xíu, chứ nó trầm quá khó thấy."
+  2. *Animation theo chủ đề khi trỏ chuột:* "chỗ xem bói chỉ tay, hay tarot,.... mỗi thứ sẽ background animation mỗi lần trỏ đúng vào phần đó sẽ theo chủ đề để huyền bí hơn".
+- **Các giải pháp & nâng cấp thực hiện:**
+  1. **Nâng Cấp Background Sáng Lên, Nổi Bật & Huyền Ảo (`StarField.tsx` & `globals.css`):**
+     - Tăng độ sáng, kích thước và mật độ hạt sao, tăng độ nét chòm sao Bắc Đẩu và Tử Vi Viên.
+     - Vòng Bát Quái và 12 Địa Chi (Celestial Dial) được tăng độ hiển thị từ 0.16 lên 0.45, bổ sung hiệu ứng phát quang hào quang vàng kim (Gold Aura Glow) và Thái Cực Âm Dương nổi bật rõ nét.
+     - Nền tối chuyển từ đen tuyền sang gam xanh thẳm vũ trụ có chiều sâu (`#060e1f`), bổ sung các dải tinh vân hào quang (Cosmic Nebula Ambient Glow) huyền ảo rực rỡ, không bị chìm hay u tối.
+  2. **Xây Dựng Module Bói Chỉ Tay Toàn Diện (`lib/metaphysics/palmistry.ts` & `VisualPalmDiagram.tsx`):**
+     - Luận giải 4 đường chỉ tay chính: Sinh Đạo, Trí Đạo, Tâm Đạo, Định Mệnh.
+     - Luận các tướng tay quý: Chữ M, Chữ Nhất (Simian Line), Tam Giác Vàng, Vòng Mộc Tinh, Mắt Phật.
+     - Tướng pháp 5 hình thái bàn tay theo Ngũ Hành (Kim, Mộc, Thủy, Hỏa, Thổ) và các gò bàn tay.
+     - Đồ hình bàn tay SVG tương tác phát sáng sinh động, cho phép bấm chọn trực quan.
+  3. **Tích Hợp Thematic Background Animation Khi Trỏ Chuột (`ThematicMetaphysicsBackground.tsx`):**
+     - Động cơ hoạt họa chuyên biệt theo 7 chủ đề:
+       + *Chỉ Tay (Palmistry):* Luồng sáng thần thánh chạy dọc các đường chỉ tay với hào quang phát sáng.
+       + *Tarot:* Cổng không gian ma pháp Arcana Portal xoay tròn, các biểu tượng 4 chất và lá bài bay lượn trong tinh vân.
+       + *Bói Hữu Duyên (Động Tâm):* Đồng hồ thiên văn và các vòng sóng rung động tâm linh hoàng kim.
+       + *Trạch Nhật:* Chu kỳ Nhật Nguyệt quang hoa và vòng 28 Tinh Tú xoay chuyển.
+       + *Bát Tự:* Đồ hình Ngũ Hành tương sinh ngũ giác và Can Chi luân chuyển.
+       + *Kinh Dịch:* Bát Quái Tiên Thiên / Hậu Thiên và Thái Cực chuyển động.
+       + *Thần Số Học:* Ma trận số học Pythagoras thần bí và 12 chòm sao Hoàng Đạo.
+     - Mỗi khi người dùng trỏ chuột (hover) vào bất kỳ mục nào, background chuyển đổi mượt mà theo chủ đề đó.
+  4. **Bổ Sung Showcase Các Hình Thức Bói Phổ Biến Tại Trang Chủ (`app/page.tsx`):**
+     - Thiết kế khối khám phá trực quan tương tự `xemboimienphi.com`, hiệu ứng hover phát sáng rực rỡ, dẫn lối trực tiếp đến từng công cụ bói toán.
+
 ### [2026-11-09] - Đợt 15: Nâng Cấp Trả Lời Trực Diện & Sửa Lỗi Font Bói Hữu Duyên, Hiệu Chỉnh Cuộn Thư, Tích Hợp Animation Huyền Ảo Giao Diện Tối & Việt Hóa Toàn Diện 100%
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

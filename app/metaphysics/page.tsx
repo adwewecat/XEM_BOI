@@ -10,6 +10,21 @@ import { drawTarotSpread, TarotSpreadResult } from '@/lib/metaphysics/tarot';
 import { calculateAlmanac, AlmanacResult } from '@/lib/metaphysics/almanac';
 import VisualBaguaHexagram from '@/components/metaphysics/VisualBaguaHexagram';
 import VisualTarotCard from '@/components/metaphysics/VisualTarotCard';
+import VisualPalmDiagram from '@/components/metaphysics/VisualPalmDiagram';
+import ThematicMetaphysicsBackground, { MetaphysicsTheme } from '@/components/metaphysics/ThematicMetaphysicsBackground';
+import {
+  analyzePalm,
+  PalmInput,
+  PalmistryResult,
+  HAND_ELEMENT_DATA,
+  SPECIAL_SIGNS_DATA,
+  HandElement,
+  LifeLineType,
+  HeadLineType,
+  HeartLineType,
+  FateLineType,
+  SpecialSign,
+} from '@/lib/metaphysics/palmistry';
 import {
   calculateLifePath,
   calculateDestinyNumber,
@@ -20,7 +35,9 @@ import {
 } from '@/lib/metaphysics/numerology';
 
 export default function MetaphysicsPage() {
-  const [activeTab, setActiveTab] = useState<'dongtam' | 'almanac' | 'bazi' | 'tarot' | 'iching' | 'numerology'>('dongtam');
+  const [activeTab, setActiveTab] = useState<MetaphysicsTheme>('palmistry');
+  const [hoveredTab, setHoveredTab] = useState<MetaphysicsTheme | null>(null);
+  const activeAnimationTheme: MetaphysicsTheme = hoveredTab || activeTab;
 
   // --- THÔNG TIN NGƯỜI DÙNG ĐỒNG BỘ TỪ LÁ SỐ ---
   const [userProfile, setUserProfile] = useState<{
@@ -34,6 +51,31 @@ export default function MetaphysicsPage() {
     province?: string;
     city?: string;
   } | null>(null);
+
+  // --- STATE CHO BÓI CHỈ TAY (PALMISTRY) ---
+  const [palmInput, setPalmInput] = useState<PalmInput>({
+    element: 'tho',
+    side: 'right',
+    lifeLine: 'dai_sau',
+    headLine: 'chia_doi',
+    heartLine: 'dai_len_moc_tinh',
+    fateLine: 'ro_net_thang',
+    specialSigns: ['chu_m', 'tam_giac_vang'],
+    gender: 'male',
+  });
+  const [palmResult, setPalmResult] = useState<PalmistryResult | null>(() => {
+    return analyzePalm({
+      element: 'tho',
+      side: 'right',
+      lifeLine: 'dai_sau',
+      headLine: 'chia_doi',
+      heartLine: 'dai_len_moc_tinh',
+      fateLine: 'ro_net_thang',
+      specialSigns: ['chu_m', 'tam_giac_vang'],
+      gender: 'male',
+    });
+  });
+  const [isPalmAnalyzing, setIsPalmAnalyzing] = useState(false);
 
   // --- STATE CHO BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) ---
   const [dongTamQuestion, setDongTamQuestion] = useState('');
@@ -95,6 +137,13 @@ export default function MetaphysicsPage() {
           if (p.year) setNumYear(Number(p.year));
           if (p.month) setNumMonth(Number(p.month));
           if (p.day) setNumDay(Number(p.day));
+          if (p.gender) {
+            setPalmInput(prev => ({
+              ...prev,
+              gender: p.gender === 'female' ? 'female' : 'male',
+              side: p.gender === 'female' ? 'left' : 'right',
+            }));
+          }
         }
       }
     } catch {}
@@ -109,6 +158,14 @@ export default function MetaphysicsPage() {
     setDongTamDate(`${y}-${m}-${d}`);
     setDongTamTime(`${h}:${min}`);
     setAlmanacDate(`${y}-${m}-${d}`);
+    // 3. Đọc tham số tab từ URL nếu có (?tab=palmistry | tarot | ...)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam && ['palmistry', 'tarot', 'dongtam', 'almanac', 'bazi', 'iching', 'numerology'].includes(tabParam)) {
+        setActiveTab(tabParam as MetaphysicsTheme);
+      }
+    } catch {}
   }, []);
 
   const handleCastDongTam = () => {
@@ -137,6 +194,35 @@ export default function MetaphysicsPage() {
       setTarotResult(drawTarotSpread(tarotType, tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'));
       setIsTarotDrawing(false);
     }, 500);
+  };
+
+  const handleAnalyzePalm = () => {
+    setIsPalmAnalyzing(true);
+    setTimeout(() => {
+      setPalmResult(analyzePalm(palmInput));
+      setIsPalmAnalyzing(false);
+    }, 400);
+  };
+
+  const handleQuickAIScan = () => {
+    setIsPalmAnalyzing(true);
+    const gen = userProfile?.gender === 'female' ? 'female' : 'male';
+    const isFem = gen === 'female';
+    const quickInput: PalmInput = {
+      element: isFem ? 'thuy' : 'kim',
+      side: isFem ? 'left' : 'right',
+      lifeLine: 'dai_sau',
+      headLine: 'chia_doi',
+      heartLine: 'dai_len_moc_tinh',
+      fateLine: 'ro_net_thang',
+      specialSigns: ['chu_m', 'tam_giac_vang', 'mat_phat'],
+      gender: gen,
+    };
+    setPalmInput(quickInput);
+    setTimeout(() => {
+      setPalmResult(analyzePalm(quickInput));
+      setIsPalmAnalyzing(false);
+    }, 450);
   };
 
   const baziData: BaziResult = useMemo(() => {
@@ -172,8 +258,11 @@ export default function MetaphysicsPage() {
   }, [almanacDate, userProfile]);
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8" style={{ background: 'var(--bg-page)' }}>
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative" style={{ background: 'transparent' }}>
+      {/* Dynamic Thematic Background Animation theo chủ đề khi trỏ chuột / chọn tab */}
+      <ThematicMetaphysicsBackground activeTheme={activeAnimationTheme} />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Breadcrumb Header */}
         <div className="flex items-center justify-between mb-6 pb-3 border-b border-amber-500/20">
           <Link href="/chart" className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
@@ -196,7 +285,7 @@ export default function MetaphysicsPage() {
             KIM CỔ ĐÔNG TÂY · BÁCH GIA THUẬT SỐ
           </h1>
           <p className="text-sm sm:text-base text-zinc-300 max-w-2xl mx-auto leading-relaxed">
-            Hợp nhất tinh hoa Mệnh Lý Phương Đông (<strong className="text-amber-300">Tử Bình Bát Tự, Chu Dịch 64 Quẻ, Trạch Nhật</strong>) 
+            Hợp nhất tinh hoa Mệnh Lý Phương Đông (<strong className="text-amber-300">Bói Chỉ Tay, Tử Bình Bát Tự, Chu Dịch 64 Quẻ, Trạch Nhật</strong>) 
             và Huyền Học Phương Tây (<strong className="text-amber-300">Bài Tarot 22 Ẩn Chính, Thần Số Học Pitago, 12 Cung Hoàng Đạo</strong>).
           </p>
         </div>
@@ -215,7 +304,7 @@ export default function MetaphysicsPage() {
               <span className="text-zinc-300 font-medium">{userProfile.gender === 'female' ? 'Nữ Mệnh' : 'Nam Mệnh'}</span>
             </div>
             <div className="text-[11px] text-zinc-400 flex items-center gap-2">
-              <span className="text-emerald-400 font-semibold">Tự động điền Bát Tự, Thần Số Học & Đối chiếu Hợp Mệnh</span>
+              <span className="text-emerald-400 font-semibold">Tự động điền Bát Tự, Tướng Tay, Thần Số & Hợp Mệnh</span>
               <Link href="/chart" className="text-amber-400 font-semibold hover:underline">
                 Đổi lá số khác →
               </Link>
@@ -223,11 +312,41 @@ export default function MetaphysicsPage() {
           </div>
         )}
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Tích Hợp Thematic Background Animation khi trỏ (Hover) */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex flex-wrap justify-center p-1.5 rounded-xl bg-zinc-900/80 border border-amber-500/30 backdrop-blur-md shadow-xl gap-1 sm:gap-2">
+          <div className="inline-flex flex-wrap justify-center p-1.5 rounded-xl bg-zinc-900/90 border border-amber-500/35 backdrop-blur-md shadow-2xl gap-1 sm:gap-2">
+            <button
+              onClick={() => setActiveTab('palmistry')}
+              onMouseEnter={() => setHoveredTab('palmistry')}
+              onMouseLeave={() => setHoveredTab(null)}
+              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
+                activeTab === 'palmistry'
+                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
+                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
+              }`}
+            >
+              <span>🖐️</span>
+              <span>Bói Chỉ Tay (Tướng Tay)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('tarot')}
+              onMouseEnter={() => setHoveredTab('tarot')}
+              onMouseLeave={() => setHoveredTab(null)}
+              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
+                activeTab === 'tarot'
+                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
+                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
+              }`}
+            >
+              <span>🃏</span>
+              <span>Bài Tarot (22 Ẩn Chính)</span>
+            </button>
+
             <button
               onClick={() => setActiveTab('dongtam')}
+              onMouseEnter={() => setHoveredTab('dongtam')}
+              onMouseLeave={() => setHoveredTab(null)}
               className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 activeTab === 'dongtam'
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
@@ -235,11 +354,13 @@ export default function MetaphysicsPage() {
               }`}
             >
               <span>🔮</span>
-              <span>Bói Hữu Duyên (Giờ Động Tâm)</span>
+              <span>Bói Hữu Duyên (Động Tâm)</span>
             </button>
 
             <button
               onClick={() => setActiveTab('almanac')}
+              onMouseEnter={() => setHoveredTab('almanac')}
+              onMouseLeave={() => setHoveredTab(null)}
               className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 activeTab === 'almanac'
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
@@ -252,6 +373,8 @@ export default function MetaphysicsPage() {
 
             <button
               onClick={() => setActiveTab('bazi')}
+              onMouseEnter={() => setHoveredTab('bazi')}
+              onMouseLeave={() => setHoveredTab(null)}
               className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 activeTab === 'bazi'
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
@@ -263,19 +386,9 @@ export default function MetaphysicsPage() {
             </button>
 
             <button
-              onClick={() => setActiveTab('tarot')}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'tarot'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🃏</span>
-              <span>Bài Tarot (22 Ẩn Chính)</span>
-            </button>
-
-            <button
               onClick={() => setActiveTab('iching')}
+              onMouseEnter={() => setHoveredTab('iching')}
+              onMouseLeave={() => setHoveredTab(null)}
               className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 activeTab === 'iching'
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
@@ -288,6 +401,8 @@ export default function MetaphysicsPage() {
 
             <button
               onClick={() => setActiveTab('numerology')}
+              onMouseEnter={() => setHoveredTab('numerology')}
+              onMouseLeave={() => setHoveredTab(null)}
               className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
                 activeTab === 'numerology'
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
@@ -299,6 +414,399 @@ export default function MetaphysicsPage() {
             </button>
           </div>
         </div>
+
+        {/* ============================================================== */}
+        {/* TAB 0: BÓI CHỈ TAY (TƯỚNG PHÁP BÀN TAY ĐÔNG TÂY - PALMISTRY) */}
+        {/* ============================================================== */}
+        {activeTab === 'palmistry' && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
+            <div className="card-glass p-6 rounded-2xl border border-amber-500/30 shadow-2xl bg-zinc-950/85 space-y-6">
+              {/* Header Panel */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+                <div>
+                  <div className="flex items-center gap-2 text-base sm:text-lg font-bold text-amber-300">
+                    <span>🖐️</span> BÓI CHỈ TAY TOÀN THƯ · TƯỚNG PHÁP BÀN TAY ĐÔNG TÂY (PALMISTRY)
+                  </div>
+                  <p className="text-xs text-zinc-400 mt-1">
+                    Luận giải 4 đại tuyến chỉ tay, ngũ hành dáng tay và các dấu ấn quý tướng cát tường (Chữ M, Simian Line, Tam Giác Vàng).
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleQuickAIScan}
+                  disabled={isPalmAnalyzing}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>✨</span>
+                  <span>{isPalmAnalyzing ? 'Đang Quét Tướng Tay...' : 'Quét Nhanh Bằng AI Tướng Số'}</span>
+                </button>
+              </div>
+
+              {/* Grid 2 Cột: Bàn Tay Trực Quan & Tùy Chọn Chỉ Tay */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Cột Trái: Đồ hình bàn tay trực quan (5 cột) */}
+                <div className="lg:col-span-5 flex flex-col items-center">
+                  <div className="text-xs font-bold text-amber-200 mb-2 flex items-center gap-1.5">
+                    <span>🔍</span> ĐỒ HÌNH CHỈ TAY TƯƠNG TÁC
+                  </div>
+                  <VisualPalmDiagram input={palmInput} />
+                  <p className="text-[11px] text-zinc-400 text-center mt-2 italic">
+                    Di chuột hoặc chạm vào các đường chỉ tay hoặc gò trên hình để xem giải nghĩa tức thì.
+                  </p>
+                </div>
+
+                {/* Cột Phải: Các Lựa Chọn Đặc Điểm Chỉ Tay (7 cột) */}
+                <div className="lg:col-span-7 space-y-4">
+                  {/* Hàng 1: Dáng Bàn Tay Ngũ Hành & Tay Xem */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-zinc-300 block mb-1.5">
+                        🖐️ Hình Thái Bàn Tay (Ngũ Hành):
+                      </label>
+                      <select
+                        value={palmInput.element}
+                        onChange={(e) => setPalmInput({ ...palmInput, element: e.target.value as HandElement })}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-semibold text-amber-200 focus:outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        <option value="kim">Bàn Tay Hành Kim (Vuông vức, cương nghị)</option>
+                        <option value="moc">Bàn Tay Hành Mộc (Thon dài, tri thức uyên bác)</option>
+                        <option value="thuy">Bàn Tay Hành Thủy (Tròn trặn múp míp, linh hoạt)</option>
+                        <option value="hoa">Bàn Tay Hành Hỏa (Nhiệt huyết, tiên phong)</option>
+                        <option value="tho">Bàn Tay Hành Thổ (Dày dặn, vững chãi)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-zinc-300 block mb-1.5">
+                        ✋ Bàn Tay Đang Xem:
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPalmInput({ ...palmInput, side: 'left' })}
+                          className={`py-2 px-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                            palmInput.side === 'left'
+                              ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-md shadow-amber-500/20'
+                              : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-zinc-500'
+                          }`}
+                        >
+                          Tay Trái {palmInput.gender === 'female' ? '(Hậu Thiên)' : '(Tiên Thiên)'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPalmInput({ ...palmInput, side: 'right' })}
+                          className={`py-2 px-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                            palmInput.side === 'right'
+                              ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-md shadow-amber-500/20'
+                              : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-zinc-500'
+                          }`}
+                        >
+                          Tay Phải {palmInput.gender === 'female' ? '(Tiên Thiên)' : '(Hậu Thiên)'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4 Đường Chỉ Tay Chính */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {/* Đường Sinh Đạo */}
+                    <div>
+                      <label className="text-xs font-bold text-emerald-400 block mb-1 flex items-center gap-1">
+                        <span>🌱</span> Đường Sinh Đạo (Thể chất & Sức sống):
+                      </label>
+                      <select
+                        value={palmInput.lifeLine}
+                        onChange={(e) => setPalmInput({ ...palmInput, lifeLine: e.target.value as LifeLineType })}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        <option value="dai_sau">Dài, sâu, rõ nét & hồng nhuận (Đại Thọ)</option>
+                        <option value="uon_cong_rong">Uốn vòng rộng quanh gò Kim Tinh (Nhân Từ)</option>
+                        <option value="re_nhanh">Phân nhánh về cuối (Xuất Ngoại / Đi Xa)</option>
+                        <option value="ngan_manh">Ngắn nhưng đậm nét (Bùng Nổ Năng Lượng)</option>
+                        <option value="dut_doan">Đứt đoạn rồi nối tiếp (Bước Ngoặt Cuộc Đời)</option>
+                      </select>
+                    </div>
+
+                    {/* Đường Trí Đạo */}
+                    <div>
+                      <label className="text-xs font-bold text-cyan-400 block mb-1 flex items-center gap-1">
+                        <span>💡</span> Đường Trí Đạo (Tư duy & Học vấn):
+                      </label>
+                      <select
+                        value={palmInput.headLine}
+                        onChange={(e) => setPalmInput({ ...palmInput, headLine: e.target.value as HeadLineType })}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        <option value="chia_doi">Đuôi cá chia đôi (Tướng Bút Nhà Văn - Đa Tài)</option>
+                        <option value="cong_xuong">Cong nhẹ về gò Nguyệt Tinh (Sáng Tạo Cao)</option>
+                        <option value="thang_dai">Thẳng dài dứt khoát (Duy Lý Sắc Bén)</option>
+                        <option value="ngan_thang">Ngắn nhưng cương mãnh (Hành Động Tốc Độ)</option>
+                        <option value="uon_luon">Uốn lượn gợn sóng (Linh Hoạt Biến Hóa)</option>
+                      </select>
+                    </div>
+
+                    {/* Đường Tâm Đạo */}
+                    <div>
+                      <label className="text-xs font-bold text-rose-400 block mb-1 flex items-center gap-1">
+                        <span>❤️</span> Đường Tâm Đạo (Tình cảm & Hôn nhân):
+                      </label>
+                      <select
+                        value={palmInput.heartLine}
+                        onChange={(e) => setPalmInput({ ...palmInput, heartLine: e.target.value as HeartLineType })}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        <option value="dai_len_moc_tinh">Dài uốn lên gò Mộc Tinh (Trọng Tình Nghĩa)</option>
+                        <option value="duoi_en">Phân nhánh đuôi én (Hòa Hợp Viên Mãn)</option>
+                        <option value="cong_sau">Uốn cong sâu & đậm (Nhiệt Huyết Nồng Nàn)</option>
+                        <option value="thang_ngang">Thẳng tắp băng ngang (Kiên Định Sắt Son)</option>
+                        <option value="ngan_duoi_tho_tinh">Ngắn dừng dưới Thổ Tinh (Lý Trí Thực Tế)</option>
+                      </select>
+                    </div>
+
+                    {/* Đường Định Mệnh */}
+                    <div>
+                      <label className="text-xs font-bold text-purple-400 block mb-1 flex items-center gap-1">
+                        <span>⚡</span> Đường Định Mệnh (Công danh & Tài vận):
+                      </label>
+                      <select
+                        value={palmInput.fateLine}
+                        onChange={(e) => setPalmInput({ ...palmInput, fateLine: e.target.value as FateLineType })}
+                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        <option value="ro_net_thang">Thẳng tắp từ cổ tay lên Thổ Tinh (Tự Lực Cánh Sinh)</option>
+                        <option value="huong_thai_duong">Rẽ nhánh lên gò Thái Dương (Danh Lợi Song Toàn)</option>
+                        <option value="tu_go_nguyet">Xuất phát từ gò Nguyệt Tinh (Quý Nhân Phù Trợ)</option>
+                        <option value="dut_doan">Đứt đoạn nối tiếp (Tái Sinh Ngoạn Mục)</option>
+                        <option value="mo_nhat">Mờ nhạt hoặc tự do (Số Phận Tự Định Đoạt)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Dấu Ấn Quý Tướng Hiếm Có (Checkboxes) */}
+                  <div className="pt-2">
+                    <div className="text-xs font-bold text-amber-300 mb-2 flex items-center gap-1.5">
+                      <span>✨</span> Dấu Ấn Quý Tướng Đặc Biệt Trên Bàn Tay:
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[
+                        { id: 'chu_m', label: 'Bàn Tay Chữ M', icon: '🌟' },
+                        { id: 'chu_nhat', label: 'Chỉ Tay Chữ Nhất', icon: '⚡' },
+                        { id: 'tam_giac_vang', label: 'Tam Giác Vàng Tụ Tài', icon: '🔺' },
+                        { id: 'vong_moc_tinh', label: 'Vòng Mộc Tinh (Solomon)', icon: '👑' },
+                        { id: 'mat_phat', label: 'Vân Mắt Phật (Ngón Cái)', icon: '👁️' },
+                      ].map((sign) => {
+                        const isChecked = palmInput.specialSigns.includes(sign.id as SpecialSign);
+                        return (
+                          <button
+                            key={sign.id}
+                            type="button"
+                            onClick={() => {
+                              const next = isChecked
+                                ? palmInput.specialSigns.filter((s) => s !== sign.id)
+                                : [...palmInput.specialSigns, sign.id as SpecialSign];
+                              setPalmInput({ ...palmInput, specialSigns: next });
+                            }}
+                            className={`p-2 rounded-lg text-xs font-medium border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                              isChecked
+                                ? 'bg-amber-500/20 border-amber-500 text-amber-200 font-bold'
+                                : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                            }`}
+                          >
+                            <span>{sign.icon}</span>
+                            <span className="truncate">{sign.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Nút Luận Giải */}
+                  <div className="pt-3">
+                    <button
+                      type="button"
+                      onClick={handleAnalyzePalm}
+                      disabled={isPalmAnalyzing}
+                      className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-sm tracking-widest shadow-xl shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>🔮</span>
+                      <span>{isPalmAnalyzing ? 'ĐANG LUẬN GIẢI TƯỚNG TAY...' : 'LUẬN GIẢI CHỈ TAY CHI TIẾT →'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* BẢNG KẾT QUẢ LUẬN GIẢI CHỈ TAY TOÀN DIỆN */}
+            {palmResult && (
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-6">
+                {/* 1. KHỐI KẾT LUẬN CỐT CÁCH & TRỰC DIỆN */}
+                <div className="card-glass p-6 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-950/40 via-zinc-950/90 to-zinc-950/95 shadow-2xl relative overflow-hidden">
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-amber-500/30 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl">
+                        🖐️
+                      </div>
+                      <div>
+                        <div className="text-xs uppercase font-mono tracking-widest text-amber-400 font-bold">
+                          KẾT LUẬN TỔNG THỂ TƯỚNG PHÁP
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-black text-amber-100">
+                          {palmResult.overallVerdict.archetype}
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-1.5 rounded-full bg-amber-500 text-zinc-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30">
+                      ✦ {palmResult.overallVerdict.destinyGrade}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-amber-200/90 italic mb-4 font-medium">
+                    {palmResult.sideMeaning}
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                    <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-emerald-500/30">
+                      <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mb-1">
+                        <span>🌱</span> SỨC KHỎE & THỌ MẠNG
+                      </div>
+                      <p className="text-xs text-zinc-300 leading-relaxed">
+                        {palmResult.lifeLine.summary}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-cyan-500/30">
+                      <div className="text-xs font-bold text-cyan-400 flex items-center gap-1.5 mb-1">
+                        <span>💡</span> CÔNG DANH & SỰ NGHIỆP
+                      </div>
+                      <p className="text-xs text-zinc-300 leading-relaxed">
+                        {palmResult.overallVerdict.careerProspect}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-rose-500/30">
+                      <div className="text-xs font-bold text-rose-400 flex items-center gap-1.5 mb-1">
+                        <span>❤️</span> TÌNH DUYÊN & GIA ĐẠO
+                      </div>
+                      <p className="text-xs text-zinc-300 leading-relaxed">
+                        {palmResult.overallVerdict.loveProspect}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Lời khuyên cốt lõi */}
+                  <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                    <div className="text-xs font-black text-amber-300 mb-1 flex items-center gap-1.5">
+                      <span>💎</span> PHƯƠNG HƯỚNG TU TÂM ĐỔI TƯỚNG & KHỞI PHÁT PHÚC KHÍ:
+                    </div>
+                    <p className="text-xs text-zinc-200 leading-relaxed">
+                      {palmResult.overallVerdict.keyAction}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. CHI TIẾT 4 ĐẠI TUYẾN CHỈ TAY */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    palmResult.lifeLine,
+                    palmResult.headLine,
+                    palmResult.heartLine,
+                    palmResult.fateLine,
+                  ].map((line) => (
+                    <div key={line.name} className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/80 space-y-3">
+                      <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{line.glyph}</span>
+                          <div>
+                            <div className="text-xs text-zinc-400 font-semibold">{line.name}</div>
+                            <div className="text-sm font-bold text-amber-200">{line.title}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-base font-black text-amber-400">{line.score}</span>
+                          <span className="text-[10px] text-zinc-500">/100</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 text-xs text-zinc-300">
+                        {line.details.map((d, idx) => (
+                          <div key={idx} className="flex items-start gap-2">
+                            <span className="text-amber-400 mt-0.5">•</span>
+                            <span className="leading-relaxed">{d}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-[11px] text-amber-300/90 leading-relaxed">
+                        <strong>Lời khuyên:</strong> {line.advice}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 3. NGŨ ĐẠI GÒ BÀN TAY (MOUNTS) & DẤU ẤN QUÝ TƯỚNG */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Gò Bàn Tay */}
+                  <div className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/80 space-y-3">
+                    <div className="text-sm font-bold text-amber-300 flex items-center gap-2 border-b border-zinc-800 pb-2">
+                      <span>⛰️</span> NGŨ ĐẠI GÒ BÀN TAY (CÁC ĐỈNH ĐỒI KHÍ VẬN)
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      <div className="p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                        <span className="font-bold text-amber-400">Gò Kim Tinh (Venus): </span>
+                        <span className="text-zinc-300">{palmResult.mountsOverview.venus}</span>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                        <span className="font-bold text-blue-400">Gò Mộc Tinh (Jupiter): </span>
+                        <span className="text-zinc-300">{palmResult.mountsOverview.jupiter}</span>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                        <span className="font-bold text-yellow-400">Gò Thái Dương (Sun): </span>
+                        <span className="text-zinc-300">{palmResult.mountsOverview.sun}</span>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                        <span className="font-bold text-teal-400">Gò Thủy Tinh (Mercury): </span>
+                        <span className="text-zinc-300">{palmResult.mountsOverview.mercury}</span>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800">
+                        <span className="font-bold text-purple-400">Gò Nguyệt Tinh (Moon): </span>
+                        <span className="text-zinc-300">{palmResult.mountsOverview.moon}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dấu Ấn Quý Tướng Hiếm Thấy */}
+                  <div className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/80 space-y-3">
+                    <div className="text-sm font-bold text-amber-300 flex items-center gap-2 border-b border-zinc-800 pb-2">
+                      <span>👑</span> DẤU ẤN QUÝ TƯỚNG HIẾM THẤY TRÊN LÒNG BÀN TAY
+                    </div>
+                    {palmResult.specialSignsInfo.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {palmResult.specialSignsInfo.map((s) => (
+                          <div key={s.id} className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-amber-300">✦ {s.name}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 border border-amber-500/40">
+                                {s.rarity}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-zinc-300">{s.meaning}</p>
+                            <p className="text-[11px] text-emerald-400 font-medium">✨ Phúc báo: {s.blessing}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-zinc-400 py-4 text-center">
+                        Bàn tay thanh tú tự nhiên, tích lũy phúc đức từ hành động chân chính để khai mở các vân quý cát tường.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
 
         {/* ============================================================== */}
         {/* TAB 1: BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM - MAI HOA & LỤC HÀO) */}

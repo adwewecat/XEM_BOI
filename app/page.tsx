@@ -784,6 +784,292 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      {/* ══ CÁC HÌNH THỨC XEM BÓI PHỔ BIẾN (THEMATIC SHOWCASE VỚI ANIMATION THEO CHỦ ĐỀ) ════════ */}
+      <section className="relative z-10 py-16 px-6 md:px-10 lg:px-14">
+        <FadeIn className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${c.goldLine})` }} />
+            <span className="text-[10px] tracking-[0.4em] uppercase font-bold" style={{ color: c.goldSolid }}>
+              KHÁM PHÁ VẬN MỆNH & TƯƠNG LAI
+            </span>
+            <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${c.goldLine})` }} />
+          </div>
+          <h2 className={`grad-text ${theme === 'dark' ? 'grad-text-dark' : 'grad-text-light'} font-black text-2xl sm:text-4xl mb-3 tracking-tight`}>
+            Các Hình Thức Xem Bói Phổ Biến
+          </h2>
+          <p className="text-xs sm:text-sm max-w-xl mx-auto" style={{ color: c.textSecond }}>
+            Hợp nhất nhân tướng học Đông Phương, kinh điển Tử Vi Thiên Kỷ và thuật chiêm tinh Tây Phương với animation huyền ảo sinh động.
+          </p>
+        </FadeIn>
+
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Card 1: Bói Chỉ Tay */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/metaphysics?tab=palmistry')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(16, 185, 129, 0.35)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            {/* Thematic Hover Background Animation: Bàn tay phát sáng và các luồng sáng chỉ tay */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-emerald-950/40 via-amber-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-25 transition-opacity duration-500 pointer-events-none text-emerald-400">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <path d="M 30 90 C 25 70, 15 50, 20 30 C 25 15, 45 20, 50 35 C 55 10, 70 15, 70 35 C 80 15, 90 25, 85 45 C 95 40, 95 60, 85 75 Z" />
+                <path d="M 35 55 Q 50 65 65 75" className="stroke-emerald-400 group-hover:animate-pulse" />
+                <path d="M 35 45 Q 60 55 75 55" className="stroke-cyan-400 group-hover:animate-pulse" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">🖐️</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  MỚI RA MẮT
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-amber-300 transition-colors">
+                Xem Bói Chỉ Tay (Palmistry)
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                Định hướng tương lai qua 4 đại tuyến chỉ tay (Sinh Đạo, Trí Đạo, Tâm Đạo, Định Mệnh) và các vân quý cát tường (Chữ M, Tam Giác Vàng).
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Xem ngay <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>Đồ hình tương tác SVG</span>
+            </div>
+          </motion.div>
+
+          {/* Card 2: Bói Bài Tarot */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/metaphysics?tab=tarot')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(168, 85, 247, 0.35)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            {/* Thematic Hover Background Animation: Arcana Portal xoay tròn */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-purple-950/40 via-indigo-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none text-purple-400 group-hover:rotate-45 transition-transform duration-1000">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <circle cx="50" cy="50" r="40" strokeDasharray="4,4" />
+                <polygon points="50,15 80,75 20,75" />
+                <polygon points="50,85 80,25 20,25" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">🃏</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/40">
+                  CHIÊM TINH TÂY PHƯƠNG
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-purple-300 transition-colors">
+                Xem Bói Bài Tarot
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                Khai mở thông điệp vũ trụ dẫn lối từ 22 lá bài Ẩn Chính Rider-Waite, thấu thị tình cảm, sự nghiệp và vận trình tương lai.
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-purple-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Rút bài ngay <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>22 Ẩn Chính Chuẩn</span>
+            </div>
+          </motion.div>
+
+          {/* Card 3: Lập Lá Số Tử Vi */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/chart')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(212, 168, 67, 0.45)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            {/* Thematic Hover Background Animation: Bát Quái và Thiên Bàn Tử Vi */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-amber-950/40 via-yellow-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none text-amber-400 group-hover:rotate-90 transition-transform duration-1000">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <circle cx="50" cy="50" r="42" />
+                <circle cx="50" cy="50" r="28" strokeDasharray="3,3" />
+                <path d="M 50 22 Q 64 36 50 50 Q 36 64 50 78" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">🔮</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                  CHÍNH TÔNG THIÊN KỶ
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-amber-300 transition-colors">
+                Lập Lá Số Tử Vi Đẩu Số
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                An sao 12 cung, 14 Chính tinh, Tứ Hóa phi tinh và hiệu chỉnh Giờ Chân Thái Dương 63 tỉnh thành theo giáo trình danh sư Nghê Hải Hà.
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Lập lá số <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>Giờ Chân Thái Dương</span>
+            </div>
+          </motion.div>
+
+          {/* Card 4: Xem Ngày Lành Dữ */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/metaphysics?tab=almanac')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(234, 179, 8, 0.35)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-yellow-950/40 via-amber-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-25 transition-opacity duration-500 pointer-events-none text-yellow-400">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <circle cx="50" cy="50" r="30" />
+                <path d="M 50 10 L 50 20 M 50 80 L 50 90 M 10 50 L 20 50 M 80 50 L 90 50" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">📅</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/40">
+                  TRẠCH NHẬT PHONG THỦY
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-yellow-300 transition-colors">
+                Xem Ngày Lành Dữ (Trạch Nhật)
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                Tra cứu Hoàng Đạo, Nhị Thập Bát Tú, Thần Sát và đối chiếu tuổi bản mệnh chọn ngày cát tường cho xuất hành, khai trương, cưới hỏi.
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-yellow-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Tra cứu ngay <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>Nhị Thập Bát Tú</span>
+            </div>
+          </motion.div>
+
+          {/* Card 5: Bói Hữu Duyên */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/metaphysics?tab=dongtam')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(59, 130, 246, 0.35)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-blue-950/40 via-cyan-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-25 transition-opacity duration-500 pointer-events-none text-blue-400">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <circle cx="50" cy="50" r="38" />
+                <circle cx="50" cy="50" r="24" />
+                <circle cx="50" cy="50" r="10" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">🪙</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/40">
+                  MAI HOA & LỤC HÀO
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-blue-300 transition-colors">
+                Bói Hữu Duyên (Giờ Động Tâm)
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                Gieo quẻ theo thời khắc tâm niệm phát khởi, hồi đáp trực diện và dứt khoát các vấn đề đi lại, bình an, công việc hay tình cảm.
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-blue-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Gieo quẻ ngay <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>Trả lời trực diện</span>
+            </div>
+          </motion.div>
+
+          {/* Card 6: Thần Số Học Pitago */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => router.push('/metaphysics?tab=numerology')}
+            className="group relative rounded-2xl p-6 border overflow-hidden flex flex-col justify-between cursor-pointer transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'rgba(12, 18, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: 'rgba(236, 72, 153, 0.35)',
+              boxShadow: c.cardShadow,
+            }}
+          >
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-pink-950/40 via-purple-950/20 to-transparent" />
+            <div className="absolute -right-6 -bottom-6 w-36 h-36 opacity-10 group-hover:opacity-25 transition-opacity duration-500 pointer-events-none text-pink-400">
+              <svg viewBox="0 0 100 100" className="w-full h-full stroke-current fill-none stroke-2">
+                <polygon points="50,15 90,85 10,85" />
+                <line x1="50" y1="15" x2="50" y2="85" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl">🔯</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/40">
+                  HUYỀN HỌC PITAGO
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1.5 text-zinc-100 group-hover:text-pink-300 transition-colors">
+                Thần Số Học & Ngày Sinh
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: c.textSecond }}>
+                Giải mã con số chủ đạo (Life Path), 4 đỉnh cao kim tự tháp cuộc đời, số sứ mệnh tên gọi và dự báo chu kỳ năm cá nhân.
+              </p>
+            </div>
+
+            <div className="relative z-10 mt-5 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-pink-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                Khám phá ngay <span>→</span>
+              </span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>Kim Tự Tháp Cuộc Đời</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ══ 哲学引言 ══════════════════════════════════════ */}
       <section className="relative z-10 overflow-hidden min-h-[82svh] lg:min-h-[92vh] flex items-center" style={{ padding: '72px 24px' }}>
         <WeakBoundary line={c.navBorder} />
