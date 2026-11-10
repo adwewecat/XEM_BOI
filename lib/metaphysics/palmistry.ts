@@ -498,3 +498,4 @@ export function analyzePalm(input: PalmInput): PalmistryResult {
     },
   };
 }
+

@@ -114,18 +114,24 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
         </h2>
       </motion.div>
 
-      {/* 4x4 命盘网格（含 SVG 叠加层） */}
-      <div
-        className="grid rounded-xl overflow-hidden relative"
-        style={{
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gridTemplateRows: 'repeat(4, auto)',
-          gap: '1px',
-          background: 'var(--t-border)',
-          border: '1px solid var(--t-border)',
-          boxShadow: '0 4px 32px rgba(0,0,0,0.15)',
-        }}
-      >
+      {/* 4x4 命盘网格（含 SVG 叠加层） - Tối Ưu Vuốt Ngang Mượt Mà Trên Mobile */}
+      <div className="w-full overflow-x-auto pb-2 scrollbar-thin">
+        <div className="sm:hidden text-center text-[10px] text-amber-300/90 font-medium mb-1.5 flex items-center justify-center gap-1.5">
+          <span>👈</span>
+          <span>Vuốt ngang để xem trọn vẹn 12 cung</span>
+          <span>👉</span>
+        </div>
+        <div
+          className="grid rounded-xl overflow-hidden relative min-w-[520px] sm:min-w-0"
+          style={{
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateRows: 'repeat(4, auto)',
+            gap: '1px',
+            background: 'var(--t-border)',
+            border: '1px solid var(--t-border)',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.15)',
+          }}
+        >
         {ANIMATION_ORDER.map((branch, i) => {
           const [row, col] = BRANCH_GRID_POS[branch];
           const palace = palaceMap[branch];
@@ -273,6 +279,7 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
 
       {/* Chú thích Tứ Hóa & Hướng Dẫn */}

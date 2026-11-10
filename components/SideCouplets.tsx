@@ -173,9 +173,10 @@ export default function SideCouplets() {
       </div>
 
       {/* ============================================================== */}
-      {/* BANNER PHÁP LÝ CHO THIẾT BỊ DI ĐỘNG & MÀN HÌNH VỪA (< 1280px) */}
+      {/* BANNER PHÁP LÝ CHO TABLET & MÀN HÌNH VỪA (768px - 1280px)       */}
+      {/* (Trên mobile < 768px đã có nút ⚖️ Pháp Lý trong MobileBottomNav) */}
       {/* ============================================================== */}
-      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-auto bg-zinc-950/95 border-t border-amber-500/30 px-3 py-1.5 backdrop-blur-md">
+      <div className="hidden md:block xl:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-auto bg-zinc-950/95 border-t border-amber-500/30 px-3 py-1.5 backdrop-blur-md">
         <div className="flex items-center justify-between max-w-5xl mx-auto gap-2">
           <div className="text-[10px] sm:text-[11px] text-zinc-300 leading-tight flex-1">
             <span className="text-amber-400 font-bold">⚠️ LƯU Ý PHÁP LÝ:</span> Thông tin chỉ mang tính chất giải trí, không cổ xúy mê tín dị đoan. Không công kích bất kỳ cá nhân tổ chức nào.
@@ -183,7 +184,7 @@ export default function SideCouplets() {
           <button
             type="button"
             onClick={() => setShowModal(true)}
-            className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded border border-amber-500/40 hover:bg-amber-500/20 whitespace-nowrap"
+            className="text-[10px] font-bold text-amber-400 px-2 py-0.5 rounded border border-amber-500/40 hover:bg-amber-500/20 whitespace-nowrap cursor-pointer"
           >
             Chi Tiết
           </button>

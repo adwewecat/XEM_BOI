@@ -73,6 +73,25 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-10] - Đợt 17: Tối Ưu Hóa Toàn Diện Giao Diện Mobile Đẳng Cấp, Tinh Tế & Huyền Ảo
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "hãy xử lý để có giao diện mobile nhé, xử lý thật đẹp và huyền bí".
+- **Các giải pháp & nâng cấp thực hiện:**
+  1. **Thanh Điều Hướng Đáy Màn Hình Di Động (Mystical Mobile Bottom Navigation Bar - `MobileBottomNav.tsx`):**
+     - Thiết kế chuẩn Mobile UX/App Native với chất liệu Dark Glass phát quang viền vàng kim hoàng gia.
+     - 5 tab trọng tâm: 🔮 Lá Số (`/chart`), 🖐️ Bói Toán (`/metaphysics`), ☯️ Hợp Mệnh (`/heming`), 🌌 Vạn Tinh (`/knowledge`), 📜 Cổ Thư (`/library`).
+     - Tích hợp hiệu ứng hào quang phát sáng (Active Glow Pill) và an toàn với thanh Home Bar của iPhone (`pb-safe`).
+     - Tích hợp nút xem nhanh tuyên bố pháp lý tiện lợi, không che khuất màn hình.
+  2. **Thanh Chọn Môn Bói Vuốt Ngang Mượt Mà (`app/metaphysics/page.tsx`):**
+     - Chuyển đổi khối tab bói toán từ dạng bẻ nhiều dòng sang thanh vuốt ngang mượt mà (`overflow-x-auto scrollbar-none snap-x`), chuẩn trải nghiệm ứng dụng di động cao cấp.
+     - Hỗ trợ cảm ứng một chạm (Touch/Tap) chuyển đổi tức thì Thematic Background Animation theo đúng chủ đề (Chỉ tay, Tarot, Bát Tự, Kinh Dịch, Trạch Nhật, Thần Số Học).
+  3. **Tối Ưu Đồ Hình Chỉ Tay & Lá Số Trên Màn Hình Nhỏ:**
+     - Đồ hình bàn tay SVG (`VisualPalmDiagram`) tự co giãn tỷ lệ hoàn hảo, các nút chọn đường chỉ tay và gò sao to rõ, dễ bấm bằng ngón tay.
+     - Mệnh bàn 12 cung (`ChartBoard.tsx`) được bọc container cuộn ngang mượt mà kèm gợi ý vuốt, tránh tình trạng 12 cung bị ép dẹp trên màn hình 360px-400px.
+  4. **Tối Ưu Header & Hero Trang Chủ (`Navbar.tsx` & `app/page.tsx`):**
+     - Header mobile thu gọn tinh gọn, nút Lập Lá Số và Nút Đổi Theme gọn gàng.
+     - Kích thước chữ tiêu đề thích ứng mượt mà (`clamp(32px, 8vw, 84px)`), triệt tiêu lỗi tràn viền hoặc xuống dòng gãy chữ.
+
 ### [2026-11-10] - Đợt 16: Tăng Độ Sáng Nổi Bật Cho Background, Thêm Module Bói Chỉ Tay (Palmistry) & Tích Hợp Thematic Background Animation Huyền Ảo Theo Từng Chủ Đề
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

@@ -59,8 +59,8 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto py-1 scrollbar-none">
+        {/* Navigation Tabs (Desktop & Tablet) */}
+        <nav className="hidden md:flex items-center gap-1 sm:gap-2 overflow-x-auto py-1 scrollbar-none">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -92,8 +92,20 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Theme Toggle Button & GitHub */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Actions & Theme Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <Link
+            href="/chart"
+            className="md:hidden px-2.5 py-1 rounded-full border text-[11px] font-bold transition-all flex items-center gap-1"
+            style={{
+              borderColor: isDark ? 'rgba(212,168,67,0.45)' : 'rgba(184,146,42,0.4)',
+              background: isDark ? 'rgba(212,168,67,0.15)' : 'rgba(184,146,42,0.12)',
+              color: isDark ? '#f5d070' : '#8b6410',
+            }}
+          >
+            <span>🔮</span>
+            <span>Lập Số</span>
+          </Link>
           <button
             type="button"
             onClick={toggle}

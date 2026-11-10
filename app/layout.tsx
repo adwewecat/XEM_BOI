@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import StarField from '@/components/StarField';
 import SideCouplets from '@/components/SideCouplets';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_URL } from '@/lib/site';
@@ -46,9 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <StarField />
           <Navbar />
           <SideCouplets />
-          <div suppressHydrationWarning className="relative z-10 flex-1">
+          <div suppressHydrationWarning className="relative z-10 flex-1 pb-16 md:pb-0">
             {children}
           </div>
+          <MobileBottomNav />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

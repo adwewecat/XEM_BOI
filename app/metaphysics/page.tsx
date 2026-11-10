@@ -312,106 +312,45 @@ export default function MetaphysicsPage() {
           </div>
         )}
 
-        {/* Navigation Tabs - Tích Hợp Thematic Background Animation khi trỏ (Hover) */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex flex-wrap justify-center p-1.5 rounded-xl bg-zinc-900/90 border border-amber-500/35 backdrop-blur-md shadow-2xl gap-1 sm:gap-2">
-            <button
-              onClick={() => setActiveTab('palmistry')}
-              onMouseEnter={() => setHoveredTab('palmistry')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'palmistry'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🖐️</span>
-              <span>Bói Chỉ Tay (Tướng Tay)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('tarot')}
-              onMouseEnter={() => setHoveredTab('tarot')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'tarot'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🃏</span>
-              <span>Bài Tarot (22 Ẩn Chính)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('dongtam')}
-              onMouseEnter={() => setHoveredTab('dongtam')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'dongtam'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🔮</span>
-              <span>Bói Hữu Duyên (Động Tâm)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('almanac')}
-              onMouseEnter={() => setHoveredTab('almanac')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'almanac'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>📅</span>
-              <span>Xem Ngày Lành Dữ (Trạch Nhật)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('bazi')}
-              onMouseEnter={() => setHoveredTab('bazi')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'bazi'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🎴</span>
-              <span>Tử Bình Bát Tự (Tứ Trụ)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('iching')}
-              onMouseEnter={() => setHoveredTab('iching')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'iching'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🪙</span>
-              <span>Kinh Dịch (64 Quẻ)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('numerology')}
-              onMouseEnter={() => setHoveredTab('numerology')}
-              onMouseLeave={() => setHoveredTab(null)}
-              className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                activeTab === 'numerology'
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30 font-black'
-                  : 'text-zinc-400 hover:text-amber-200 hover:bg-zinc-800/60'
-              }`}
-            >
-              <span>🔯</span>
-              <span>Thần Số & Hoàng Đạo</span>
-            </button>
+        {/* Navigation Tabs - Vuốt Ngang Mượt Mà Trên Mobile & Tích Hợp Thematic Background Animation */}
+        <div className="relative mb-8">
+          <div className="w-full overflow-x-auto scrollbar-none py-1 px-1 flex flex-nowrap sm:flex-wrap items-center sm:justify-center gap-1.5 sm:gap-2 snap-x">
+            {[
+              { id: 'palmistry', label: 'Bói Chỉ Tay', icon: '🖐️', tag: 'Mới' },
+              { id: 'tarot', label: 'Bài Tarot', icon: '🃏', tag: 'Chiêm Tinh' },
+              { id: 'dongtam', label: 'Bói Hữu Duyên', icon: '🔮', tag: 'Động Tâm' },
+              { id: 'almanac', label: 'Trạch Nhật', icon: '📅', tag: 'Ngày Lành' },
+              { id: 'bazi', label: 'Tử Bình Bát Tự', icon: '🎴', tag: 'Tứ Trụ' },
+              { id: 'iching', label: 'Kinh Dịch', icon: '🪙', tag: '64 Quẻ' },
+              { id: 'numerology', label: 'Thần Số Học', icon: '🔯', tag: 'Pitago' },
+            ].map((t) => {
+              const isSelected = activeTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(t.id as MetaphysicsTheme);
+                    setHoveredTab(t.id as MetaphysicsTheme);
+                  }}
+                  onMouseEnter={() => setHoveredTab(t.id as MetaphysicsTheme)}
+                  onMouseLeave={() => setHoveredTab(null)}
+                  className={`snap-center flex-shrink-0 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                    isSelected
+                      ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/40 font-black scale-105 border-amber-300'
+                      : 'bg-zinc-900/85 text-zinc-300 border border-zinc-700/60 hover:text-amber-200 hover:border-amber-500/40'
+                  }`}
+                >
+                  <span className="text-base leading-none">{t.icon}</span>
+                  <span>{t.label}</span>
+                  {t.tag && !isSelected && (
+                    <span className="hidden sm:inline text-[9px] px-1.5 py-0.5 rounded font-normal opacity-60 bg-zinc-800">
+                      {t.tag}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
