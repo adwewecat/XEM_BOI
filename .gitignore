@@ -22,6 +22,11 @@ node_modules/
 .env
 !.env.example
 
+# Admin persistent secret data
+/data/
+admin_config.json
+
+
 # Debug logs
 npm-debug.log*
 yarn-debug.log*

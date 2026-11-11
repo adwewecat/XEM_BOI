@@ -73,6 +73,35 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 23: Cấu Hình Gemini AI Tập Trung Dùng Chung Toàn Hệ Thống, Bảo Mật Riêng Biệt Dành Cho Quản Trị Viên (Admin)
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "Cấu hình gemini sẽ cấu hình 1 lần và dùng chung nhé, , và chỉ admin mới được cấu hình chứ sao ai cũng được cấu hình".
+- **Phân tích vấn đề:**
+  1. *Trải nghiệm người dùng phổ thông:* Trước đây, hệ thống yêu cầu hoặc hiển thị nút cho từng khách truy cập tự nhập Gemini API Key của họ lưu vào `localStorage`. Người dùng bình thường không biết API key là gì, gây rắc rối và khó tiếp cận.
+  2. *Thiếu tính tập trung & dùng chung:* Toàn bộ trang web cần sử dụng một tài khoản/API key Gemini duy nhất do Chủ sở hữu website / Admin cấu hình 1 lần trên máy chủ, phục vụ cho toàn bộ lượt truy cập.
+  3. *Bảo mật & Phân quyền:* Khách vãng lai tuyệt đối không được cấu hình hay can thiệp vào API key. Chỉ Quản trị viên (Admin) có mật khẩu bảo mật mới có quyền truy cập vào trung tâm cấu hình để xem trạng thái, kiểm tra kết nối, đổi API Key, chọn Model và đổi mật khẩu quản trị.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Xây Dựng Module Quản Lý Cấu Hình Phía Máy Chủ (`lib/server/adminConfig.ts`):**
+     - Lưu trữ tệp cấu hình bí mật tại `data/admin_config.json` (được đưa vào `.gitignore` để không bao giờ bị lộ lên GitHub).
+     - Cơ chế đọc đa tầng thông minh: Ưu tiên cấu hình trong `data/admin_config.json`, tự động fallback sang biến môi trường `GEMINI_API_KEY` / `GOOGLE_API_KEY`.
+     - Hỗ trợ đổi model ưu tiên (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-1.5-pro`) và bảo vệ bằng mật khẩu quản trị (`DEFAULT_ADMIN_PASSWORD = 'admin@2026'`).
+  2. **Xây Dựng Bộ API Quản Trị Bảo Mật (`/api/admin/config` & `/api/admin/test`):**
+     - `GET /api/admin/config`: Xác thực mật khẩu admin, trả về trạng thái hoạt động và masked key (`AIzaSy••••4xAb`), tuyệt đối không để lộ key trần.
+     - `POST /api/admin/config`: Cập nhật API key mới, chọn model và cho phép đổi mật khẩu admin.
+     - `POST /api/admin/test`: Kiểm tra kết nối thực tế tới Google Gemini API và trả về kết quả phản hồi của AI trước khi admin lưu cấu hình.
+  3. **Xây Dựng Trang Quản Trị Viên Chuyên Nghiệp (`app/admin/page.tsx`):**
+     - Giao diện trực quan, sang trọng, tương thích hoàn toàn giao diện tối (`dark mode`).
+     - Cổng đăng nhập bảo mật bằng mật khẩu quản trị viên.
+     - Bảng điều khiển giám sát trạng thái AI theo thời gian thực (Đang hoạt động / Chưa cấu hình, Model, Thời gian cập nhật).
+     - Form dán API key, nút kiểm tra kết nối 1-click, lựa chọn 3 mô hình Gemini và hướng dẫn lấy key miễn phí từ Google AI Studio.
+  4. **Thanh Lọc Giao Diện Người Dùng Phổ Thông (`app/metaphysics/page.tsx` & `/api/ai/divine`):**
+     - Gỡ bỏ hoàn toàn modal nhập API Key, biến `userApiKey`, và các nút cài đặt gây rối mắt khỏi giao diện người dùng.
+     - Khi người dùng Reo Quẻ hoặc Rút Bài Tarot, hệ thống tự động sử dụng cấu hình Gemini AI dùng chung từ máy chủ.
+     - Khách xem bói được hưởng trọn vẹn kết quả luận giải thông minh mà không cần phải thực hiện bất kỳ thao tác kỹ thuật nào.
+     - Bổ sung liên kết quản trị kín đáo ở chân trang trỏ về `/admin`.
+  5. **Kiểm Thử & Đóng Gói:**
+     - 17/17 test suites hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 238 routes PASS 100%.
+
 ### [2026-11-11] - Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời & Trả Lời Lệch Đề Khi Hỏi Khác Nhau Trong Bói Động Tâm / Tarot, Tự Động Kích Hoạt Gemini AI
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "hỏi 2 câu khác nhau, nhưng lại cùng 1 câu trả lời, và đang không liên quan" (Kèm ảnh chụp màn hình minh họa: Quẻ `Lôi Hỏa Phong Động Hào 5 Biến Trạch Hỏa Cách` -> Kết luận rập khuôn: *"Về sự việc bạn hỏi: CẦN THẬN TRỌNG TỪNG BƯỚC, KHÔNG NÊN NÓNG VỘI, TẬP TRUNG LÀM TỐT PHẦN VIỆC CỦA MÌNH"*).

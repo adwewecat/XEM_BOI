@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminConfig } from '@/lib/server/adminConfig';
 
 /**
  * API LUẬN GIẢI CHIÊM BỐC & VẬN MỆNH BẰNG GEMINI AI
  * Tương thích Google Gemini 1.5 Flash / 2.0 Flash / Pro
- * Hỗ trợ cả API key từ Server (GEMINI_API_KEY) và API key cá nhân do người dùng nhập.
+ * Cấu hình tập trung một lần bởi Quản trị viên (Admin) và dùng chung cho toàn bộ hệ thống.
  */
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, question, contextData, customApiKey } = body;
+    const { type, question, contextData } = body;
 
-    const apiKey =
-      (typeof customApiKey === 'string' && customApiKey.trim().length > 0
-        ? customApiKey.trim()
-        : null) ||
-      process.env.GEMINI_API_KEY ||
-      process.env.GOOGLE_API_KEY ||
-      process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const config = getAdminConfig();
+    const apiKey = config.geminiApiKey?.trim();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -25,9 +21,9 @@ export async function POST(req: NextRequest) {
           success: false,
           error: 'NO_API_KEY',
           message:
-            'Chưa có API Key. Vui lòng nhập Gemini API Key miễn phí của bạn ở nút "Cài Đặt AI" để kích hoạt luận giải trực tiếp!',
+            'Hệ thống AI hiện chưa được cấu hình bởi Quản trị viên.',
         },
-        { status: 400 }
+        { status: 503 }
       );
     }
 
@@ -105,8 +101,10 @@ YÊU CẦU: Dựa trên nguyên lý Tử Vi Đẩu Số của danh sư Nghê H�
 Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;
     }
 
-    // Thử gọi các model của Gemini API theo thứ tự ưu tiên
-    const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+    // Thử gọi các model của Gemini API theo thứ tự ưu tiên (ưu tiên model quản trị viên đã chọn)
+    const preferredModel = config.geminiModel || 'gemini-1.5-flash';
+    const fallbackList = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'].filter(m => m !== preferredModel);
+    const modelsToTry = [preferredModel, ...fallbackList];
     let lastError = '';
     let responseText = '';
 
