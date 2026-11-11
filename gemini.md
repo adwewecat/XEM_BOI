@@ -73,6 +73,35 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 28: Vẽ Trực Tiếp Các Đường Chỉ Tay Neon Phát Sáng & Nhận Diện Gò Lên Ảnh Bàn Tay Thật Của Người Dùng
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "KHI QUÉT CHỈ TAY, HÃY VẼ ĐÚNG VÀO ẢNH ĐÃ ĐĂNG ĐỂ PHÂN TÍCH ĐÚNG TỪNG ĐƯỜNG" (Kèm ảnh chụp màn hình tải ảnh bàn tay thật lên nhưng trước đây hệ thống chỉ hiện ảnh trần và diagram hoạt họa chung chung).
+- **Nguyên nhân phát hiện:**
+  1. Trước đây, khi người dùng tải ảnh bàn tay lên, hệ thống chỉ hiển thị ảnh tĩnh trong khung `img` và một thanh laze chạy qua lại.
+  2. Bảng kết quả phân tích bên dưới chỉ dùng một diagram hoạt họa vector đen tím dựng sẵn (`VisualPalmDiagram`), không hề vẽ hay chồng các nét chỉ tay thực tế lên chính bức ảnh bàn tay người dùng đã đăng.
+  3. Bàn tay người dùng chụp có thể đặt dọc, đặt ngang (như trong ảnh mẫu người dùng gửi, ngón tay nằm ngang), cần có công cụ căn chỉnh (xoay, lật, thu phóng, dịch chuyển) để nét vẽ ôm khít vào lòng bàn tay thật.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Xây Dựng Component Vẽ Chỉ Tay Chuyên Biệt `PalmLinesOverlay` (`components/metaphysics/PalmLinesOverlay.tsx`):**
+     - Vẽ trực tiếp các tuyến chỉ tay phát sáng Neon đa tầng (Neon Glow Filter) đè khớp lên bức ảnh bàn tay thật:
+       * **Đường Sinh Đạo (Life Line):** Màu xanh ngọc Emerald `#10b981` ôm quanh Gò Kim Tinh.
+       * **Đường Trí Đạo (Head Line):** Màu xanh lam Cyan `#06b6d4` chạy ngang lòng bàn tay sang Gò Nguyệt Tinh.
+       * **Đường Tâm Đạo (Heart Line):** Màu đỏ hồng Ruby `#f43f5e` chạy dưới các gốc ngón tay.
+       * **Đường Định Mệnh (Fate Line):** Màu tím Violet `#a855f7` vươn thẳng từ cổ tay lên gốc ngón giữa.
+       * **Các Gò Bàn Tay (Mounts):** Gò Kim Tinh, Mộc Tinh, Thổ Tinh, Thái Dương, Thủy Tinh, Nguyệt Tinh có vòng tròn phát sáng và tọa độ giải phẫu.
+       * **Dấu Ấn Quý Tướng:** Điểm nối Chữ M (nối Tâm - Trí - Định Mệnh - Sinh Đạo) phát sáng vàng kim.
+     - **Thanh Công Cụ Tinh Chỉnh Nét Vẽ Khớp Ảnh (Calibration Toolbar):**
+       * Hỗ trợ lật tay (Trái ⇄ Phải), Xoay +90°, Xoay -90° (giúp khớp ngay với bàn tay chụp ngang như ảnh của người dùng), Phóng to / Thu nhỏ, Dịch chuyển 4 hướng (↑, ↓, ←, →), và thanh trượt điều chỉnh độ sáng nét vẽ.
+       * Nút bật/tắt hiển thị nét vẽ để người dùng dễ dàng so sánh trước và sau khi vẽ.
+     - **Tương Tác Click Vào Từng Đường:** Bấm vào đường nào trên ảnh thì đường đó sáng bừng lên, hiện tooltip giải nghĩa nhanh ngay trên ảnh.
+  2. **Tích Hợp Vào Cả Khung Tải Ảnh (`PalmPhotoUploader.tsx`) & Kết Quả Phân Tích (`app/metaphysics/page.tsx`):**
+     - Ngay khi tải ảnh lên hoặc chọn ảnh mẫu, nét vẽ chỉ tay xuất hiện trực tiếp trên ảnh.
+     - Trong khối kết quả phân tích AI, ảnh bàn tay thật kèm nét vẽ neon được phóng to nổi bật ở vị trí trung tâm, đồng bộ highlight với 4 thẻ phân tích chi tiết bên dưới.
+  3. **Kiểm Thử & Đóng Gói:**
+     - `npm run typecheck` 0 lỗi.
+     - 18/18 test suites hồi quy PASS 100%.
+     - `npm run build` 238 routes tĩnh PASS 100%.
+     - Khởi động lại server Next.js phục vụ người dùng.
+
 ### [2026-11-11] - Đợt 27: Sửa Triệt Để Lỗi Gemini AI Fallback Khai Tử 1.5 Pro, Khắc Phục Lỗi Regex Tiếng Việt Bị Lẫn Vào Nhân Duyên & Thêm Chiêm Thiên Thời
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "kiểm tra kết nối thành công nhưng mà vẫn lỗi" (Kèm ảnh: Bói câu hỏi "hôm nay thời tiết thế nào" -> Báo lỗi đỏ `models/gemini-1.5-pro is not found`, bên dưới phán nhầm thành nhân duyên; trang Admin kiểm tra kết nối thành công).

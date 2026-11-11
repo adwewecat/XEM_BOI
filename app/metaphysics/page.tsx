@@ -12,6 +12,7 @@ import VisualBaguaHexagram from '@/components/metaphysics/VisualBaguaHexagram';
 import VisualTarotCard from '@/components/metaphysics/VisualTarotCard';
 import VisualPalmDiagram from '@/components/metaphysics/VisualPalmDiagram';
 import PalmPhotoUploader from '@/components/metaphysics/PalmPhotoUploader';
+import PalmLinesOverlay from '@/components/metaphysics/PalmLinesOverlay';
 import ThematicMetaphysicsBackground, { MetaphysicsTheme } from '@/components/metaphysics/ThematicMetaphysicsBackground';
 import {
   analyzePalm,
@@ -94,6 +95,7 @@ export default function MetaphysicsPage() {
     });
   });
   const [isPalmAnalyzing, setIsPalmAnalyzing] = useState(false);
+  const [activePalmLine, setActivePalmLine] = useState<string | null>(null);
 
   // --- STATE CHO BÓI HỮU DUYÊN (GIỜ ĐỘNG TÂM) ---
   const [dongTamQuestion, setDongTamQuestion] = useState('');
@@ -774,38 +776,101 @@ export default function MetaphysicsPage() {
         {/* BẢNG KẾT QUẢ LUẬN GIẢI CHỈ TAY TOÀN DIỆN */}
         {palmResult && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-6">
-            {/* 0. KHỐI THỊ GIÁC AI: ẢNH BÀN TAY ĐÃ TẢI LÊN & CÁC ĐẶC TRƯNG NHẬN DIỆN */}
+            {/* 0. KHỐI THỊ GIÁC AI: NÉT VẼ CHỈ TAY TRỰC TIẾP TRÊN ẢNH ĐÃ ĐĂNG & ĐẶC TÍNH NHẬN DIỆN */}
             {palmResult.uploadedImage && (
-              <div className="card-glass p-5 rounded-2xl border border-amber-500/40 bg-zinc-950/90 shadow-2xl space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
-                  <div className="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2">
-                    <span>🔍</span> QUÉT THỊ GIÁC AI BÀN TAY ({palmResult.input.side === 'left' ? 'TAY TRÁI' : 'TAY PHẢI'})
+              <div className="card-glass p-5 sm:p-6 rounded-2xl border-2 border-amber-500/40 bg-zinc-950/90 shadow-2xl space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">
+                  <div className="text-xs sm:text-sm font-black text-amber-300 flex items-center gap-2">
+                    <span>🖐️</span> HỆ THỐNG VẼ ĐÚNG CÁC ĐƯỜNG CHỈ TAY LÊN ẢNH ({palmResult.input.side === 'left' ? 'TAY TRÁI' : 'TAY PHẢI'})
                   </div>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
-                    ✓ AI Vision Phân Tích Thành Công
+                  <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Đã Khớp Nét Vẽ Chỉ Tay Neon
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-                  <div className="sm:col-span-4 max-w-[180px] mx-auto aspect-[3/4] rounded-xl overflow-hidden border border-amber-500/30 bg-black/60 shadow-lg">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={palmResult.uploadedImage}
-                      alt="Ảnh bàn tay phân tích"
-                      className="w-full h-full object-contain"
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* Cột 1 (Lớn, chiếm 6-7 cột): ẢNH BÀN TAY VẼ CHỈ TAY NEON TRỰC QUAN */}
+                  <div className="lg:col-span-7 flex flex-col items-center">
+                    <PalmLinesOverlay
+                      imageUrl={palmResult.uploadedImage}
+                      side={palmResult.input.side}
+                      result={palmResult}
+                      activeLine={activePalmLine}
+                      onSelectLine={(lineKey) => setActivePalmLine(activePalmLine === lineKey ? null : lineKey)}
+                      allowCalibration={true}
+                      showLabels={true}
                     />
+                    <p className="text-[11px] text-zinc-400 text-center mt-2.5 italic">
+                      💡 Nhấn vào từng đường chỉ tay hoặc gò trên ảnh để xem phân tích chi tiết. Dùng nút <strong className="text-cyan-300">⚙️ Căn Chỉnh</strong> để xoay hoặc chỉnh vị trí nét vẽ khớp 100% với góc chụp của bàn tay.
+                    </p>
                   </div>
-                  <div className="sm:col-span-8 space-y-2">
-                    <div className="text-xs font-bold text-zinc-300 mb-1">
-                      Các đặc tính tướng số AI đã phát hiện trên bàn tay:
+
+                  {/* Cột 2 (5 cột): BẢNG DANH MỤC TUYẾN CHỈ TAY & ĐẶC TÍNH PHÁT HIỆN */}
+                  <div className="lg:col-span-5 space-y-3.5">
+                    <div className="text-xs font-bold text-amber-200 flex items-center justify-between">
+                      <span>🎯 CHỌN ĐƯỜNG KHẢO SÁT NHANH TRÊN ẢNH:</span>
+                      {activePalmLine && (
+                        <button
+                          type="button"
+                          onClick={() => setActivePalmLine(null)}
+                          className="text-[11px] text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                        >
+                          Bỏ chọn
+                        </button>
+                      )}
                     </div>
-                    <div className="grid grid-cols-1 gap-1.5 text-xs">
-                      {palmResult.detectedFeaturesSummary?.map((feat, idx) => (
-                        <div key={idx} className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-200 flex items-center gap-2">
-                          <span className="text-amber-400">✦</span>
-                          <span>{feat}</span>
-                        </div>
-                      ))}
+
+                    {/* 4 Nút tương tác chọn nhanh từng đường chỉ tay */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { key: 'life', name: 'Đường Sinh Đạo', color: '#10b981', icon: '🌱' },
+                        { key: 'head', name: 'Đường Trí Đạo', color: '#06b6d4', icon: '🧠' },
+                        { key: 'heart', name: 'Đường Tâm Đạo', color: '#f43f5e', icon: '❤️' },
+                        { key: 'fate', name: 'Đường Định Mệnh', color: '#a855f7', icon: '⚡' },
+                      ].map((item) => {
+                        const isSelected = activePalmLine === item.key;
+                        return (
+                          <button
+                            key={item.key}
+                            type="button"
+                            onClick={() => setActivePalmLine(isSelected ? null : item.key)}
+                            className={`p-2.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                              isSelected
+                                ? 'scale-[1.02] shadow-lg ring-1'
+                                : 'bg-zinc-900/80 border-zinc-800 hover:border-zinc-700'
+                            }`}
+                            style={{
+                              backgroundColor: isSelected ? `${item.color}20` : undefined,
+                              borderColor: isSelected ? item.color : undefined,
+                              color: isSelected ? item.color : '#e4e4e7',
+                            }}
+                          >
+                            <span className="flex items-center gap-1.5 truncate">
+                              <span>{item.icon}</span>
+                              <span className="truncate">{item.name}</span>
+                            </span>
+                            {isSelected && <span className="text-[10px]">👁️</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-800/80 space-y-2">
+                      <div className="text-xs font-bold text-zinc-300">
+                        Đặc tính tướng pháp AI đã trích xuất:
+                      </div>
+                      <div className="space-y-1.5 text-xs max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                        {palmResult.detectedFeaturesSummary?.map((feat, idx) => (
+                          <div
+                            key={idx}
+                            className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-200 flex items-start gap-2"
+                          >
+                            <span className="text-amber-400 mt-0.5">✦</span>
+                            <span className="leading-relaxed">{feat}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -881,40 +946,66 @@ export default function MetaphysicsPage() {
                 {/* 2. CHI TIẾT 4 ĐẠI TUYẾN CHỈ TAY */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    palmResult.lifeLine,
-                    palmResult.headLine,
-                    palmResult.heartLine,
-                    palmResult.fateLine,
-                  ].map((line) => (
-                    <div key={line.name} className="card-glass p-5 rounded-2xl border border-zinc-800 bg-zinc-950/80 space-y-3">
-                      <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{line.glyph}</span>
-                          <div>
-                            <div className="text-xs text-zinc-400 font-semibold">{line.name}</div>
-                            <div className="text-sm font-bold text-amber-200">{line.title}</div>
+                    { data: palmResult.lifeLine, key: 'life', color: '#10b981' },
+                    { data: palmResult.headLine, key: 'head', color: '#06b6d4' },
+                    { data: palmResult.heartLine, key: 'heart', color: '#f43f5e' },
+                    { data: palmResult.fateLine, key: 'fate', color: '#a855f7' },
+                  ].map(({ data: line, key, color }) => {
+                    const isSelected = activePalmLine === key;
+                    return (
+                      <div
+                        key={line.name}
+                        onClick={() => setActivePalmLine(isSelected ? null : key)}
+                        className={`card-glass p-5 rounded-2xl border transition-all cursor-pointer space-y-3 ${
+                          isSelected
+                            ? 'ring-2 ring-offset-2 ring-offset-zinc-950 shadow-2xl scale-[1.01]'
+                            : 'border-zinc-800 bg-zinc-950/80 hover:border-zinc-700'
+                        }`}
+                        style={{
+                          borderColor: isSelected ? color : undefined,
+                          backgroundColor: isSelected ? `${color}12` : undefined,
+                          boxShadow: isSelected ? `0 0 25px ${color}30` : undefined,
+                        }}
+                      >
+                        <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{line.glyph}</span>
+                            <div>
+                              <div className="text-xs text-zinc-400 font-semibold flex items-center gap-1.5">
+                                <span>{line.name}</span>
+                                {isSelected && (
+                                  <span
+                                    className="text-[10px] px-1.5 py-0.2 rounded font-bold text-zinc-950"
+                                    style={{ backgroundColor: color }}
+                                  >
+                                    Đang xem trên ảnh
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm font-bold text-amber-200">{line.title}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-base font-black text-amber-400">{line.score}</span>
+                            <span className="text-[10px] text-zinc-500">/100</span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <span className="text-base font-black text-amber-400">{line.score}</span>
-                          <span className="text-[10px] text-zinc-500">/100</span>
+
+                        <div className="space-y-1.5 text-xs text-zinc-300">
+                          {line.details.map((d, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <span className="text-amber-400 mt-0.5">•</span>
+                              <span className="leading-relaxed">{d}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-[11px] text-amber-300/90 leading-relaxed">
+                          <strong>Lời khuyên:</strong> {line.advice}
                         </div>
                       </div>
-
-                      <div className="space-y-1.5 text-xs text-zinc-300">
-                        {line.details.map((d, idx) => (
-                          <div key={idx} className="flex items-start gap-2">
-                            <span className="text-amber-400 mt-0.5">•</span>
-                            <span className="leading-relaxed">{d}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-[11px] text-amber-300/90 leading-relaxed">
-                        <strong>Lời khuyên:</strong> {line.advice}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* 3. NGŨ ĐẠI GÒ BÀN TAY (MOUNTS) & DẤU ẤN QUÝ TƯỚNG */}

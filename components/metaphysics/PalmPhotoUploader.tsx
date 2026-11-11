@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HandSide, PalmistryResult } from '@/lib/metaphysics/palmistry';
+import PalmLinesOverlay from '@/components/metaphysics/PalmLinesOverlay';
 
 interface UserProfileData {
   name?: string;
@@ -433,43 +434,29 @@ export default function PalmPhotoUploader({
             </div>
           </div>
         ) : (
-          /* Trạng thái đã chọn ảnh: Preview + Nút đổi ảnh + Thanh Laze Quét khi phân tích */
-          <div className="relative rounded-2xl overflow-hidden border-2 border-amber-500/40 bg-zinc-950 p-4 flex flex-col items-center">
-            <div className="relative max-w-sm w-full aspect-[3/4] rounded-xl overflow-hidden bg-black/60 border border-zinc-800 flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={selectedImage}
-                alt="Ảnh bàn tay đã tải lên"
-                className="w-full h-full object-contain select-none"
-              />
-
-              {/* Lớp phủ Laze Scanner khi đang phân tích */}
-              {isAnalyzing && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden bg-amber-500/10">
-                  {/* Tia sáng quét laze */}
-                  <motion.div
-                    animate={{ top: ['0%', '100%', '0%'] }}
-                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_15px_4px_rgba(251,191,36,0.8)]"
-                  />
-                  {/* Lưới định vị chỉ tay */}
-                  <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px] opacity-25" />
-                </div>
-              )}
-            </div>
+          /* Trạng thái đã chọn ảnh: HIỂN THỊ NÉT VẼ CHỈ TAY PHÁT SÁNG TRỰC TIẾP TRÊN ẢNH ĐÃ ĐĂNG */
+          <div className="space-y-3">
+            <PalmLinesOverlay
+              imageUrl={selectedImage}
+              side={side}
+              result={currentResult}
+              isAnalyzing={isAnalyzing}
+              allowCalibration={true}
+              showLabels={true}
+            />
 
             {/* Thông tin file & nút thao tác */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-zinc-800 text-xs">
-              <span className="text-zinc-300 truncate max-w-[200px]">
-                📸 {imageFileName || 'Ảnh bàn tay'}
+            <div className="w-full flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs">
+              <span className="text-zinc-300 truncate max-w-[240px] flex items-center gap-1.5 font-medium">
+                <span>📸</span> {imageFileName || 'Ảnh bàn tay đã tải lên'}
               </span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold cursor-pointer transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1"
                 >
-                  📷 Đổi ảnh khác
+                  <span>📷</span> Đổi ảnh khác
                 </button>
                 <button
                   type="button"
@@ -477,7 +464,7 @@ export default function PalmPhotoUploader({
                     setSelectedImage(null);
                     setImageFileName('');
                   }}
-                  className="px-3 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 text-rose-300 text-xs font-semibold cursor-pointer transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 text-rose-300 text-xs font-semibold cursor-pointer transition-all"
                 >
                   ✕ Gỡ ảnh
                 </button>
