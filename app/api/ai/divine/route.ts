@@ -91,11 +91,22 @@ YÊU CẦU BẠN LUẬN GIẢI THEO CẤU TRÚC:
 2. ☯️ **DỊCH LÝ THÂU SUỐT**: Phân tích thể hiện của quẻ Chủ (${originalName}) sang quẻ Biến (${changedName}), hào động ${movingLine} mang thông điệp chuyển hóa gì.
 3. ⏳ **ỨNG KỲ THỜI GIAN & LỜI KHUYÊN HÀNH SỰ**: Thời điểm then chốt sự việc ứng nghiệm và thái độ ứng xử đúng đạo quân tử.`;
     } else if (type === 'ziwei') {
-      promptContent = `[BỐI CẢNH LUẬN GIẢI TỬ VI ĐẨU SỐ]
-Câu hỏi/vấn đề cần tư vấn: "${question.trim()}"
-Dữ liệu cung vị / lá số: ${JSON.stringify(contextData || {})}
+      const pData = contextData || {};
+      promptContent = `[BỐI CẢNH LUẬN GIẢI TỬ VI ĐẨU SỐ CHUẨN PHÁI THIÊN KỶ NGHÊ HẢI HÀ]
+- Đương số: ${pData.name || 'Đương số'} (${pData.gender || 'Nam'} Mệnh, ${pData.currentAge || ''} tuổi)
+- Thời khắc sinh: Dương lịch ${pData.solarDate || ''} · Âm lịch ${pData.lunarDate || ''} · Cục: ${pData.wuxingJu || ''}
+- Cung Mệnh (Tiên thiên): Cung ${pData.mingGong?.stem || ''} ${pData.mingGong?.branch || ''} - Chính tinh toạ thủ: ${pData.mingGong?.majors || ''} - Toàn bộ tinh diệu: ${pData.mingGong?.allStars || ''}
+- Cung Thân (Hậu vận): Thân cư Cung ${pData.shenGong?.palace || ''} (${pData.shenGong?.branch || ''})
+- Đại Hạn Hiện Tại: Cung ${pData.currentDaXian?.palace || ''} (${pData.currentDaXian?.ageRange || ''}, ${pData.currentDaXian?.branch || ''})
+- Cung vị đang khảo sát chi tiết: Cung ${pData.selectedPalace?.name || 'Mệnh'} (${pData.selectedPalace?.stem || ''} ${pData.selectedPalace?.branch || ''}, Chính tinh: ${pData.selectedPalace?.majors || ''})
 
-YÊU CẦU: Dựa trên nguyên lý Tử Vi Đẩu Số của danh sư Nghê Hải Hà, luận giải sâu sắc, rõ ràng các sao tọa thủ, tam phương tứ chính và đưa ra lời định hướng thiết thực.`;
+CÂU HỎI / VẤN ĐỀ ĐƯƠNG SỐ MUỐN HỎI THẦY:
+"${question.trim()}"
+
+YÊU CẦU BẠN LUẬN GIẢI THEO CẤU TRÚC 3 PHẦN:
+1. 🎯 **LỜI GIẢI ĐOÁN TRỰC DIỆN CHO CÂU HỎI**: Trả lời thẳng thắn, chính xác 100% vào điều đương số đang hỏi. Đưa ra phán quyết rõ ràng, không vòng vo né tránh.
+2. 🌟 **BẢN MỆNH & CƠ CHẾ TINH DIỆU TỬ VI**: Phân tích vì sao các sao tọa thủ (Chính tinh, Cát/Sát tinh, Tứ Hóa, Tam phương tứ chính) và thời vận (Đại hạn hiện tại / Cung đang xem) lại tạo nên kết quả và diễn biến đó.
+3. 🧭 **HƯỚNG DẪN HÀNH ĐỘNG & BÀI HỌC DƯỠNG TÂM LẬP MỆNH**: Lời khuyên thiết thực theo tinh thần danh sư Nghê Hải Hà: Cần phát huy sở trường gì, khắc phục điểm yếu nào, giải hạn thị phi/trắc trở ra sao để chuyển nguy thành an, tự tay làm chủ số mệnh.`;
     } else {
       promptContent = `Câu hỏi chiêm bốc vận mệnh của đương số: "${question.trim()}"
 Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;

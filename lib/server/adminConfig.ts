@@ -69,3 +69,4 @@ export function verifyAdminPassword(inputPass: string): boolean {
   const validPass = current.adminPassword || DEFAULT_ADMIN_PASSWORD;
   return inputPass.trim() === validPass.trim();
 }
+

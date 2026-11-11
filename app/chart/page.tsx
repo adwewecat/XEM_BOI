@@ -16,6 +16,21 @@ import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
 import { PALACE_VI, getPalaceName, getStarName, BRANCHES_VI, STEMS_VI, BRIGHTNESS_VI, generatePalaceAnalysis } from '@/lib/ziwei/vietnamese';
 import { useTheme } from '@/components/ThemeProvider';
 
+function formatBoldMarkup(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="text-amber-300 font-bold px-0.5">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export default function ChartPage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -26,8 +41,14 @@ export default function ChartPage() {
   const [liunianYear, setLiunianYear] = useState(() => new Date().getFullYear());
   const [shareOpen, setShareOpen] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
-  const [guideTab, setGuideTab] = useState<'steps' | 'terms'>('steps');
+  const [guideTab, setGuideTab] = useState<'steps' | 'terms' | 'palace_map'>('steps');
   const [rightTab, setRightTab] = useState<'patterns' | 'insights' | 'palace'>('palace');
+
+  // State cho trợ lý hỏi đáp Tử Vi AI chuyên sâu
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Lưu thông tin sinh để dùng khi xuất ảnh lá số (ShareModal)
   const [birthState, setBirthState] = useState({
@@ -59,6 +80,73 @@ export default function ChartPage() {
       gender: data.gender,
       city: data.city || data.province || 'Hà Nội'
     });
+  };
+
+  const handleAskAi = async (overrideQ?: string) => {
+    const q = (overrideQ || aiQuestion).trim();
+    if (!q || !chart) return;
+    setIsAiLoading(true);
+    setAiError(null);
+    try {
+      const mingP = chart.palaces.find(p => p.branch === chart.mingGongBranch);
+      const shenP = chart.palaces.find(p => p.branch === chart.shenGongBranch);
+      const currentDx = chart.daXians[chart.currentDaXianIndex];
+
+      const contextData = {
+        name: birthState.city && birthState.city !== 'Hà Nội' ? birthState.city : 'Đương số',
+        gender: chart.birthInfo.gender === 'female' ? 'Nữ Mệnh' : 'Nam Mệnh',
+        currentAge: chart.currentAge,
+        solarDate: `${chart.birthInfo.day}/${chart.birthInfo.month}/${chart.birthInfo.year}`,
+        lunarDate: `${chart.lunarInfo.lunarDay}/${chart.lunarInfo.lunarMonth}/${chart.lunarInfo.lunarYear} Âm lịch`,
+        wuxingJu: chart.wuxingJuName,
+        mingGong: {
+          stem: STEMS_VI[mingP?.stem ?? 0],
+          branch: BRANCHES_VI[chart.mingGongBranch],
+          majors: mingP?.stars.filter(s => s.type === 'major').map(s => `${getStarName(s.name).vi} [${s.brightnessRaw || ''}]`).join(', ') || 'Vô Chính Diệu',
+          allStars: mingP?.stars.map(s => getStarName(s.name).vi).join(', '),
+        },
+        shenGong: {
+          palace: getPalaceName(shenP?.name || '').vi,
+          branch: BRANCHES_VI[chart.shenGongBranch],
+        },
+        currentDaXian: currentDx ? {
+          palace: getPalaceName(currentDx.palaceName).vi,
+          ageRange: `${currentDx.startAge}-${currentDx.endAge} tuổi`,
+          branch: BRANCHES_VI[currentDx.palaceBranch],
+        } : null,
+        selectedPalace: selectedPalace ? {
+          name: getPalaceName(selectedPalace.name).vi,
+          stem: STEMS_VI[selectedPalace.stem],
+          branch: BRANCHES_VI[selectedPalace.branch],
+          majors: selectedPalace.stars.filter(s => s.type === 'major').map(s => `${getStarName(s.name).vi} [${s.brightnessRaw || ''}]`).join(', ') || 'Vô Chính Diệu',
+        } : null,
+      };
+
+      const res = await fetch('/api/ai/divine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'ziwei',
+          question: q,
+          contextData,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAiError(data.message || 'Không thể kết nối đến Gemini AI lúc này.');
+        return;
+      }
+
+      setAiAnswer(data.answer);
+      if (overrideQ) {
+        setAiQuestion(overrideQ);
+      }
+    } catch (err: unknown) {
+      setAiError(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ AI');
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   const handleSelectFamous = (person: FamousPerson) => {
@@ -561,6 +649,170 @@ export default function ChartPage() {
                     <span className="font-bold text-amber-300 block">💡 Lời Khuyên Danh Sư Nghê Hải Hà:</span>
                     <p className="italic">{analysis.advice}</p>
                   </div>
+
+                  {/* 7. KẾT LUẬN GIẢI ĐOÁN CỐT LÕI DÀNH CHO ĐƯƠNG SỐ */}
+                  {analysis.coreVerdict && (
+                    <div className="p-4 rounded-xl bg-gradient-to-b from-amber-950/30 via-stone-900/90 to-amber-950/20 border-2 border-amber-400/60 shadow-2xl space-y-3">
+                      <div className="flex items-center gap-2 pb-2 border-b border-amber-500/40">
+                        <span className="text-base">🎯</span>
+                        <h4 className="font-black text-amber-300 text-xs sm:text-sm uppercase tracking-wide">
+                          KẾT LUẬN GIẢI ĐOÁN CỐT LÕI (DÀNH RIÊNG CHO BẠN)
+                        </h4>
+                      </div>
+
+                      {/* Tiêu đề định vị cách cục */}
+                      <div className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-200 font-extrabold text-xs">
+                        👑 {analysis.coreVerdict.verdictTitle}
+                      </div>
+
+                      {/* Cốt cách & Khí chất */}
+                      <div className="space-y-1 text-xs">
+                        <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                          <span>👤</span>
+                          <span>Cốt Cách & Khí Chất Tiên Thiên:</span>
+                        </span>
+                        <p className="text-stone-200 leading-relaxed pl-4 border-l-2 border-amber-500/40">
+                          {analysis.coreVerdict.temperament}
+                        </p>
+                      </div>
+
+                      {/* Thế mạnh & Ngành nghề */}
+                      <div className="space-y-1 text-xs">
+                        <span className="font-bold text-emerald-300 flex items-center gap-1.5">
+                          <span>💼</span>
+                          <span>Thế Mạnh & Ngành Nghề Đắc Lộc Nhất:</span>
+                        </span>
+                        <p className="text-stone-200 leading-relaxed pl-4 border-l-2 border-emerald-500/40">
+                          {analysis.coreVerdict.strengthsAndCareer}
+                        </p>
+                      </div>
+
+                      {/* Khảo nghiệm & Thận trọng */}
+                      <div className="space-y-1 text-xs">
+                        <span className="font-bold text-rose-300 flex items-center gap-1.5">
+                          <span>⚠️</span>
+                          <span>Khảo Nghiệm Vận Trình & Điểm Cần Tu Dưỡng:</span>
+                        </span>
+                        <p className="text-stone-200 leading-relaxed pl-4 border-l-2 border-rose-500/40">
+                          {analysis.coreVerdict.challengesAndCautions}
+                        </p>
+                      </div>
+
+                      {/* Phán Quyết Định Mệnh Cốt Tử */}
+                      <div className="p-3 rounded-lg bg-amber-500/20 border border-amber-400/70 text-amber-100 text-xs leading-relaxed font-semibold shadow-inner">
+                        <div className="text-[11px] font-black uppercase text-amber-300 tracking-wider mb-1 flex items-center gap-1">
+                          <span>📜</span>
+                          <span>Phán Quyết Định Mệnh Cốt Tử:</span>
+                        </div>
+                        <p className="text-amber-100">{analysis.coreVerdict.directConclusion}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 8. TRỢ LÝ TỬ VI AI · ĐẶT CÂU HỎI VỀ LÁ SỐ */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-950/40 via-stone-900/90 to-purple-950/40 border border-indigo-500/50 shadow-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🔮</span>
+                        <span className="font-black text-indigo-300 text-xs sm:text-sm">
+                          TRỢ LÝ TỬ VI AI · LUẬN GIẢI CHUYÊN SÂU
+                        </span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-mono">
+                        Gemini Pro
+                      </span>
+                    </div>
+
+                    <p className="text-[11.5px] text-stone-300">
+                      Bạn có thắc mắc gì về <strong className="text-amber-300">Cung {analysis.palaceNameVi}</strong> hoặc toàn bộ lá số của mình? Hãy chọn câu hỏi nhanh bên dưới hoặc nhập câu hỏi riêng:
+                    </p>
+
+                    {/* Gợi ý câu hỏi nhanh 1-click */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        `Ý nghĩa tổng quan cung ${analysis.palaceNameVi} của tôi là gì?`,
+                        'Tôi làm nghề gì hoặc đầu tư lĩnh vực nào thì phát tài nhất?',
+                        'Chuyện tình duyên hôn nhân của tôi thế nào, khi nào thuận lợi?',
+                        'Đại hạn hiện tại này tôi nên tiến công hay phòng thủ?',
+                        'Lá số của tôi có cách cục gì đặc biệt, phát về danh hay tài?'
+                      ].map((quickQ, qIdx) => (
+                        <button
+                          key={qIdx}
+                          type="button"
+                          disabled={isAiLoading}
+                          onClick={() => handleAskAi(quickQ)}
+                          className="text-[11px] px-2.5 py-1 rounded-full bg-stone-800/80 hover:bg-indigo-600/30 text-stone-300 hover:text-indigo-200 border border-stone-700/80 hover:border-indigo-400/50 transition-all text-left"
+                        >
+                          💬 {quickQ}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Ô nhập câu hỏi tuỳ biến */}
+                    <div className="space-y-2 pt-1">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={aiQuestion}
+                          onChange={(e) => setAiQuestion(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !isAiLoading && aiQuestion.trim()) {
+                              handleAskAi();
+                            }
+                          }}
+                          placeholder={`Đặt câu hỏi về cung ${analysis.palaceNameVi} hoặc vận mệnh của bạn...`}
+                          className="flex-1 px-3 py-2 text-xs rounded-lg bg-stone-950/80 border border-indigo-500/30 text-stone-100 placeholder-stone-500 focus:outline-none focus:border-indigo-400"
+                        />
+                        <button
+                          type="button"
+                          disabled={isAiLoading || !aiQuestion.trim()}
+                          onClick={() => handleAskAi()}
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow transition-all flex items-center gap-1.5 shrink-0"
+                        >
+                          {isAiLoading ? (
+                            <>
+                              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              <span>Đang Luận...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>✨</span>
+                              <span>Hỏi Thầy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Lỗi nếu có */}
+                      {aiError && (
+                        <div className="p-2 rounded bg-rose-950/50 border border-rose-500/40 text-rose-300 text-xs">
+                          ⚠️ {aiError}
+                        </div>
+                      )}
+
+                      {/* Hiển thị câu trả lời AI */}
+                      {aiAnswer && (
+                        <div className="mt-3 p-3.5 rounded-xl bg-stone-950/90 border border-indigo-400/50 space-y-2">
+                          <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                            <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                              <span>📜</span>
+                              <span>Lời Thầy Giải Đoán Cho Bạn:</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setAiAnswer(null)}
+                              className="text-[10px] text-stone-400 hover:text-stone-200"
+                            >
+                              Đóng
+                            </button>
+                          </div>
+                          <div className="text-xs text-stone-200 leading-relaxed whitespace-pre-wrap space-y-2">
+                            {formatBoldMarkup(aiAnswer)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </motion.div>
               );
             })()}
@@ -622,11 +874,11 @@ export default function ChartPage() {
               </div>
 
               {/* Tab Chuyển Đổi Trong Modal */}
-              <div className="flex rounded-xl p-1 bg-stone-900 border border-stone-800">
+              <div className="flex flex-wrap gap-1 rounded-xl p-1 bg-stone-900 border border-stone-800">
                 <button
                   type="button"
                   onClick={() => setGuideTab('steps')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`flex-1 min-w-[120px] py-1.5 rounded-lg text-xs font-bold transition-all ${
                     guideTab === 'steps'
                       ? 'bg-amber-500 text-stone-950 shadow'
                       : 'text-stone-400 hover:text-stone-200'
@@ -637,17 +889,28 @@ export default function ChartPage() {
                 <button
                   type="button"
                   onClick={() => setGuideTab('terms')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`flex-1 min-w-[160px] py-1.5 rounded-lg text-xs font-bold transition-all ${
                     guideTab === 'terms'
                       ? 'bg-amber-500 text-stone-950 shadow'
                       : 'text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  📖 Giải Mã: Bản Mệnh · Đại Hạn · Lưu Niên
+                  📖 Bản Mệnh · Cung Mệnh · Đại Hạn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGuideTab('palace_map')}
+                  className={`flex-1 min-w-[160px] py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    guideTab === 'palace_map'
+                      ? 'bg-amber-500 text-stone-950 shadow'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  🗺️ Bản Đồ 12 Cung: Bấm Đâu Để Xem?
                 </button>
               </div>
 
-              {guideTab === 'steps' ? (
+              {guideTab === 'steps' && (
                 <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
                   {/* Bước 1 */}
                   <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
@@ -708,62 +971,183 @@ export default function ChartPage() {
                     </p>
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {guideTab === 'terms' && (
                 <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
-                  {/* Bản Mệnh là gì */}
-                  <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-2">
+                  {/* 1. Bản Mệnh vs Cung Mệnh vs Cung Thân */}
+                  <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-2.5">
                     <div className="font-extrabold text-amber-300 flex items-center gap-2 text-sm">
                       <span>🌟</span>
-                      <span>1. XEM BẢN MỆNH LÀ XEM VỚI Ý NGHĨA GÌ?</span>
+                      <span>1. PHÂN BIỆT BẢN MỆNH · CUNG MỆNH · CUNG THÂN</span>
                     </div>
-                    <p className="text-stone-300 text-xs leading-relaxed">
-                      - <strong>Bản Mệnh (Cung Mệnh):</strong> Là cái &quot;Gốc&quot; của toàn bộ cây số mệnh. Mệnh quyết định cốt cách tiên thiên, tính cách bẩm sinh, trí tuệ, tài năng tiềm ẩn và &quot;trần nhà&quot; thành bại lớn nhất trong đời người.<br />
-                      - <strong>Xem Mệnh để làm gì?</strong> Để thấu suốt chính mình: Biết sở trường để phát huy, biết nhược điểm để sửa đổi, biết làm ngành nghề gì thì hợp khí số.<br />
-                      - <strong>Thân Cư (Hậu Vận):</strong> Đại diện cho nửa đời sau (từ 30 tuổi trở đi). Mệnh là tư chất khi sinh ra, còn Thân là thành tựu do bạn nỗ lực tạo nên. Thân cư Phu Thê thì coi trọng gia đình bạn đời; Thân cư Quan Lộc thì cuộc đời vì sự nghiệp; Thân cư Tài Bạch thì lo toan tài chính.
-                    </p>
+                    <div className="space-y-2 text-xs text-stone-300 leading-relaxed">
+                      <div className="p-2.5 rounded bg-stone-900/80 border border-stone-700">
+                        <strong className="text-amber-300">🌱 Bản Mệnh (Ngũ Hành Nạp Âm năm sinh):</strong><br />
+                        Là cốt chất ngũ hành tiên thiên khởi sinh của bạn (ví dụ: <em>Sa Trung Kim</em>, <em>Dương Liễu Mộc</em>, <em>Sơn Hạ Hỏa</em>...). Bản Mệnh là &quot;chất liệu gốc&quot; dùng để so sánh sinh/khắc với Cục số (Mệnh sinh Cục là lao tâm, Cục sinh Mệnh là được hoàn cảnh trợ duyên) và dùng để so đôi tuổi vợ chồng.
+                      </div>
+                      <div className="p-2.5 rounded bg-stone-900/80 border border-stone-700">
+                        <strong className="text-amber-300">🏛️ Cung Mệnh (Cung vị số 1 trên Thiên Bàn):</strong><br />
+                        Là <strong>&quot;Bộ Tổng Tư Lệnh&quot;</strong>, hạt nhân tiên thiên của sinh mệnh. Cung Mệnh quyết định cốt cách, ngoại hình, tư chất thông minh, tài năng bẩm sinh và vận mệnh thời tiền vận (1–30 tuổi). Xem Mệnh là xem cái <strong>GỐC</strong> của cây đại thụ — gốc có sâu rễ bền thì hoa trái mới xum xuê.
+                      </div>
+                      <div className="p-2.5 rounded bg-stone-900/80 border border-stone-700">
+                        <strong className="text-sky-300">⚓ Cung Thân (Hậu Vận Sau 30 Tuổi):</strong><br />
+                        Mệnh là hạt giống gieo xuống, còn Thân là thành quả nỗ lực gặt hái sau 30 tuổi. Thân cư đâu thì tâm trí và sự nghiệp dồn vào đó: Thân cư Quan Lộc thì cả đời vì công danh; Thân cư Phu Thê thì gia đình bạn đời là trọng tâm; Thân cư Tài Bạch thì miệt mài gầy dựng của cải.
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Đại hạn 24-33 là gì */}
+                  {/* 2. Đại hạn 10 năm */}
                   <div className="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40 space-y-2">
                     <div className="font-extrabold text-purple-300 flex items-center gap-2 text-sm">
                       <span>⏳</span>
-                      <span>2. ĐẠI HẠN 24–33 TUỔI LÀ SAO? TẠI SAO TRỎ VÀO CUNG PHU THÊ?</span>
+                      <span>2. ĐẠI HẠN LÀ SAO? TẠI SAO LẠI TRỎ VÀO CUNG KHÁC (VÍ DỤ PHU THÊ)?</span>
                     </div>
                     <p className="text-stone-300 text-xs leading-relaxed">
-                      - <strong>Quy luật chu kỳ 10 năm:</strong> Cuộc đời con người trong Tử Vi được chia thành các nấc thang 10 năm gọi là <em>Đại Hạn</em>.<br />
-                      - <strong>Tại sao lại trỏ vào Cung Phu Thê?</strong> Đương số sinh năm 2000, hiện 26 tuổi, rơi đúng vào khoảng tuổi <strong>24 đến 33 tuổi</strong>. Trên lá số của bạn, dải số này nằm tại cung Giáp Dần — mang tên Cung Phu Thê.<br />
-                      - <strong>Ý nghĩa &quot;Cung Mệnh Lâm Thời&quot;:</strong> Trong 10 năm từ 24 đến 33 tuổi, Cung Phu Thê tạm thời đóng vai trò như Cung Mệnh của bạn! Mọi biến động lớn nhất về tâm sinh lý, các mối quan hệ tình cảm, duyên nợ hôn nhân hoặc người bạn đời/đối tác sẽ ảnh hưởng trực tiếp đến sự nghiệp và tài lộc của bạn.<br />
-                      - <strong>Tam phương tứ chính Đại Hạn:</strong> Trong 10 năm này, Quan Lộc đại hạn sẽ chiếu về, thử thách và cơ hội lập gia đình đi đôi với sự nghiệp.
+                      - <strong>Quy luật chu kỳ 10 năm:</strong> Đời người trong Tử Vi chia thành các nấc thang 10 năm gọi là <em>Đại Hạn</em>.<br />
+                      - <strong>Ý nghĩa &quot;Cung Mệnh Lâm Thời&quot;:</strong> Khi bạn bước vào độ tuổi của Đại Hạn nào, cung đó tạm thời trở thành &quot;Cung Mệnh&quot; thứ hai của bạn trong suốt 10 năm! Ví dụ: Nếu Đại Hạn đang ở Cung Phu Thê (như tuổi 24–33), mọi quyết định lớn nhất về tình cảm, kết hôn, sự trợ lực từ người bạn đời và đối tác sẽ ảnh hưởng trực tiếp đến sự nghiệp và tài chính của bạn trong 10 năm đó.
                     </p>
                   </div>
 
-                  {/* Lưu Niên */}
+                  {/* 3. Lưu Niên */}
                   <div className="p-4 rounded-xl bg-sky-950/30 border border-sky-500/40 space-y-2">
                     <div className="font-extrabold text-sky-300 flex items-center gap-2 text-sm">
                       <span>📅</span>
-                      <span>3. LƯU NIÊN NÊN XEM THẾ NÀO? Ý NGHĨA LÀ GÌ?</span>
+                      <span>3. LƯU NIÊN NÊN XEM THẾ NÀO?</span>
                     </div>
                     <p className="text-stone-300 text-xs leading-relaxed">
-                      - <strong>Đại Hạn quản 10 năm (Thời thế vĩ mô), Lưu Niên quản 1 năm (Biến cố vi mô):</strong> Lưu Niên là vận trình của riêng năm đó (ví dụ năm 2026 Bính Ngọ).<br />
-                      - <strong>Cách xem chuẩn danh sư:</strong> Cung Ngọ trên lá số sẽ là gốc của năm 2026. Tứ Hóa năm 2026 kích hoạt (Đồng Lộc, Cơ Quyền, Xương Khoa, Liêm Kỵ).<br />
-                      - <strong>Nguyên lý kết hợp 3 tầng:</strong><br />
-                      &nbsp;&nbsp;+ <em>Mệnh (Gốc rễ):</em> Nội lực bên trong của bạn có vững vàng không?<br />
-                      &nbsp;&nbsp;+ <em>Đại Hạn (Thời cuộc 10 năm):</em> Đang vào giai đoạn thuận buồm xuôi gió hay gặp trắc trở?<br />
-                      &nbsp;&nbsp;+ <em>Lưu Niên (Cơ hội cụ thể năm nay):</em> Năm nay có nên đầu tư, đổi việc, kết hôn hay nên giữ mình phòng thủ?
+                      - <strong>Đại Hạn quản 10 năm (Thời thế vĩ mô), Lưu Niên quản 1 năm (Biến cố vi mô):</strong> Lưu Niên cho biết cơ hội và hạn cụ thể của từng năm (ví dụ năm 2026 Bính Ngọ).<br />
+                      - <strong>Nguyên tắc 3 tầng:</strong><br />
+                      &nbsp;&nbsp;+ <em>Mệnh (Nội lực bản thân):</em> Bạn có đủ tài trí và bản lĩnh không?<br />
+                      &nbsp;&nbsp;+ <em>Đại Hạn (Thời thế 10 năm):</em> Đang vào giai đoạn thịnh vượng hay trắc trở?<br />
+                      &nbsp;&nbsp;+ <em>Lưu Niên (Cơ hội năm nay):</em> Năm nay có nên đầu tư, đổi nghề, lập gia đình hay giữ mình phòng thủ?
                     </p>
                   </div>
+                </div>
+              )}
 
-                  {/* Những yếu tố khác */}
-                  <div className="p-4 rounded-xl bg-stone-900 border border-stone-700 space-y-2">
-                    <div className="font-extrabold text-amber-300 flex items-center gap-2 text-sm">
-                      <span>🔮</span>
-                      <span>4. CÁC THÀNH PHẦN KHÁC TRÊN LÁ SỐ CẦN BIẾT:</span>
-                    </div>
-                    <p className="text-stone-300 text-xs leading-relaxed">
-                      - <strong>Tam Phương Tứ Chính:</strong> Tuyệt đối không xem 1 cung đơn lẻ! Đối Cung (xung chiếu) tác động tới 40%, 2 cung Tam Hợp (hội chiếu) tác động mỗi cung 30%.<br />
-                      - <strong>Cung Vô Chính Diệu:</strong> Cung không có chính tinh nào trong 14 sao lớn. Cung này linh hoạt, uyển chuyển, cần mượn sao của cung đối diện về để luận giải.<br />
-                      - <strong>Lục Sát Tinh (Kình, Đà, Hỏa, Linh, Không, Kiếp):</strong> Những ngôi sao rèn luyện bản lĩnh. Gặp cát tinh chế hóa thì bộc phát anh hùng, gặp hãm địa thì cần thận trọng phòng ngừa rủi ro.
-                    </p>
+              {guideTab === 'palace_map' && (
+                <div className="space-y-3.5 text-xs text-stone-200 leading-relaxed">
+                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
+                    💡 <strong>Bản Đồ 12 Cung Vị:</strong> Bạn đang băn khoăn về vấn đề gì trong cuộc sống? Hãy tra cứu bảng dưới đây và bấm vào nút <strong>[ 🎯 Bấm Xem Cung Này ]</strong> để hệ thống nhảy ngay đến cung vị đó và mở phân tích chi tiết:
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[55vh] overflow-y-auto pr-1">
+                    {[
+                      {
+                        name: 'CUNG MỆNH',
+                        badge: '🌟 Gốc Tiên Thiên',
+                        desc: 'Cốt cách, bản lĩnh, tư chất thông minh, ngoại hình và vận mệnh thời tiền vận (1–30 tuổi). Xem Mệnh là xem cái "gốc" của toàn bộ đời người.',
+                        match: (p: Palace) => p.isMingGong,
+                      },
+                      {
+                        name: 'CUNG THÂN',
+                        badge: '⚓ Hậu Vận Sau 30t',
+                        desc: 'Thành quả nỗ lực nửa đời sau (từ 30 tuổi trở đi), nơi an thân lập mệnh, phương hướng dồn tâm huyết của bạn.',
+                        match: (p: Palace) => p.isShenGong,
+                      },
+                      {
+                        name: 'CUNG QUAN LỘC',
+                        badge: '💼 Công Danh Sự Nghiệp',
+                        desc: 'Nghề nghiệp, con đường thăng tiến, quan chức, kinh doanh, công chức hay tự do, môi trường công tác và phong cách hành sự.',
+                        match: (p: Palace) => p.name === '官禄' || p.name.includes('官'),
+                      },
+                      {
+                        name: 'CUNG TÀI BẠCH',
+                        badge: '💰 Tiền Tài & Tài Lộc',
+                        desc: 'Khả năng kiếm tiền, nguồn tài chính, dòng tiền đầu tư, năng lực quản lý của cải, giữ được tiền hay hao tài tốn của.',
+                        match: (p: Palace) => p.name === '财帛' || p.name.includes('财'),
+                      },
+                      {
+                        name: 'CUNG PHU THÊ',
+                        badge: '💍 Hôn Nhân Tình Duyên',
+                        desc: 'Duyên nợ tình cảm, tính cách và diện mạo người bạn đời, thời điểm kết hôn, gia đạo êm ấm hay trắc trở thử thách.',
+                        match: (p: Palace) => p.name === '夫妻' || p.name.includes('夫妻'),
+                      },
+                      {
+                        name: 'CUNG ĐIỀN TRẠCH',
+                        badge: '🏡 Bất Động Sản Nhà Đất',
+                        desc: 'Nhà cửa, đất đai, bất động sản, cơ ngơi tích lũy, tài sản thừa kế từ gia tiên và phong thủy nơi sinh sống.',
+                        match: (p: Palace) => p.name === '田宅' || p.name.includes('田'),
+                      },
+                      {
+                        name: 'CUNG PHÚC ĐỨC',
+                        badge: '🕊️ Phúc Ấm & Tâm Linh',
+                        desc: 'Phúc đức tổ tiên dòng họ, tuổi thọ, sự bình an trong tâm hồn, mức độ thụ hưởng tinh thần và may mắn ngầm.',
+                        match: (p: Palace) => p.name === '福德' || p.name.includes('福'),
+                      },
+                      {
+                        name: 'CUNG THIÊN DI',
+                        badge: '✈️ Xuất Ngoại & Đi Xa',
+                        desc: 'Đi xa quê lập nghiệp, xuất ngoại, môi trường bên ngoài xã hội, đối nhân xử thế và sự đón nhận của người đời.',
+                        match: (p: Palace) => p.name === '迁移' || p.name.includes('迁'),
+                      },
+                      {
+                        name: 'CUNG TẬT ÁCH',
+                        badge: '🏥 Sức Khỏe & Thể Trạng',
+                        desc: 'Sức khỏe cơ thể, các tạng phủ dễ suy yếu, bệnh lý tiềm ẩn, tai ương và những điều cần chăm sóc phòng ngừa.',
+                        match: (p: Palace) => p.name === '疾厄' || p.name.includes('疾'),
+                      },
+                      {
+                        name: 'CUNG TỬ TỨC',
+                        badge: '👶 Con Cái & Hậu Duệ',
+                        desc: 'Đường con cái, khả năng sinh nở, tính cách tài năng của con, phúc lộc phụ dưỡng và sự hiếu thuận tuổi già.',
+                        match: (p: Palace) => p.name === '子女' || p.name.includes('子'),
+                      },
+                      {
+                        name: 'CUNG PHỤ MẪU',
+                        badge: '👨‍👩‍👦 Cha Mẹ & Phúc Gia Tộc',
+                        desc: 'Tình cảm với cha mẹ, sự chăm sóc giáo dưỡng, phúc lộc của phụ mẫu và mối tương quan gia đình ruột thịt.',
+                        match: (p: Palace) => p.name === '父母' || p.name.includes('父'),
+                      },
+                      {
+                        name: 'CUNG HUYNH ĐỆ',
+                        badge: '🤝 Anh Em & Bạn Chí Cốt',
+                        desc: 'Tình cảm anh chị em trong nhà, bạn bè tri kỷ chí cốt cùng chung lưng đấu cật khởi nghiệp làm ăn.',
+                        match: (p: Palace) => p.name === '兄弟' || p.name.includes('兄'),
+                      },
+                      {
+                        name: 'CUNG NÔ BỘC (GIAO HỮU)',
+                        badge: '👥 Đồng Nghiệp & Đối Tác',
+                        desc: 'Bạn bè xã giao, cấp dưới, nhân viên, đối tác làm ăn, mức độ được người khác phò trợ hay bị phản trắc.',
+                        match: (p: Palace) => p.name === '交友' || p.name === '奴仆' || p.name.includes('友') || p.name.includes('仆'),
+                      },
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 flex flex-col justify-between space-y-2 transition-all shadow"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span className="font-extrabold text-amber-300 text-xs">
+                              {item.name}
+                            </span>
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30">
+                              {item.badge}
+                            </span>
+                          </div>
+                          <p className="text-[11.5px] text-stone-300 leading-relaxed">
+                            {item.desc}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!chart) return;
+                            const target = chart.palaces.find(item.match);
+                            if (target) {
+                              setSelectedPalace(target);
+                              setRightTab('palace');
+                              setShowGuideModal(false);
+                            }
+                          }}
+                          className="w-full py-1.5 px-3 rounded-lg text-[11px] font-bold bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-amber-500/40 hover:border-amber-400 transition-all flex items-center justify-center gap-1"
+                        >
+                          <span>🎯</span>
+                          <span>Bấm Xem Cung Này Ngay</span>
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

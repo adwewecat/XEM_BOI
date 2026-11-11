@@ -73,6 +73,40 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 24: Bổ Sung Kết Luận Cốt Lõi Từng Cung Vị, Trợ Lý Tử Vi AI Đặt Câu Hỏi & Bản Đồ Hướng Dẫn 12 Cung (Bản Mệnh vs Cung Mệnh vs Cung Thân)
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. *Thiếu kết luận Cung Mệnh:* "CUNG Mệnh, tôi xem xong không thấy có kết luận , có lời khuyên nhưng không thấy có kết luận ở dưới, VD như Ý Nghĩa Cung Mệnh Cung:Cung Mệnh là hạt nhân tiên thiên của sinh mệnh, chủ về cốt cách, tính tình bẩm sinh, tài năng tiềm ẩn, ngoại hình và vận mệnh thời tiền vận (1–30 tuổi). Xem Mệnh là xem cái 'gốc' của toàn bộ đời người. Vậy ý nghĩa của mệnh cung người xem bói là gì , từ cái biểu đồ lá số tử vi đó thì cho ra được kết quả gì".
+  2. *Cần ô hỏi đáp chuyên sâu:* "phân tích chuyên sâu hoặc hỏi thêm thì nên có ô để hỏi thêm nhé".
+  3. *Làm rõ Bản mệnh, Cung mệnh, khi nào bấm cung nào:* "Bản mệnh , cung mệnh , khi nào thì bấm vào cung nào để xem, hướng dẫn tôi luôn nhé. chứ hơi mơ hồ".
+- **Phân tích vấn đề:**
+  1. *Chỉ có lý thuyết giáo khoa mà thiếu kết luận cho đương số:* Mục phân tích trước đây chỉ hiển thị định nghĩa chung chung về Cung Mệnh, danh sách sao và lời khuyên chung, người dùng không biết tóm lại mình là người thế nào, làm nghề gì thì đắc lộc, và tương lai ra sao.
+  2. *Không có cơ chế hỏi đáp mở rộng:* Người dùng có rất nhiều câu hỏi riêng về lá số (đại hạn, tiền bạc, ngành nghề, hôn nhân) nhưng không có chỗ để hỏi thêm.
+  3. *Mơ hồ giữa Bản Mệnh vs Cung Mệnh vs Cung Thân và không biết bấm cung nào:* Khái niệm ngũ hành nạp âm năm sinh (Bản Mệnh) và Cung Mệnh (Cung số 1) thường bị nhầm lẫn; người dùng không biết muốn xem đất đai, hôn nhân hay con cái thì phải bấm vào đâu.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Xây Dựng Engine Luận Đoán Cốt Lõi Từng Cung Vị (`synthesizePalaceVerdict` trong `lib/ziwei/vietnamese.ts`):**
+     - Đưa ra cấu trúc 5 tầng kết luận riêng biệt cho đương số (`PalaceCoreVerdict`):
+       * `verdictTitle`: Tiêu đề định vị cách cục (ví dụ: *Mệnh Tọa Cự Môn [Vượng] Tại Ngọ: Thạch Trung Ẩn Ngọc · Bậc Thầy Trí Tuệ & Hùng Biện*).
+       * `temperament`: Cốt cách & Khí chất tiên thiên bẩm sinh.
+       * `strengthsAndCareer`: Thế mạnh & Ngành nghề phát tài đắc lộc nhất.
+       * `challengesAndCautions`: Khảo nghiệm vận trình & Điểm cần tu dưỡng.
+       * `directConclusion`: Phán quyết định mệnh cốt tử trực diện.
+     - Phủ sóng toàn bộ 14 Chính tinh (Cự Môn, Tử Vi, Thiên Phủ, Thái Dương, Thái Âm, Thiên Cơ, Vũ Khúc, Sát Phá Tham, Vô Chính Diệu...), Lục Sát Tinh, Tứ Hóa và Tuần/Triệt.
+  2. **Tích Hợp Trợ Lý Tử Vi AI Hỏi Đáp Chuyên Sâu Ngay Trên Lá Số (`app/chart/page.tsx` & `/api/ai/divine`):**
+     - Bổ sung khối "🔮 TRỢ LÝ TỬ VI AI · LUẬN GIẢI CHUYÊN SÂU" ngay dưới phần phân tích cung.
+     - Sẵn sàng 5 gợi ý câu hỏi nhanh 1-click (Ý nghĩa tổng quan cung, Nghề nghiệp phát tài, Tình duyên hôn nhân, Đại hạn 10 năm, Cách cục đặc biệt).
+     - Ô nhập câu hỏi riêng và nút "Hỏi Thầy", kết nối trực tiếp với Google Gemini Pro thông qua máy chủ, tự động nạp toàn bộ dữ liệu lá số của đương số (Mệnh, Thân, Đại hạn, Tam phương tứ chính) làm bối cảnh để AI giải đoán chính xác 100%.
+  3. **Nâng Cấp Modal Cẩm Nang 3 Tab Đầy Đủ & Bản Đồ 12 Cung 1-Click (`app/chart/page.tsx`):**
+     - *Tab 1: 🧭 5 Bước Xem Nhanh:* Lộ trình chiêm nghiệm tuần tự từ Mệnh -> Tam phương -> Tứ hóa -> Đại hạn -> Cung chức năng.
+     - *Tab 2: 📖 Bản Mệnh · Cung Mệnh · Đại Hạn:* Phân biệt rành mạch:
+       + **Bản Mệnh (Ngũ Hành Nạp Âm):** Cốt chất ngũ hành gốc (Kim, Mộc, Thủy, Hỏa, Thổ) của năm sinh. Dùng để so sánh sinh khắc với Cục và hợp tuổi vợ chồng.
+       + **Cung Mệnh (Cung số 1):** Bộ Tổng Tư Lệnh quản lý tính cách, trí tuệ, diện mạo và tiền vận 1–30 tuổi.
+       + **Cung Thân:** Hậu vận sau 30 tuổi, nơi an thân lập mệnh nửa đời sau.
+       + **Đại Hạn 10 Năm:** Cung Mệnh lâm thời của từng chặng đường 10 năm.
+     - *Tab 3: 🗺️ Bản Đồ 12 Cung - Bấm Đâu Để Xem?:* Bảng tra cứu toàn diện 12 cung + Thân cư + Đại hạn hiện tại với nút bấm `[ 🎯 Bấm Xem Cung Này Ngay ]` giúp người dùng chuyển cung tức thì chỉ với 1 nhấp chuột.
+  4. **Kiểm Thử & Đóng Gói:**
+     - 17/17 test suites hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 238 routes tĩnh PASS 100%.
+
 ### [2026-11-11] - Đợt 23: Cấu Hình Gemini AI Tập Trung Dùng Chung Toàn Hệ Thống, Bảo Mật Riêng Biệt Dành Cho Quản Trị Viên (Admin)
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "Cấu hình gemini sẽ cấu hình 1 lần và dùng chung nhé, , và chỉ admin mới được cấu hình chứ sao ai cũng được cấu hình".

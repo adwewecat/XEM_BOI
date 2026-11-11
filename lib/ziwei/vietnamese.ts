@@ -631,6 +631,193 @@ Thời điểm này bản mệnh nên giữ tâm thế điềm tĩnh, sáng su�
   return `Lá số bản mệnh an Mệnh tại cung ${mingBranchVi}, ${mingStarsStr}, nạp âm ${juVi}. Cuộc đời nhiều cơ duyên cát lành, nên vững tâm phát triển tài đức.`;
 }
 
+export interface PalaceCoreVerdict {
+  verdictTitle: string;
+  temperament: string;
+  strengthsAndCareer: string;
+  challengesAndCautions: string;
+  directConclusion: string;
+}
+
+/**
+ * Tổng hợp kết luận giải đoán cốt lõi chuyên sâu độc bản cho cung vị
+ */
+function synthesizePalaceVerdict(palace: Palace, chart: ZiweiChart): PalaceCoreVerdict {
+  const majors = palace.stars.filter(s => s.type === 'major').map(s => s.name);
+  const shas = palace.stars.filter(s => s.type === 'sha').map(s => s.name);
+  const luckies = palace.stars.filter(s => s.type === 'lucky').map(s => s.name);
+
+  const hasTriet = palace.stars.some(s => s.name.includes('截') || s.name === 'Triệt' || s.name === '截空' || s.name === '副截');
+  const hasTuan = palace.stars.some(s => s.name.includes('旬') || s.name === 'Tuần' || s.name === '旬空' || s.name === '副旬');
+  const hasHoaKy = palace.stars.some(s => s.siHua === '忌');
+  const hasHoaLoc = palace.stars.some(s => s.siHua === '禄');
+  const hasHoaQuyen = palace.stars.some(s => s.siHua === '权');
+  const hasHoaKhoa = palace.stars.some(s => s.siHua === '科');
+
+  const pName = palace.name;
+
+  if (pName === '命宫') {
+    // ─── LUẬN GIẢI CHUYÊN SÂU CUNG MỆNH ───
+    if (majors.includes('巨门')) {
+      const isNgoOrTy = palace.branch === 6 || palace.branch === 0;
+      return {
+        verdictTitle: isNgoOrTy
+          ? 'MỆNH CÁCH "THẠCH TRUNG ẨN NGỌC" (ĐÁ QUÝ GIẤU TRONG NGỌC) · KHẨU TÀI TRÍ TUỆ'
+          : 'MỆNH CÁCH "CỰ MÔN ĐỘC TỌA" · TƯ DUY SẮC BÉN & PHẢN BIỆN CAO MINH',
+        temperament: 'Sao Cự Môn tọa thủ Mệnh Cung là biểu tượng của chiều sâu tư duy, trí tuệ phản biện, trực giác sắc bén và năng lực ngôn ngữ vượt bậc. Đương số là người có chiều sâu nội tâm, không thích a dua xu nịnh, nhìn thấu bản chất vấn đề, tư duy logic chặt chẽ và luôn giữ vững lập trường độc lập.',
+        strengthsAndCareer: 'Khẩu tài (tài ăn nói), óc phân tích và năng lực đàm phán là vũ khí tối thượng của bạn. Rất đắc lợi trong các lĩnh vực: Chuyên gia tư vấn chiến lược, Luật sư, Giảng viên đại học, Nghiên cứu khoa học, Đàm phán thương mại, Công nghệ phân tích dữ liệu, Truyền thông hoặc Ngoại giao.',
+        challengesAndCautions: hasTriet || hasTuan || shas.length > 0 || hasHoaKy
+          ? 'Cung Mệnh gặp Triệt/Tuần hoặc Sát tinh: Thời tiền vận (trước 30 tuổi) sẽ có giai đoạn lận đận, hay gặp phải thị phi, hiểu lầm hoặc cảm giác tài năng chưa được công nhận xứng đáng. Đây là giai đoạn tôi luyện ngọc thô; cần nhẫn nhịn, dùng thực lực và chuyên môn sâu để chứng minh, tránh sa đà vào tranh cãi hơn thua.'
+          : 'Cần chú ý cẩn trọng lời ăn tiếng nói khi phát biểu, tránh quá thẳng thắn khiến tiểu nhân sinh lòng đố kỵ.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Đương số là bậc kỳ tài "Ngọc ẩn trong đá" — Tiền vận tự lực cánh sinh lập nghiệp từ hai bàn tay trắng, tích lũy nội lực vượt qua thị phi; khi vượt qua mốc 30 tuổi bước sang Thân Cung (Thái Dương), ngọc trong đá sẽ phát quang rực rỡ, danh tài song thu, công thành danh toại!',
+      };
+    }
+
+    if (majors.includes('紫微') || majors.includes('天府')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "ĐẾ TINH TÔN QUÝ" · KHÍ PHÁCH LÃNH ĐẠO ĐƯỜNG HOÀNG',
+        temperament: 'Tử Vi / Thiên Phủ tại Mệnh là đấng quân tử tiên thiên, phong thái đĩnh đạc, bao dung, có tư chất người đứng đầu, tính tình điềm đạm và trọng chữ tín.',
+        strengthsAndCareer: 'Có năng khiếu quản trị vĩ mô, quy tụ lòng người. Phù hợp làm lãnh đạo doanh nghiệp, cơ quan quản lý nhà nước, tài chính ngân hàng, điều hành tổ chức lớn.',
+        challengesAndCautions: 'Cần tránh tính cách tự cao, áp đặt quan điểm lên người khác; nên lắng nghe cấp dưới để quy tụ nhân tài.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Đương số mang số mệnh lãnh đạo và kiến tạo, cuộc đời có quý nhân nâng đỡ, tự thân tạo dựng cơ đồ hiển vinh bền vững.',
+      };
+    }
+
+    if (majors.includes('太阳')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "NHẬT QUANG MINH HIỂN" · NHIỆT HUYẾT QUANG ĐẠI',
+        temperament: 'Thái Dương thủ Mệnh chủ về lòng dạ quang minh chính đại, khẳng khái, nhiệt tình giúp đỡ người khác, có chí hướng vươn cao.',
+        strengthsAndCareer: 'Hợp các ngành giáo dục, pháp luật, truyền thông, chính trị, tổ chức sự kiện, ngoại giao hoặc làm chủ thương hiệu riêng.',
+        challengesAndCautions: 'Tính tình bộc trực đôi khi dễ bị kẻ xấu lợi dụng lòng tốt; cần giữ sự kín đáo trong các quyết định kinh doanh lớn.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Vận mệnh tỏa sáng rực rỡ như vầng thái dương, tài năng bộc lộ sớm, danh tiếng vang xa, hậu vận an khang phú quý.',
+      };
+    }
+
+    if (majors.includes('太阴')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "NGUYỆT LÃNG THIÊN MÔN" · PHÚ TÚC TÀI KHÍ THÂM SÂU',
+        temperament: 'Thái Âm thủ Mệnh là người dịu dàng, nội tâm sâu lắng, tinh tế, có mắt thẩm mỹ và năng lực quan sát tỉ mỉ.',
+        strengthsAndCareer: 'Rất có duyên với bất động sản, tài chính kế toán, nghệ thuật, sáng tạo nội dung, nhân sự hoặc kinh doanh tiêu dùng.',
+        challengesAndCautions: 'Đôi khi đa sầu đa cảm, thiếu quyết đoán trong thời khắc then chốt; cần rèn luyện tính dứt khoát.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Càng về hậu vận tài sản càng tích lũy dồi dào, cuộc sống sung túc an nhàn, điền sản đất đai phì nhiêu.',
+      };
+    }
+
+    if (majors.includes('天机')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "THIÊN PHÚC MƯU LƯỢC" · TRÍ TUỆ NHẠY BÉN BẬC THẦY',
+        temperament: 'Thiên Cơ là sao trí tuệ, cơ biến khôn lường, thích tìm tòi sáng tạo, tính tình hiền lành và tư duy mưu lược.',
+        strengthsAndCareer: 'Phù hợp làm chiến lược gia, kỹ sư công nghệ, phân tích tài chính, cố vấn cấp cao, nghiên cứu học thuật.',
+        challengesAndCautions: 'Nghĩ nhiều hơn làm, hay lo xa thái quá; cần kiên trì bám đuổi một mục tiêu thay vì phân tán sức lực.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Lấy chất xám và trí tuệ làm vốn liếng vô giá, chuyển bại thành thắng nhờ tài ứng biến linh hoạt.',
+      };
+    }
+
+    if (majors.includes('武曲')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "VŨ TÀI CƯƠNG NGHỊ" · BẢN LĨNH DỰNG CƠ ĐỒ',
+        temperament: 'Vũ Khúc là tài tinh kiêm võ tinh, cương trực, dứt khoát, trọng lời hứa, có bản lĩnh thương trường và tính tự lập rất cao.',
+        strengthsAndCareer: 'Kinh doanh, đầu tư tài chính, ngân hàng, công nghệ chế tạo, quản lý chuỗi cung ứng, điều hành sản xuất.',
+        challengesAndCautions: 'Tính tình có phần khô khan, ít bộc lộ tình cảm; cần mềm mỏng hơn trong gia đạo và các mối quan hệ thân tình.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Đương số là người tự lực cánh sinh kiệt xuất, tay trắng làm nên cơ nghiệp, tài vận vững bền.',
+      };
+    }
+
+    if (majors.includes('七杀') || majors.includes('破军')) {
+      return {
+        verdictTitle: 'MỆNH CÁCH "SÁT PHÁ CAN TRƯỜNG" · TIÊN PHONG BỨT PHÁ MỞ LỐI',
+        temperament: 'Dũng mãnh, dám nghĩ dám làm, không chịu gò bó theo khuôn mẫu cũ, thích mạo hiểm và có ý chí sắt đá vượt qua mọi nghịch cảnh.',
+        strengthsAndCareer: 'Khởi nghiệp sáng lập công ty, mở rộng thị trường mới, công nghệ đột phá, quân đội, thể thao hoặc quản trị rủi ro.',
+        challengesAndCautions: 'Cuộc đời có nhiều bước ngoặt thăng trầm; cần học chữ "Nhẫn" và chuẩn bị nguồn lực tài chính phòng bị vững vàng.',
+        directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Người làm nên nghiệp lớn từ sóng gió, càng gặp khó khăn bản lĩnh càng phi thường, lập nên kỳ tích hiển hách.',
+      };
+    }
+
+    // Mặc định hoặc Vô Chính Diệu
+    return {
+      verdictTitle: majors.length === 0
+        ? 'MỆNH CÁCH "HƯ LINH THÍCH ỨNG" · UYỂN CHUYỂN MƯỢN LỰC THỜI THẾ'
+        : 'MỆNH CÁCH BẢN THÂN · CỐT CÁCH TRUNG CHÍNH KHỞI SẮC',
+      temperament: 'Linh hoạt, nhạy bén với sự thay đổi của môi trường, có khả năng dung nạp nhiều quan điểm và dễ dàng thích nghi với thời cuộc.',
+      strengthsAndCareer: 'Môi giới, kết nối đối tác, ngoại giao, tư vấn trung gian, dịch vụ đa ngành và phát triển kinh doanh.',
+      challengesAndCautions: 'Cần tìm cho mình một người thầy hoặc hệ giá trị vững chắc làm kim chỉ nam để không bị chao đảo theo hoàn cảnh.',
+      directConclusion: 'Ý NGHĨA BẢN MỆNH CỐT TỬ: Đương số biết mượn sức gió để đẩy thuyền, khéo léo biến nguồn lực bên ngoài thành thành tựu của chính mình.',
+    };
+  }
+
+  // ─── CÁC CUNG VỊ KHÁC ───
+  if (pName === '夫妻') {
+    return {
+      verdictTitle: 'DUYÊN NỢ HÔN NHÂN & HÒA HỢP BẠN ĐỜI',
+      temperament: 'Cung Phu Thê phản ánh nhân duyên, phong thái và tính cách của người phối ngẫu cũng như mức độ tương thích trong đời sống gia đạo.',
+      strengthsAndCareer: 'Bạn đời là người có cá tính độc lập, có năng lực chuyên môn riêng, hỗ trợ đắc lực cho con đường phát triển của đương số.',
+      challengesAndCautions: hasTriet || shas.length > 0 || hasHoaKy
+        ? 'Có dấu hiệu khảo nghiệm tình cảm: Nên kết hôn muộn (sau 28-30 tuổi) hoặc trải qua một vài mối tình thời trẻ để chín chắn hơn, giúp hôn nhân sau này trăm năm bền vững.'
+        : 'Cần lắng nghe và tôn trọng không gian riêng tư của nhau, tránh áp đặt suy nghĩ cá nhân.',
+      directConclusion: 'Ý NGHĨA CUNG PHU THÊ: Vợ chồng cùng chung hoạn nạn mới thấu hiểu chân tình; càng đồng lòng chia sẻ thì gia đạo càng hưng vượng.',
+    };
+  }
+
+  if (pName === '官禄') {
+    return {
+      verdictTitle: 'CÔNG DANH SỰ NGHIỆP & ĐƯỜNG TIẾN THÂN',
+      temperament: 'Phản ánh chí hướng sự nghiệp, phong cách làm việc và vị trí xã hội của đương số trong cuộc đời.',
+      strengthsAndCareer: 'Năng lực chuyên môn vững vàng, có tinh thần trách nhiệm cao, thích hợp với các vị trí quản lý hoặc chuyên gia nòng cốt.',
+      challengesAndCautions: 'Tránh nôn nóng nhảy việc khi chưa chuẩn bị đủ nguồn lực; cần tích lũy quan hệ tốt với cấp trên và cộng sự.',
+      directConclusion: 'Ý NGHĨA CUNG QUAN LỘC: Sự nghiệp phát triển bền vững theo từng nấc thang, nỗ lực phấn đấu ắt gặt hái thành tựu danh giá.',
+    };
+  }
+
+  if (pName === '财帛') {
+    return {
+      verdictTitle: 'TÀI LỘC VƯỢNG TƯỚNG & DÒNG TIỀN KINH DOANH',
+      temperament: 'Phản ánh năng lực tài chính, phương thức kiếm tiền và mức độ giữ gìn của cải của đương số.',
+      strengthsAndCareer: 'Dòng tiền có sự lưu chuyển sinh lời, thích hợp phát triển các kênh thu nhập từ kỹ năng chuyên môn và đầu tư bền vững.',
+      challengesAndCautions: 'Cần quản lý rủi ro chặt chẽ, tránh đầu cơ mạo hiểm vào những kênh không am hiểu.',
+      directConclusion: 'Ý NGHĨA CUNG TÀI BẠCH: Tiền tài tích lũy từ bàn tay và khối óc, càng biết tái đầu tư hợp lý thì tài khố càng sung túc.',
+    };
+  }
+
+  if (pName === '田宅') {
+    return {
+      verdictTitle: 'BẤT ĐỘNG SẢN & CƠ NGHIỆP ĐIỀN SẢN',
+      temperament: 'Phản ánh năng lực tích lũy tài sản cố định, nhà đất, không gian sống và phong thủy gia trạch.',
+      strengthsAndCareer: 'Có duyên sở hữu nhà đất riêng, tích lũy điền sản làm của để dành vững chắc cho hậu thế.',
+      challengesAndCautions: 'Khi mua bán giao dịch bất động sản cần rà soát kỹ lưỡng giấy tờ pháp lý và quy hoạch.',
+      directConclusion: 'Ý NGHĨA CUNG ĐIỀN TRẠCH: Đất đai nhà cửa là bến đỗ bình an, càng về sau càng gia tăng giá trị tài sản cố định.',
+    };
+  }
+
+  if (pName === '迁移') {
+    return {
+      verdictTitle: 'XUẤT NGOẠI & QUAN HỆ MÔI TRƯỜNG NGOÀI',
+      temperament: 'Phản ánh sự may mắn khi đi xa quê hương, hoạt động ngoại giao và sự tương trợ của môi trường xã hội.',
+      strengthsAndCareer: 'Càng ra ngoài giao thiệp càng gặp nhiều quý nhân, có duyên công tác xa hoặc định cư phát triển ở các thành phố lớn/nước ngoài.',
+      challengesAndCautions: 'Khi đi lại đường sá cần chú ý an toàn giao thông và thích ứng nhanh với văn hóa địa phương.',
+      directConclusion: 'Ý NGHĨA CUNG THIÊN DI: Động thái hướng ngoại mang lại nhiều bước ngoặt đột phá cho vận mệnh đương số.',
+    };
+  }
+
+  if (pName === '疾厄') {
+    return {
+      verdictTitle: 'SỨC KHỎE NGŨ HÀNH & ĐIỀU DƯỠNG THÂN TÂM',
+      temperament: 'Phản ánh thể chất tiên thiên và những tạng phủ ngũ hành cần được chú trọng bảo dưỡng trong đời sống.',
+      strengthsAndCareer: 'Thể trạng nhìn chung có sức đề kháng tự nhiên tốt nếu duy trì lối sống lành mạnh.',
+      challengesAndCautions: 'Cần chú ý cân bằng giữa làm việc và nghỉ ngơi, tránh lao lực kéo dài ảnh hưởng hệ thần kinh và tiêu hóa.',
+      directConclusion: 'Ý NGHĨA CUNG TẬT ÁCH: Thân an thì tâm mới định, dưỡng sinh điều độ là chìa khóa thọ mạng trường cửu.',
+    };
+  }
+
+  // Cung vị chung
+  return {
+    verdictTitle: `LUẬN ĐOÁN CUNG ${getPalaceName(palace.name).vi.toUpperCase()}`,
+    temperament: 'Cung vị mang năng lượng cát tường hài hòa, tương tác tích cực với toàn bộ bố cục lá số.',
+    strengthsAndCareer: 'Phát huy tinh thần hợp tác, kết nối hài hòa các mối quan hệ nhân duyên.',
+    challengesAndCautions: 'Cần duy trì tâm thế khiêm nhường, dĩ hòa vi quý để giữ trọn vẹn phúc khí.',
+    directConclusion: `Ý NGHĨA CỐT TỬ: Cung ${getPalaceName(palace.name).vi} đóng góp vào sự vẹn toàn của cuộc đời đương số, thuận thời hành sự ắt an khang.`,
+  };
+}
+
 /**
  * Luận giải chi tiết một Cung vị cụ thể trên lá số Tử Vi (chuẩn phái Thiên Kỷ Nghê Hải Hà)
  */
@@ -645,6 +832,7 @@ export function generatePalaceAnalysis(palace: Palace, chart: ZiweiChart): {
   shaStarsText: string;
   sanFangText: string;
   advice: string;
+  coreVerdict: PalaceCoreVerdict;
 } {
   const palaceInfo = getPalaceName(palace.name);
   const ganzhiInfo = getGanzhiName(palace.stem, palace.branch);
@@ -737,6 +925,9 @@ export function generatePalaceAnalysis(palace: Palace, chart: ZiweiChart): {
     advice = 'Theo đạo lý Thiên Kỷ Nghê Hải Hà: "Số mệnh chưa bao giờ là định đoạt tuyệt đối. Người hiểu mệnh để hành xử thuận thời, biến nguy thành an, dưỡng tâm lập mệnh".';
   }
 
+  // 7. Tổng hợp Kết luận giải đoán cốt lõi độc bản
+  const coreVerdict = synthesizePalaceVerdict(palace, chart);
+
   return {
     palaceNameVi,
     ganzhiVi: ganzhiInfo.vi,
@@ -748,5 +939,6 @@ export function generatePalaceAnalysis(palace: Palace, chart: ZiweiChart): {
     shaStarsText,
     sanFangText,
     advice,
+    coreVerdict,
   };
 }
