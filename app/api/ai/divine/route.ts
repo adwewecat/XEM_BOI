@@ -114,8 +114,15 @@ Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;
 
     // Thử gọi các model của Gemini API theo thứ tự ưu tiên (ưu tiên model quản trị viên đã chọn)
     const preferredModel = config.geminiModel || 'gemini-3.6-flash';
-    const fallbackList = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'].filter(m => m !== preferredModel);
-    const modelsToTry = [preferredModel, ...fallbackList];
+    // Danh sách các model chính thức 2026 hỗ trợ sinh nội dung cho API key này
+    const VALID_FALLBACK_MODELS = [
+      'gemini-3.6-flash',
+      'gemini-3.8-flash',
+      'gemini-3.7-flash',
+      'gemini-flash-latest',
+      'gemini-2.5-flash',
+    ];
+    const modelsToTry = [preferredModel, ...VALID_FALLBACK_MODELS.filter((m) => m !== preferredModel)];
     let lastError = '';
     let responseText = '';
 
@@ -144,7 +151,11 @@ Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          lastError = errData?.error?.message || `HTTP ${res.status} ${res.statusText}`;
+          const errMsg = errData?.error?.message || `HTTP ${res.status} ${res.statusText}`;
+          // Lưu lỗi của preferredModel làm ưu tiên hiển thị nếu thất bại
+          if (!lastError || model === preferredModel) {
+            lastError = `[${model}] ${errMsg}`;
+          }
           continue; // thử model tiếp theo nếu có lỗi
         }
 
@@ -155,7 +166,10 @@ Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;
           break; // thành công
         }
       } catch (err: unknown) {
-        lastError = err instanceof Error ? err.message : String(err);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (!lastError || model === preferredModel) {
+          lastError = `[${model}] ${errMsg}`;
+        }
       }
     }
 

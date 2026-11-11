@@ -73,6 +73,28 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 27: Sửa Triệt Để Lỗi Gemini AI Fallback Khai Tử 1.5 Pro, Khắc Phục Lỗi Regex Tiếng Việt Bị Lẫn Vào Nhân Duyên & Thêm Chiêm Thiên Thời
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "kiểm tra kết nối thành công nhưng mà vẫn lỗi" (Kèm ảnh: Bói câu hỏi "hôm nay thời tiết thế nào" -> Báo lỗi đỏ `models/gemini-1.5-pro is not found`, bên dưới phán nhầm thành nhân duyên; trang Admin kiểm tra kết nối thành công).
+- **Nguyên nhân cốt lõi phát hiện:**
+  1. *Lỗi Fallback model đã bị Google khai tử:* API key dạng mới 2026 của người dùng (`AQ.Ab8R••••Os3A`) không còn cấp quyền hoặc đã loại bỏ các model cũ (`gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.0-flash`). Khi gọi API, nếu `fallbackList` chứa các model cũ này, lỗi 404 của model cuối cùng `gemini-1.5-pro` đã ghi đè vào `lastError`, hiển thị thông báo gây hoang mang cho người dùng.
+  2. *Bug Regex Substring tiếng Việt:* Trong `lib/metaphysics/dongtam.ts`, regex `isLove` có chứa pattern `|ế|`. Từ "thời tiết" chứa âm "tiết" (có ký tự "ế"), dẫn đến câu hỏi về thời tiết bị nhận nhầm 100% thành tình duyên / nhân duyên.
+  3. *Thiếu miền Chiêm Thiên Thời / Thời Tiết:* Dịch lý Lục Hào truyền thống có chuyên đề chiêm thiên thời (mưa, nắng, gió bão, sấm chớp) nhưng engine chưa có intent riêng cho chủ đề này.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Cập Nhật Toàn Bộ Mô Hình AI 2026 Hợp Lệ (`app/api/ai/divine/route.ts` & `app/admin/page.tsx`):**
+     - Đặt `gemini-3.6-flash` làm model mặc định số 1.
+     - Cập nhật danh sách fallback chuẩn 2026: `['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-flash-latest', 'gemini-2.5-flash']`. Loại bỏ vĩnh viễn các model cũ `1.5-pro`, `1.5-flash`, `2.0-flash`.
+     - Giữ nguyên lỗi ưu tiên của preferredModel thay vì bị đè bởi model phụ.
+     - Cập nhật giao diện Quản trị viên (`/admin`) với các tùy chọn model mới nhất.
+  2. **Khắc Phục Dứt Điểm Regex Substring & Bổ Sung Chiêm Thiên Thời (`lib/metaphysics/dongtam.ts`):**
+     - Sửa `isLove`: thay `|ế|` thành `/(bị ế|thoát ế|ở vậy|\bế\b)/i` với ranh giới từ ngữ, không thể ăn nhầm vào các từ có vần "iết" hay "tế".
+     - Bổ sung intent `isWeather` (thời tiết, mưa, nắng, bão, dông...): Dụng Thần lấy `Phụ Mẫu (Mây Mưa, Sương Tuyết) phối Hào Thế (Khí Quyển Xung Quanh)`.
+     - Luận giải Bát Quái chuẩn xác: Ly Hỏa (nắng ráo, hanh khô), Khảm Thủy / Đoài Trạch (mưa ẩm, mây mù), Chấn Lôi / Tốn Phong (dông gió, sấm sét), Càn Khôn Cấn (quang đãng, râm mát).
+  3. **Bổ Sung Bài Test Hồi Quy & Kiểm Thử Toàn Diện (`scripts/regression/dongtam-intent.test.ts`):**
+     - Thêm bài test hồi quy tự động kiểm tra `isWeather`, `isLove`, `isContactOrNews`, `isPastLife`.
+     - 18/18 test suites PASS 100%. `npm run typecheck` 0 lỗi. `npm run build` 238 routes PASS.
+     - Khởi động lại máy chủ Next.js và test endpoint thực tế: Phản hồi HTTP 200, trả lời chính xác câu hỏi thời tiết.
+
 ### [2026-11-11] - Đợt 26: Khắc Phục Triệt Để Trùng Dụng Thần & Rập Khuôn Kết Luận Trong Bói Động Tâm, Đưa Khối AI Gemini Lên Vị Trí Trung Tâm
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "BÓI HỮU duyên tôi bói thử 2 câu, đều kết luận y chang , dụng thần chiêm đoán cũng y chang" (Kèm ảnh: Câu hỏi "NAY HOTLINE CÓ GỌI CHO TÔI NHIỀU KHÔNG" -> Dụng Thần rơi vào Thế Hào và ra câu văn mẫu cũ).

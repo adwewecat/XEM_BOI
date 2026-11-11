@@ -326,9 +326,9 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
                   { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash ⭐', desc: 'Mới nhất 2026 · Siêu tốc độ, suy luận cực kỳ thông minh' },
+                  { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', desc: 'Thế hệ mới 2026 · Đỉnh cao phân tích và nhạy bén' },
+                  { id: 'gemini-flash-latest', name: 'Gemini Flash Latest', desc: 'Tự động sử dụng bản Flash mới nhất của Google' },
                   { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Bản ổn định cao cấp, phản hồi nhanh nhạy và chuẩn xác' },
-                  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', desc: 'Rất nhanh, ổn định cao, miễn phí dồi dào' },
-                  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', desc: 'Suy luận dịch lý siêu sâu, chất lượng cao' },
                 ].map((m) => (
                   <button
                     key={m.id}

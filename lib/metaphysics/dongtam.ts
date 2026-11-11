@@ -432,6 +432,7 @@ export function castDongTam(
   const qClean = question.trim().toLowerCase();
 
   const isPastLife = /(kiếp trước|tiền kiếp|kiếp sau|tiền duyên|luân hồi|linh hồn|sứ mệnh|túc mệnh|túc nghiệp|căn duyên|tâm linh|chân ngã|nhân quả|đầu thai|nghiệp duyên|tu tập|kiếp xưa|túc duyên)/i.test(qClean);
+  const isWeather = /(thời tiết|trời mưa|trời nắng|mưa to|mưa rào|nắng gắt|dự báo thời tiết|bão|gió bão|khí hậu|dông bão|áp thấp|ngập lụt|trời lạnh|trời nóng|nhiệt độ|không khí|mưa không|nắng không|\bmưa\b|\bnắng\b|\bbão\b)/i.test(qClean);
   const isContactOrNews = /(hotline|gọi|cuộc gọi|điện thoại|alo|nhắn tin|tin nhắn|sms|zalo|inbox|chat|email|gửi thư|thư từ|tin tức|thông báo|kết quả|phản hồi|hồi âm|liên lạc|liên hệ|gọi điện|nghe máy|bắt máy|trả lời tin|ai gọi)/i.test(qClean);
   const isBusinessCustomers = /(khách|khách hàng|khách mua|đơn hàng|chốt đơn|bán hàng|đông khách|vắng khách|ế ẩm|đắt khách|lượng khách|doanh số|mua hàng|order)/i.test(qClean);
   const isDailyLuck = /(hôm nay|ngày nay|nay|ngày mai|hôm nay thế nào|may mắn không|vận may|vận khí ngày|ngày tốt|ngày xấu)/i.test(qClean);
@@ -439,7 +440,7 @@ export function castDongTam(
   const isProperty = /(nhà đất|bất động sản|mua nhà|bán nhà|mua đất|bán đất|thuê nhà|thuê phòng|mặt bằng|chung cư|phong thủy nhà|căn hộ|đất đai)/i.test(qClean);
   const isCareer = /(công việc|đi làm|xin việc|phỏng vấn|thăng chức|tăng lương|đổi việc|nhảy việc|nghỉ việc|chuyển việc|bỏ việc|sếp|đồng nghiệp|công ty|dự án|chức vụ|tuyển dụng|hồ sơ|thi cử|kỳ thi|đi thi|thi đỗ|thi đậu|thi rớt|bằng lái|bằng cấp|học hành|điểm thi|đậu đại học|thi qua|thi tuyển|deal lương)/i.test(qClean);
   const isWealth = /(tiền|tài chính|tài lộc|kinh doanh|làm ăn|buôn bán|đầu tư|chứng khoán|đòi nợ|vay tiền|mượn tiền|lãi suất|lời lỗ|hợp đồng kinh tế|giàu|có giàu không|trúng số|vé số|tiền bạc|kiếm tiền|phát tài|nợ nần|trả nợ|đầu tư đất|coin|crypto)/i.test(qClean);
-  const isLove = /(tình duyên|tình cảm|yêu|người yêu|hẹn hò|đi hẹn hò|kết hôn|cưới|lấy chồng|lấy vợ|ly hôn|chia tay|quay lại|tỏ tình|bạn gái|bạn trai|crush|thích tôi|người ấy|bồ|vợ chồng|hôn nhân|gia đạo|ế|thoát ế|độc thân|tương tư)/i.test(qClean);
+  const isLove = /(tình duyên|tình cảm|yêu đương|\byêu\b|người yêu|hẹn hò|kết hôn|cưới xin|\bcưới\b|lấy chồng|lấy vợ|ly hôn|chia tay|quay lại|tỏ tình|bạn gái|bạn trai|crush|thích tôi|người ấy|\bbồ\b|vợ chồng|hôn nhân|gia đạo|bị ế|thoát ế|ở vậy|\bế\b|độc thân|tương tư)/i.test(qClean);
   const isHealth = /(sức khỏe|bệnh tật|ốm đau|nằm viện|nhập viện|đi khám|khám bệnh|mổ|phẫu thuật|thuốc|bác sĩ|ung thư|viêm|phổi|tim|sốt|đau|khỏi bệnh|suy nhược|mệt mỏi|người già|người lớn tuổi)/i.test(qClean);
   const isTravel = /(xuất hành|đi lại|lộ trình|xe cộ|tàu xe|máy bay|du lịch|du học|đi xa|về quê|chuyển nhà|chuyển chỗ|chuyến đi|lên đường|đường sá|an toàn giao thông)/i.test(qClean);
   const isLawsuit = /(kiện|kiện cáo|tranh chấp|tòa án|pháp luật|công an|thưa gửi|bồi thường|tranh giành|chia tài sản)/i.test(qClean);
@@ -476,6 +477,37 @@ export function castDongTam(
     } else {
       directConclusion = `Về câu hỏi "${question.trim()}": TIỀN THÂN CỦA BẠN TỪNG LÀ NGƯỜI GÁNH VÁC TRỌNG TRÁCH LỚN HOẶC TRẢI QUA NHIỀU BIẾN ĐỘNG TÌNH CẢM; KIẾP NÀY BÀI HỌC CỐT LÕI LÀ BUÔNG BỎ ÁP LỰC, CHỮA LÀNH TÂM HỒN VÀ SỐNG VÌ CHÍNH MÌNH.`;
       dichLyDetails = `Quẻ ${originalName} chuyển hóa sang ${changedName} là biểu tượng của sự thanh lọc và giải nghiệp. Dư âm tiền kiếp mách bảo bạn hãy sống vị tha, lắng nghe nội tâm và hướng thiện để mở ra vận trình tươi sáng.`;
+    }
+
+  } else if (isWeather) {
+    subject = 'Phụ Mẫu (Mây Mưa, Sương Tuyết) phối Hào Thế (Khí Quyển Xung Quanh)';
+    targetName = 'Khí hậu / Thời tiết / Mây mưa sấm chớp';
+    ungKy = 'Trong các khung giờ tiếp theo của ngày hôm nay';
+
+    const isWater = changedUpperTrigram.vi === 'Thủy' || changedUpperTrigram.vi === 'Trạch' || changedLowerTrigram.vi === 'Thủy' || changedLowerTrigram.vi === 'Trạch';
+    const isFire = changedUpperTrigram.vi === 'Hỏa' || changedLowerTrigram.vi === 'Hỏa';
+    const isThunderWind = changedUpperTrigram.vi === 'Lôi' || changedUpperTrigram.vi === 'Phong' || changedLowerTrigram.vi === 'Lôi' || changedLowerTrigram.vi === 'Phong';
+
+    if (isWater) {
+      state = 'Thủy Khí Dồi Dào, Mây Mù Kéo Đến, Dễ Có Mưa';
+      explanation = 'Chiêm thời tiết lấy hào Phụ Mẫu làm mây mưa sương tuyết. Quẻ có Khảm Thủy hoặc Đoài Trạch chủ về mưa ẩm.';
+      directConclusion = `Về thời tiết "${question.trim()}": TRỜI NHIỀU MÂY, KHẢ NĂNG CAO CÓ MƯA (HOẶC MƯA RÀO RẢI RÁC), ĐỘ ẨM KHÔNG KHÍ TĂNG; NÊN MANG THEO ÁO MƯA HAY DÙ KHI RA NGOÀI.`;
+      dichLyDetails = `Quẻ gốc ${originalName} động hào ${movingLine} biến ${changedName}. Tượng Thủy/Trạch ngưng tụ thành mây và dễ sinh mưa gió trong ngày.`;
+    } else if (isThunderWind) {
+      state = 'Phong Lôi Giao Động, Gió Lớn & Dông Sét';
+      explanation = 'Chiêm thời tiết gặp quẻ có Chấn Lôi và Tốn Phong chủ về sấm sét, dông gió hoặc thời tiết chuyển biến đột ngột.';
+      directConclusion = `Về thời tiết "${question.trim()}": THỜI TIẾT BIẾN ĐỘNG MẠNH, DỄ CÓ GIÓ TO, DÔNG GIẬT HOẶC SẤM CHỚP ĐỘT NGỘT; SAU CƠN DÔNG TRỜI SẼ RÁO DẦN.`;
+      dichLyDetails = `Quẻ gốc ${originalName} (${origInfo.nature}) động hào ${movingLine} biến ${changedName} (${changedInfo.nature}). Tượng Chấn Lôi phối Tốn Phong cho thấy không khí đối lưu mạnh mẽ, đề phòng gió giật khi đi đường.`;
+    } else if (isFire) {
+      state = 'Dương Khí Vượng Thịnh, Nhật Chiếu Quang Minh, Nắng Ráo';
+      explanation = 'Chiêm thời tiết gặp Ly Hỏa tượng trưng cho Mặt Trời tỏa sáng rực rỡ, trời tạnh ráo không mưa.';
+      directConclusion = `Về thời tiết "${question.trim()}": TRỜI NẮNG RÁO, QUANG ĐÃNG, KHÍ HẬU KHÔ RÁO VÀ ẤM ÁP; RẤT THUẬN LỢI CHO CÔNG VIỆC NGOÀI TRỜI VÀ LỘ TRÌNH ĐI LẠI.`;
+      dichLyDetails = `Quẻ biến ${changedName} mang tượng Hỏa minh sáng sủa, xua tan mây mù, trời tạnh ráo và có nắng.`;
+    } else {
+      state = 'Thiên Địa Bình Hòa, Trời Râm Mát Tạnh Ráo';
+      explanation = 'Gặp quẻ Càn Khôn Cấn chủ về thời tiết ôn hòa, mây che râm mát.';
+      directConclusion = `Về thời tiết "${question.trim()}": KHÍ TRỜI ÔN HÒA, RÂM MÁT, TẠM THỜI KHÔNG CÓ MƯA LỚN HAY THỜI TIẾT CỰC ĐOAN; THỜI TIẾT DỄ CHỊU VÀ THUẬN LỢI.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} báo hiệu trường khí ổn định, thời tiết mát mẻ êm dịu.`;
     }
 
   } else if (isLostItem) {
