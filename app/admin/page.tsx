@@ -20,7 +20,7 @@ export default function AdminPage() {
   // Form cấu hình
   const [newApiKey, setNewApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('gemini-1.5-flash');
+  const [selectedModel, setSelectedModel] = useState('gemini-3.6-flash');
   const [newPassInput, setNewPassInput] = useState('');
 
   // Trạng thái thao tác
@@ -57,7 +57,7 @@ export default function AdminPage() {
         geminiModel: data.geminiModel,
         updatedAt: data.updatedAt,
       });
-      setSelectedModel(data.geminiModel || 'gemini-1.5-flash');
+      setSelectedModel(data.geminiModel || 'gemini-3.6-flash');
       sessionStorage.setItem('ziwei_admin_pass', pass);
     } catch {
       setLoginError('Lỗi kết nối máy chủ');
@@ -259,7 +259,7 @@ export default function AdminPage() {
               <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1">
                 <span className="text-zinc-400 block font-medium">Mô Hình Gemini Đang Dùng:</span>
                 <strong className="text-cyan-300 font-mono text-sm block">
-                  {configStatus?.geminiModel || 'gemini-1.5-flash'}
+                  {configStatus?.geminiModel || 'gemini-3.6-flash'}
                 </strong>
               </div>
               <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1">
@@ -289,7 +289,7 @@ export default function AdminPage() {
             {/* Ô nhập API Key mới */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-zinc-300 block flex items-center justify-between">
-                <span>Google Gemini API Key (Bắt đầu bằng AIzaSy...):</span>
+                <span>Google Gemini API Key (Bắt đầu bằng AIzaSy... hoặc AQ...):</span>
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
@@ -323,10 +323,11 @@ export default function AdminPage() {
               <label className="text-xs font-bold text-zinc-300 block">
                 Chọn Mô Hình Ưu Tiên:
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
+                  { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash ⭐', desc: 'Mới nhất 2026 · Siêu tốc độ, suy luận cực kỳ thông minh' },
+                  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Bản ổn định cao cấp, phản hồi nhanh nhạy và chuẩn xác' },
                   { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', desc: 'Rất nhanh, ổn định cao, miễn phí dồi dào' },
-                  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Thế hệ mới nhất, phản hồi cực kỳ sắc bén' },
                   { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', desc: 'Suy luận dịch lý siêu sâu, chất lượng cao' },
                 ].map((m) => (
                   <button

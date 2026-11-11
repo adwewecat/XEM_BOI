@@ -113,8 +113,8 @@ Dữ liệu kèm theo: ${JSON.stringify(contextData || {})}`;
     }
 
     // Thử gọi các model của Gemini API theo thứ tự ưu tiên (ưu tiên model quản trị viên đã chọn)
-    const preferredModel = config.geminiModel || 'gemini-1.5-flash';
-    const fallbackList = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'].filter(m => m !== preferredModel);
+    const preferredModel = config.geminiModel || 'gemini-3.6-flash';
+    const fallbackList = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'].filter(m => m !== preferredModel);
     const modelsToTry = [preferredModel, ...fallbackList];
     let lastError = '';
     let responseText = '';

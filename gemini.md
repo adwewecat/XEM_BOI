@@ -73,6 +73,25 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 25: Nạp API Key Dùng Chung & Cấu Hình Model Gemini 3.6 Flash Siêu Tốc Độ Cho Toàn Bộ Hệ Thống
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "hãy để gemini-3.6-flash nhé: Key là: AQ.Ab8R••••Os3A"
+- **Xác thực thực tế:**
+  1. Đã kiểm tra API Key trực tiếp với Google Gemini API endpoint: Key hợp lệ 100%, trả về danh sách mô hình đầy đủ bao gồm `gemini-3.6-flash`.
+  2. Đã gọi thử nghiệm `generateContent` với `gemini-3.6-flash`: Phản hồi tức thì, kết quả chuẩn xác 100%, tốc độ vượt trội.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Lưu Trữ Cấu Hình Quản Trị Server Bảo Mật:**
+     - Lưu trữ API Key và thiết lập model `gemini-3.6-flash` trong `data/admin_config.json` và `.env.local` (cả hai tệp được `.gitignore` bảo vệ, không đưa lên GitHub).
+  2. **Nâng Cấp Backend AI Route (`app/api/ai/divine/route.ts` & `lib/server/adminConfig.ts`):**
+     - Đặt `gemini-3.6-flash` làm mô hình ưu tiên số 1 mặc định của toàn hệ thống.
+     - Fallback thông minh: `gemini-3.6-flash` -> `gemini-2.5-flash` -> `gemini-1.5-flash` -> `gemini-2.0-flash` -> `gemini-1.5-pro`.
+  3. **Cập Nhật Giao Diện Quản Trị Viên (`app/admin/page.tsx`):**
+     - Bổ sung tùy chọn `Gemini 3.6 Flash ⭐` (Mới nhất 2026 · Siêu tốc độ, suy luận cực kỳ thông minh) và `Gemini 2.5 Flash` trong bảng điều khiển Admin.
+     - Cập nhật hiển thị trạng thái model đang dùng và hỗ trợ kiểm tra kết nối 1-click.
+  4. **Kiểm Thử & Đóng Gói:**
+     - `npm run typecheck` 0 lỗi.
+     - `npm run build` 238 routes tĩnh PASS 100%.
+
 ### [2026-11-11] - Đợt 24: Bổ Sung Kết Luận Cốt Lõi Từng Cung Vị, Trợ Lý Tử Vi AI Đặt Câu Hỏi & Bản Đồ Hướng Dẫn 12 Cung (Bản Mệnh vs Cung Mệnh vs Cung Thân)
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

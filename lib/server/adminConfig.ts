@@ -28,7 +28,7 @@ export function getAdminConfig(): AdminConfig {
       const parsed = JSON.parse(content);
       return {
         geminiApiKey: parsed.geminiApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '',
-        geminiModel: parsed.geminiModel || 'gemini-1.5-flash',
+        geminiModel: parsed.geminiModel || 'gemini-3.6-flash',
         adminPassword: parsed.adminPassword || DEFAULT_ADMIN_PASSWORD,
         updatedAt: parsed.updatedAt || '',
       };
@@ -39,7 +39,7 @@ export function getAdminConfig(): AdminConfig {
 
   return {
     geminiApiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '',
-    geminiModel: 'gemini-1.5-flash',
+    geminiModel: 'gemini-3.6-flash',
     adminPassword: DEFAULT_ADMIN_PASSWORD,
   };
 }
