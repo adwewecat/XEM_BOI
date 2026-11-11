@@ -73,6 +73,28 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời & Trả Lời Lệch Đề Khi Hỏi Khác Nhau Trong Bói Động Tâm / Tarot, Tự Động Kích Hoạt Gemini AI
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "hỏi 2 câu khác nhau, nhưng lại cùng 1 câu trả lời, và đang không liên quan" (Kèm ảnh chụp màn hình minh họa: Quẻ `Lôi Hỏa Phong Động Hào 5 Biến Trạch Hỏa Cách` -> Kết luận rập khuôn: *"Về sự việc bạn hỏi: CẦN THẬN TRỌNG TỪNG BƯỚC, KHÔNG NÊN NÓNG VỘI, TẬP TRUNG LÀM TỐT PHẦN VIỆC CỦA MÌNH"*).
+- **Nguyên nhân cốt lõi phát hiện:**
+  1. *Từ khóa `isTravel` quá rộng:* Trong `lib/metaphysics/dongtam.ts`, regex `isTravel` chứa từ đơn `đi` và `về`. Trong tiếng Việt, từ "đi" xuất hiện ở mọi câu hỏi ("đi thi", "đi làm", "đi khám", "đi đầu tư", "đi chơi"). Do nhánh `isTravel` được kiểm tra sớm, hầu như mọi câu hỏi có chữ "đi" đều bị xếp nhầm thành bói xuất hành / lộ trình đường sá.
+  2. *Thiếu tri thức quẻ biến `Trạch Hỏa Cách`:* Quẻ gốc `Lôi Hỏa Phong` biến `Trạch Hỏa Cách` vốn không nằm trong danh sách tĩnh `AUSPICIOUS_HEXAGRAMS`. Khi rơi vào nhánh `else`, mã nguồn tự động fallback về câu văn mẫu cố định duy nhất: *"Về sự việc bạn hỏi: CẦN THẬN TRỌNG TỪNG BƯỚC, KHÔNG NÊN NÓNG VỘI, TẬP TRUNG LÀM TỐT PHẦN VIỆC CỦA MÌNH"*. Điều này tạo ra nghịch lý: `Trạch Hỏa Cách` là tượng của sự canh tân, lột xác, đổi mới triệt để, nhưng lại bị khuyên "cẩn trọng từng bước làm tốt việc của mình".
+  3. *Các câu hỏi khác nhau nhưng kết luận chung chung:* Kết luận không trích dẫn câu hỏi người dùng, không phân loại câu hỏi Quyết định (Có/Không), Thời điểm (Bao giờ), Phương hướng (Làm gì), Diễn tiến (Thế nào).
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Xây Dựng Cơ Sở Tri Thức Toàn Diện 64 Quẻ Kinh Dịch (`HEXAGRAM_KNOWLEDGE_64`):**
+     - Bổ sung cấu trúc dữ liệu cho đủ 64 quẻ (Đặc tính, Điềm quẻ `đại_cát` / `cát` / `bình_hòa` / `thận_trọng` / `hung`, Ý nghĩa cốt lõi, Lời khuyên hành sự).
+     - Quẻ `Trạch Hỏa Cách` được xác định chuẩn mực: Canh tân đổi mới, lột xác triệt để, rũ bỏ lối mòn cũ để đón nhận vận hội mới.
+  2. **Tái Cấu Trúc Toàn Bộ Bộ Nhận Diện Ý Định (Question Intent Parser):**
+     - Loại bỏ hoàn toàn từ đơn `đi`, `về` khỏi `isTravel`; thu hẹp vào đúng ngữ cảnh di chuyển, xuất hành, xe cộ, du lịch.
+     - Tách biệt rõ ràng các miền câu hỏi: `isCareer` (công việc, thi cử, phỏng vấn, đổi việc, deal lương...), `isWealth` (tài chính, kinh doanh, đầu tư, đất đai, nợ nần...), `isLove` (tình duyên, kết hôn, lấy vợ/chồng, crush, chia tay...), `isHealth` (bệnh tật, sức khỏe, tạng phủ...), `isProperty` (bất động sản, nhà đất, sổ đỏ...), `isLawsuit` (kiện tụng, tranh chấp...), `isPastLife` (tiền kiếp, luân hồi, sứ mệnh...).
+     - Hàm `synthesizeGeneralVerdict` xử lý linh hoạt cho các câu hỏi tổng quát: Nhận diện Có/Không (`isYesNo`), Thời điểm (`isTiming`), Lời khuyên hành động (`isActionAdvice`), Diễn biến sự việc.
+     - Mọi kết luận trực diện đều dẫn chiếu chính xác nội dung câu hỏi `"${question.trim()}"`, cam kết không có 2 câu hỏi khác nhau nào nhận cùng 1 câu trả lời rập khuôn.
+  3. **Tự Động Kích Hoạt Gemini AI Luận Giải Ngay Khi Reo Quẻ Hoặc Rút Bài Tarot:**
+     - Khi người dùng đã cài đặt API Key (`userApiKey`), hệ thống tự động gửi yêu cầu ngầm sang `/api/ai/divine` ngay khi bấm "THẦY REO QUẺ & PHÁN" hoặc "XÀO BÀI & RÚT BÀI TAROT" mà không cần phải nhấp thêm nút luận giải AI.
+     - Bổ sung huy hiệu/nút bấm trực quan `[ 🔑 AI Gemini: Bật ]` / `[ ⚙️ Cài Gemini Key ]` ngay trên thanh tiêu đề của Bói Hữu Duyên và Tarot.
+  4. **Kiểm Thử & Đóng Gói:**
+     - 17/17 test suites hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 235 routes PASS 100%.
+
 ### [2026-11-11] - Đợt 21: Tích Hợp Gemini AI Luận Giải Chiêm Bốc Trực Tiếp, Khắc Phục Lệch Đề & Lỗi Font Tarot / Bói Hữu Duyên, Giải Mã Cốt Lõi Bản Mệnh - Đại Hạn - Lưu Niên
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:**

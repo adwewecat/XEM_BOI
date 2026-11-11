@@ -202,8 +202,28 @@ export default function MetaphysicsPage() {
     setAiDongTamAnswer(null);
     setAiError(null);
     setTimeout(() => {
-      setDongTamResult(castDongTam(dongTamQuestion, dongTamDate, dongTamTime));
+      const res = castDongTam(dongTamQuestion, dongTamDate, dongTamTime);
+      setDongTamResult(res);
       setIsDongTamCasting(false);
+
+      // Tự động kích hoạt Gemini AI nếu đã có API Key
+      if (userApiKey && userApiKey.trim().length > 0) {
+        handleCallAi(
+          'iching',
+          dongTamQuestion.trim(),
+          {
+            originalName: res.hexagram.originalName,
+            changedName: res.hexagram.changedName,
+            movingLine: res.hexagram.movingLine,
+            dungThan: res.dungThan,
+            solarDate: res.datetimeInput.solarStr,
+            lunarDate: res.datetimeInput.lunarStr,
+            ganZhiDay: res.datetimeInput.ganZhiDay,
+            xunKong: res.datetimeInput.xunKong,
+          },
+          true
+        );
+      }
     }, 450);
   };
 
@@ -223,22 +243,36 @@ export default function MetaphysicsPage() {
     setAiTarotAnswer(null);
     setAiError(null);
     setTimeout(() => {
-      setTarotResult(drawTarotSpread(tarotType, tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'));
+      const q = tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan';
+      const res = drawTarotSpread(tarotType, q);
+      setTarotResult(res);
       setIsTarotDrawing(false);
+
+      // Tự động kích hoạt Gemini AI nếu đã có API Key
+      if (userApiKey && userApiKey.trim().length > 0) {
+        handleCallAi('tarot', q, res, true);
+      }
     }, 500);
   };
 
-  const handleCallAi = async (type: 'tarot' | 'iching') => {
+  const handleCallAi = async (
+    type: 'tarot' | 'iching',
+    overrideQuestion?: string,
+    overrideContext?: any,
+    isSilent = false
+  ) => {
     setIsAiLoading(true);
     setAiError(null);
     try {
       const question =
-        type === 'tarot'
+        overrideQuestion ||
+        (type === 'tarot'
           ? tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'
-          : dongTamQuestion.trim();
+          : dongTamQuestion.trim());
 
       const contextData =
-        type === 'tarot'
+        overrideContext ||
+        (type === 'tarot'
           ? tarotResult
           : dongTamResult
           ? {
@@ -251,7 +285,7 @@ export default function MetaphysicsPage() {
               ganZhiDay: dongTamResult.datetimeInput.ganZhiDay,
               xunKong: dongTamResult.datetimeInput.xunKong,
             }
-          : {};
+          : {});
 
       const res = await fetch('/api/ai/divine', {
         method: 'POST',
@@ -267,8 +301,10 @@ export default function MetaphysicsPage() {
       const data = await res.json();
       if (!res.ok || !data.success) {
         if (data.error === 'NO_API_KEY') {
-          setShowApiKeyModal(true);
-          setAiError('Vui lòng nhập API Key để kích hoạt phân tích thông minh từ Gemini AI.');
+          if (!isSilent) {
+            setShowApiKeyModal(true);
+            setAiError('Vui lòng nhập API Key để kích hoạt phân tích thông minh từ Gemini AI.');
+          }
         } else {
           setAiError(data.message || 'Không thể kết nối đến Gemini AI lúc này.');
         }
@@ -281,7 +317,9 @@ export default function MetaphysicsPage() {
         setAiDongTamAnswer(data.answer);
       }
     } catch (err: unknown) {
-      setAiError(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ AI');
+      if (!isSilent) {
+        setAiError(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ AI');
+      }
     } finally {
       setIsAiLoading(false);
     }
@@ -967,13 +1005,23 @@ export default function MetaphysicsPage() {
                 <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-amber-300">
                   <span>🔮</span> BÓI HỮU DUYÊN · MAI HOA & LỤC HÀO CHIÊM ĐOÁN THEO GIỜ ĐỘNG TÂM
                 </div>
-                <button
-                  type="button"
-                  onClick={handleSetCurrentTime}
-                  className="text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors flex items-center gap-1 font-semibold"
-                >
-                  <span>⏰</span> Lấy Giờ Hiện Tại
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKeyModal(true)}
+                    className="text-xs px-3 py-1 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-semibold transition-all cursor-pointer"
+                  >
+                    <span>{userApiKey ? '🔑' : '⚙️'}</span>
+                    <span>{userApiKey ? 'AI Gemini: Bật' : 'Cài Gemini Key'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSetCurrentTime}
+                    className="text-xs px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+                  >
+                    <span>⏰</span> Lấy Giờ Hiện Tại
+                  </button>
+                </div>
               </div>
 
               {/* Ô nhập câu hỏi */}
@@ -1607,12 +1655,22 @@ export default function MetaphysicsPage() {
         {activeTab === 'tarot' && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
             <div className="card-glass p-6 rounded-2xl border border-amber-500/30 shadow-2xl bg-zinc-950/80 space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">
                 <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-amber-300">
                   <span>🃏</span> CHIÊM TINH TAROT · 22 ĐẠI BÍ MẬT ẨN CHÍNH (MAJOR ARCANA)
                 </div>
-                <div className="text-xs text-zinc-400">
-                  Chuẩn quy cách Rider-Waite-Smith quốc tế
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKeyModal(true)}
+                    className="text-xs px-3 py-1 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-semibold transition-all cursor-pointer"
+                  >
+                    <span>{userApiKey ? '🔑' : '⚙️'}</span>
+                    <span>{userApiKey ? 'AI Gemini: Bật' : 'Cài Gemini Key'}</span>
+                  </button>
+                  <span className="text-xs text-zinc-400 hidden sm:inline">
+                    Chuẩn Rider-Waite-Smith
+                  </span>
                 </div>
               </div>
 
