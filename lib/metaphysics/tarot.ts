@@ -699,14 +699,19 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
     const read2 = r2 ? c2.reversed : c2.upright;
     const read3 = r3 ? c3.reversed : c3.upright;
 
+    const isDifficultFuture = r3 || [13, 15, 16, 18].includes(c3.id);
+    const futureTone = isDifficultFuture
+      ? `CẢNH BÁO KHẢO NGHIỆM TƯƠNG LAI: Xu hướng tới sẽ gặp phải nhiều cản trở, bế tắc hoặc cú sốc chuyển hóa mang sắc thái **${c3.nameVi}** (${r3 ? 'Ngược' : 'Xuôi'}): ${read3.summary}`
+      : `Xu hướng tương lai mở ra cơ hội tích cực theo năng lượng **${c3.nameVi}** (${r3 ? 'Ngược' : 'Xuôi'}): ${read3.summary}`;
+
     if (isPastLife) {
-      overallSynthesis = `Giải mã câu hỏi tiền kiếp "${qText}": Lá bài tiền thân **${c1.nameVi}** cho thấy ở kiếp trước bạn từng mang căn duyên đặc biệt: ${read1.summary.slice(0, 95)}... Dấu ấn tiền kiếp đó nay tiếp tục phản chiếu trong tâm thức hiện tại qua lá **${c2.nameVi}** (${read2.summary.slice(0, 95)}...). Và bài học chuyển hóa tối thượng mà vũ trụ giao phó cho linh hồn bạn ở kiếp này thể hiện qua lá **${c3.nameVi}**: ${read3.advice}`;
+      overallSynthesis = `Giải mã câu hỏi tiền kiếp "${qText}": Lá bài tiền thân **${c1.nameVi}** (${r1 ? 'Ngược' : 'Xuôi'}) cho thấy ở tiền thân bạn từng gánh vác bài học nghiệp duyên: ${read1.summary} Dấu ấn đó nay tiếp tục phản chiếu trong tâm thức hiện tại qua lá **${c2.nameVi}** (${r2 ? 'Ngược' : 'Xuôi'}): ${read2.summary} Bài học túc nghiệp cốt tử kiếp này qua lá **${c3.nameVi}** (${r3 ? 'Ngược' : 'Xuôi'}): ${read3.advice} Đừng trốn tránh sự thật mà hãy dũng cảm chuyển hóa để giải tỏa nghiệp cũ.`;
     } else if (isLoveQuestion) {
-      overallSynthesis = `Về vấn đề tình duyên "${qText}": Gốc rễ cảm xúc bắt nguồn từ nền tảng **${c1.nameVi}** (${read1.love.slice(0, 90)}...), hiện tại đang chuyển động dưới tác động của **${c2.nameVi}** (${read2.love.slice(0, 90)}...), và tương lai mối quan hệ hướng về **${c3.nameVi}**: ${read3.love} Lời khuyên của vũ trụ: ${read3.advice}`;
+      overallSynthesis = `Về vấn đề tình duyên "${qText}": Gốc rễ bắt nguồn từ nền tảng **${c1.nameVi}** (${r1 ? 'Ngược' : 'Xuôi'}): ${read1.love} Thực trạng hiện tại dưới tác động của **${c2.nameVi}** (${r2 ? 'Ngược' : 'Xuôi'}): ${read2.love} ${futureTone} Lời khuyên cảnh tỉnh: ${read3.advice}`;
     } else if (isCareerQuestion) {
-      overallSynthesis = `Về câu hỏi sự nghiệp & tài chính "${qText}": Quá trình vừa qua dựa trên tiền đề **${c1.nameVi}** (${read1.career.slice(0, 90)}...), hiện tại bạn đang chịu chi phối của **${c2.nameVi}** (${read2.career.slice(0, 90)}...), và bước ngoặt tương lai sẽ đơm hoa theo năng lượng **${c3.nameVi}**: ${read3.career} Lời khuyên chiến lược: ${read3.advice}`;
+      overallSynthesis = `Về câu hỏi sự nghiệp & tài chính "${qText}": Quá trình vừa qua dựa trên tiền đề **${c1.nameVi}** (${r1 ? 'Ngược' : 'Xuôi'}): ${read1.career} Hiện tại bạn đang chịu chi phối của **${c2.nameVi}** (${r2 ? 'Ngược' : 'Xuôi'}): ${read2.career} ${futureTone} Lời khuyên chiến lược: ${read3.advice}`;
     } else {
-      overallSynthesis = `Đối với câu hỏi "${qText}": Hành trình vận mệnh chuyển dịch từ nền tảng **${c1.nameVi}** (${read1.summary.slice(0, 85)}...) sang trạng thái hiện tại dưới tác động của **${c2.nameVi}** (${read2.summary.slice(0, 85)}...), và đang tiến mạnh mẽ về phía kết quả tương lai mang sắc thái **${c3.nameVi}** (${read3.summary.slice(0, 85)}...). Lời khuyên tổng thể: ${read3.advice}`;
+      overallSynthesis = `Đối với câu hỏi "${qText}": Hành trình vận mệnh chuyển dịch từ gốc rễ **${c1.nameVi}** (${read1.summary}) sang trạng thái hiện tại dưới tác động của **${c2.nameVi}** (${read2.summary}). ${futureTone} Lời khuyên của vũ trụ: ${read3.advice}`;
     }
   } else {
     // love spread
@@ -726,7 +731,12 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
     ];
 
     const read3 = r3 ? c3.reversed : c3.upright;
-    overallSynthesis = `Mối lương duyên này đang trong giai đoạn tương tác năng lượng sâu sắc giữa **${c1.nameVi}** và **${c2.nameVi}**. Tương lai của mối quan hệ hướng về **${c3.nameVi}**: ${read3.love} ${read3.advice}`;
+    const isTension = r1 || r2 || r3 || [13, 15, 16].includes(c3.id);
+    const relationshipAssessment = isTension
+      ? `CẢNH BÁO XUNG ĐỘT: Mối quan hệ đang tồn tại bất đồng ngầm hoặc sự thiếu trung thực giữa hai tâm thế **${c1.nameVi}** (${r1 ? 'Ngược' : 'Xuôi'}) và **${c2.nameVi}** (${r2 ? 'Ngược' : 'Xuôi'}). Tương lai mối quan hệ đối mặt với thử thách mang sắc thái **${c3.nameVi}**: ${read3.love}`
+      : `Mối lương duyên này đang có sự tương tác năng lượng sâu sắc giữa **${c1.nameVi}** và **${c2.nameVi}**. Tương lai của mối quan hệ hướng về **${c3.nameVi}**: ${read3.love}`;
+
+    overallSynthesis = `${relationshipAssessment} Lời khuyên chân thực: ${read3.advice}`;
   }
 
   return {

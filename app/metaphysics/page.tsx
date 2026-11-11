@@ -932,6 +932,39 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
+                  {/* KHỐI NÓI THẲNG SỰ THẬT: TẬT XẤU & CẠM BẪY RỦI RO */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    {/* Tật xấu & Điểm mù */}
+                    <div className="p-4 rounded-xl bg-rose-950/20 border border-rose-500/40 space-y-2">
+                      <div className="text-xs font-black text-rose-400 flex items-center gap-2 uppercase tracking-wide">
+                        <span>⚠️</span> TẬT XẤU CHÍ MẠNG & ĐIỂM MÙ TÍNH CÁCH
+                      </div>
+                      <div className="space-y-1.5 text-xs text-rose-200/90">
+                        {(palmResult.overallVerdict.criticalFlaws || []).map((flaw, idx) => (
+                          <div key={idx} className="flex items-start gap-2">
+                            <span className="text-rose-400 font-bold shrink-0">✕</span>
+                            <span className="leading-relaxed">{flaw}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Cạm bẫy định mệnh & Rủi ro */}
+                    <div className="p-4 rounded-xl bg-amber-950/25 border border-amber-500/40 space-y-2">
+                      <div className="text-xs font-black text-amber-400 flex items-center gap-2 uppercase tracking-wide">
+                        <span>🚨</span> CẠM BẪY ĐỊNH MỆNH & RỦI RO CẦN PHÒNG NGỪA
+                      </div>
+                      <div className="space-y-1.5 text-xs text-amber-200/90">
+                        {(palmResult.overallVerdict.majorRisks || []).map((risk, idx) => (
+                          <div key={idx} className="flex items-start gap-2">
+                            <span className="text-amber-400 font-bold shrink-0">!</span>
+                            <span className="leading-relaxed">{risk}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Lời khuyên cốt lõi */}
                   <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
                     <div className="text-xs font-black text-amber-300 mb-1 flex items-center gap-1.5">
@@ -952,6 +985,8 @@ export default function MetaphysicsPage() {
                     { data: palmResult.fateLine, key: 'fate', color: '#a855f7' },
                   ].map(({ data: line, key, color }) => {
                     const isSelected = activePalmLine === key;
+                    const positives = line.positives && line.positives.length > 0 ? line.positives : line.details;
+                    const negatives = line.negatives && line.negatives.length > 0 ? line.negatives : [];
                     return (
                       <div
                         key={line.name}
@@ -991,17 +1026,40 @@ export default function MetaphysicsPage() {
                           </div>
                         </div>
 
-                        <div className="space-y-1.5 text-xs text-zinc-300">
-                          {line.details.map((d, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <span className="text-amber-400 mt-0.5">•</span>
-                              <span className="leading-relaxed">{d}</span>
-                            </div>
-                          ))}
+                        {/* Ưu điểm nổi bật */}
+                        <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/25 space-y-1.5">
+                          <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
+                            <span>🌟</span> ƯU ĐIỂM & TIỀM NĂNG:
+                          </div>
+                          <div className="space-y-1 text-xs text-zinc-300">
+                            {positives.map((pos, idx) => (
+                              <div key={idx} className="flex items-start gap-2">
+                                <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                                <span className="leading-relaxed">{pos}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
 
+                        {/* Khuyết điểm & Hung hiểm cảnh báo */}
+                        {negatives.length > 0 && (
+                          <div className="p-3 rounded-xl bg-rose-950/20 border border-rose-500/25 space-y-1.5">
+                            <div className="text-[11px] font-bold text-rose-400 flex items-center gap-1.5">
+                              <span>⚠️</span> KHUYẾT ĐIỂM, TẬT XẤU & HUNG HIỂM:
+                            </div>
+                            <div className="space-y-1 text-xs text-zinc-300">
+                              {negatives.map((neg, idx) => (
+                                <div key={idx} className="flex items-start gap-2">
+                                  <span className="text-rose-400 font-bold shrink-0">✕</span>
+                                  <span className="leading-relaxed">{neg}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-[11px] text-amber-300/90 leading-relaxed">
-                          <strong>Lời khuyên:</strong> {line.advice}
+                          <strong>Lời khuyên tu tâm:</strong> {line.advice}
                         </div>
                       </div>
                     );

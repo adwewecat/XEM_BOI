@@ -73,6 +73,39 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 29: Luận Đoán Chân Thực Biện Chứng Âm Dương · Xóa Bỏ Khen Nịnh Một Chiều, Nói Thẳng Tật Xấu & Cảnh Báo Hung Hiểm
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "TẤT CẢ các bài bói đang khen quá khen, phải có lập luận đúng, có tốt có xấu, có tích cực cũng phải có tiêu cực, hãy nói đúng sự thật".
+- **Nguyên nhân phát hiện:**
+  1. *Hệ thống chiêm đoán bị nghiêng lệch một chiều:* Trước đây, từ Bói Chỉ Tay, Kinh Dịch Động Tâm, Tarot đến Trợ lý Gemini AI đều có xu hướng dùng văn từ hoa mỹ, tô hồng số phận ("Thượng Cách", "Kỳ tài danh lợi", điểm 90-98/100, "Vận trình rất tốt đẹp", quẻ biến nào cũng an ủi động viên).
+  2. *Né tránh vạch trần cái xấu và rủi ro:* Thiếu sự cân bằng Âm Dương của Đạo Dịch (Cát ắt có Hung tiềm ẩn, Hung ắt có cơ hội chuyển hóa). Quẻ hung hiểm (Thuần Khảm, Khốn, Kiển, Tụng, Bĩ) không dám phán thẳng là thất bại/nguy hiểm/hao tài/đổ vỡ. Bói chỉ tay không dám chỉ ra các tật xấu chí mạng (gia trưởng, bốc đồng, lươn lẹo, cả nể) hay các đường chỉ tay xấu (đứt đoạn, mờ nhạt, ngắn cụt).
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Nâng Cấp System Prompt Gemini AI Cốt Lõi (`app/api/ai/divine/route.ts`):**
+     - Thiết lập tôn chỉ "ĐẠO TRUNG CHÍNH & KHÁCH QUAN TUYỆT ĐỐI" cho toàn bộ trợ lý AI: Nghiêm cấm nịnh bợ, khen hão hay dùng sáo ngữ tô hồng số phận.
+     - Luôn mổ xẻ 2 mặt đối lập: Có CÁT phải có HUNG, có ĐƯỢC phải có MẤT. Đạt được tiền bạc thì phải đánh đổi mồ hôi công sức; được danh tiếng thì phải gánh chịu cô độc và đề phòng tiểu nhân ganh ghét.
+     - Khi gặp quẻ/sao/bài mang tính hung hiểm, bế tắc hoặc đối nghịch: Phải phán quyết DỨT KHOÁT, THẲNG THẮN là KHÔNG THÀNH / XẤU / CÓ RỦI RO LỚN, vạch trần điểm mù và tật xấu của đương số để người xem cảnh tỉnh.
+  2. **Tái Cấu Trúc Toàn Diện Bói Chỉ Tay (`lib/metaphysics/palmistry.ts`):**
+     - Đa dạng hóa 6 cấp độ `DestinyGrade` phản ánh chân thực cuộc đời: `Thượng Cách (Kỳ Tài Danh Lợi · Cô Độc Đỉnh Cao)`, `Trung Cát Cách (Thành Tựu Bền Vững Nhờ Thực Lực)`, `Cát Hung Tương Bán (Được Mất Song Hành · Nửa Đời Sóng Gió)`, `Đại Khí Vãn Thành (Tiền Vận Lao Đao · Hậu Vận Hưng Phát)`, `Bình Hòa Cách (Lao Tâm Bán Sức · Phải Tự Thân Vận Động)`, `Ba Đào Khảo Nghiệm Cách (Biến Cố Sức Khỏe & Thị Phi Rình Rập)`.
+     - Thang điểm chân thực: Đường đứt đoạn/mờ nhạt: 50-58 điểm; đường ngắn/cong sâu: 60-70 điểm; đường đẹp xuất sắc: 84-88 điểm (loại bỏ hoàn toàn điểm số ảo 95-98 điểm).
+     - Bổ sung 2 trường dữ liệu bắt buộc cho cả 4 đại tuyến chỉ tay (Sinh Đạo, Trí Đạo, Tâm Đạo, Định Mệnh): `positives` (Ưu điểm) và `negatives` (Khuyết điểm, tật xấu tính cách & hung hiểm rình rập).
+     - Bổ sung `criticalFlaws` (Tật xấu cốt lõi & Điểm mù tính cách) và `majorRisks` (Cạm bẫy định mệnh & Rủi ro thực tế cần phòng ngừa).
+  3. **Nâng Cấp Giao Diện Bói Chỉ Tay (`app/metaphysics/page.tsx`):**
+     - Hiển thị nổi bật 2 khối cảnh báo trung thực: `⚠️ TẬT XẤU CHÍ MẠNG & ĐIỂM MÙ TÍNH CÁCH` và `🚨 CẠM BẪY ĐỊNH MỆNH & RỦI RO CẦN PHÒNG NGỪA`.
+     - Mỗi thẻ trong 4 đại tuyến chỉ tay đều hiển thị rành mạch 2 phần: `🌟 ƯU ĐIỂM & TIỀM NĂNG` (dấu tích xanh) và `⚠️ KHUYẾT ĐIỂM, TẬT XẤU & HUNG HIỂM` (dấu chéo đỏ).
+  4. **Nâng Cấp Engine Kinh Dịch Lục Hào Động Tâm (`lib/metaphysics/dongtam.ts`):**
+     - Phân định rạch ròi 4 trạng thái quẻ: `hung`, `thận_trọng`, `bình_hòa`, `cát / đại_cát`.
+     - Khi quẻ biến lâm Điềm Hung: Phán TRẢ LỜI DỨT KHOÁT LÀ KHÔNG / RẤT XẤU VÀ NGUY HIỂM. Cảnh báo thẳng thừng về nguy cơ thất bại, hao tài phá sản, tiểu nhân phản trắc, tình cảm đổ vỡ hoặc bệnh tật trở nặng.
+     - Khi quẻ biến lâm Thận Trọng: Phán CHƯA NÊN / KHÔNG THUẬN LỢI, vạch rõ sự kìm hãm và đối kháng ngầm.
+     - Khi quẻ Cát: Luôn kèm lời cảnh tỉnh "Trèo cao ngã đau", đề phòng tiểu nhân ghen ghét và giữ gìn sức khỏe kẻo lao lực sinh bệnh.
+  5. **Cân Bằng Biện Chứng Trong Bộ Bài Tarot (`lib/metaphysics/tarot.ts`):**
+     - Khi rút trúng lá bài Ngược (Reversed) hoặc lá bài thử thách (Death, Devil, Tower, Moon): Đưa ra lời phán cảnh báo tương lai nghiêm khắc về bế tắc, thói hư tật xấu, phụ thuộc độc hại và đổ vỡ tất yếu.
+  6. **Kiểm Thử Toàn Diện & Đóng Gói:**
+     - `npm run typecheck` 0 lỗi.
+     - 18/18 test suites hồi quy PASS 100%.
+     - `next build` 238 routes tĩnh PASS 100%.
+     - Auto push commit lên GitHub remote `origin main`.
+
+
 ### [2026-11-11] - Đợt 28: Vẽ Trực Tiếp Các Đường Chỉ Tay Neon Phát Sáng & Nhận Diện Gò Lên Ảnh Bàn Tay Thật Của Người Dùng
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "KHI QUÉT CHỈ TAY, HÃY VẼ ĐÚNG VÀO ẢNH ĐÃ ĐĂNG ĐỂ PHÂN TÍCH ĐÚNG TỪNG ĐƯỜNG" (Kèm ảnh chụp màn hình tải ảnh bàn tay thật lên nhưng trước đây hệ thống chỉ hiện ảnh trần và diagram hoạt họa chung chung).

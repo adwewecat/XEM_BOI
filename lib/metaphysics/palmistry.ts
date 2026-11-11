@@ -28,11 +28,21 @@ export interface PalmAnalysisSection {
   name: string;
   glyph: string;
   title: string;
-  score: number; // Thang điểm 1-100
+  score: number; // Thang điểm 1-100 chân thực
   summary: string;
   details: string[];
+  positives: string[];
+  negatives: string[]; // Khuyết điểm, tật xấu & hung hiểm cảnh báo
   advice: string;
 }
+
+export type DestinyGrade =
+  | 'Thượng Cách (Kỳ Tài Danh Lợi · Cô Độc Đỉnh Cao)'
+  | 'Trung Cát Cách (Thành Tựu Bền Vững Nhờ Thực Lực)'
+  | 'Cát Hung Tương Bán (Được Mất Song Hành · Nửa Đời Sóng Gió)'
+  | 'Đại Khí Vãn Thành (Tiền Vận Lao Đao · Hậu Vận Hưng Phát)'
+  | 'Bình Hòa Cách (Lao Tâm Bán Sức · Phải Tự Thân Vận Động)'
+  | 'Ba Đào Khảo Nghiệm Cách (Biến Cố Sức Khỏe & Thị Phi Rình Rập)';
 
 export interface PalmistryResult {
   input: PalmInput;
@@ -66,11 +76,13 @@ export interface PalmistryResult {
   };
   overallVerdict: {
     archetype: string;
-    destinyGrade: 'Thượng Cách' | 'Trung Cát Cách' | 'Cát Cách Tiềm Tàng' | 'Đại Khí Vãn Thành';
+    destinyGrade: DestinyGrade;
     summary: string;
     careerProspect: string;
     loveProspect: string;
     wealthProspect: string;
+    criticalFlaws: string[]; // Tật xấu chí mạng & Điểm mù tính cách
+    majorRisks: string[];    // Cảnh báo rủi ro thực tế & Cạm bẫy định mệnh
     keyAction: string;
   };
 }
@@ -121,238 +133,445 @@ export const HAND_ELEMENT_DATA: Record<HandElement, {
 };
 
 // ─── Dữ Liệu Luận Giải Đường Sinh Đạo (Life Line) ──────────────────
-const LIFE_LINE_DATA: Record<LifeLineType, { title: string; score: number; summary: string; details: string[]; advice: string }> = {
+const LIFE_LINE_DATA: Record<LifeLineType, {
+  title: string;
+  score: number;
+  summary: string;
+  details: string[];
+  positives: string[];
+  negatives: string[];
+  advice: string;
+}> = {
   dai_sau: {
-    title: 'Đường Sinh Đạo Dài, Sâu & Hồng Nhuận',
-    score: 95,
-    summary: 'Biểu tượng của sinh lực dồi dào, thể chất tráng kiện, sức đề kháng phi thường và tuổi thọ viên mãn.',
+    title: 'Đường Sinh Đạo Dài, Sâu & Rõ Nét',
+    score: 86,
+    summary: 'Biểu tượng của sinh lực dồi dào, thể chất tráng kiện, sức đề kháng tự nhiên tốt và tuổi thọ bền lâu.',
     details: [
-      'Năng lượng dồi dào, hiếm khi ốm vặt nặng, khả năng tự hồi phục sau mệt mỏi cực kỳ nhanh chóng.',
-      'Tâm thái lạc quan, tính cách bền bỉ kiên cường trước áp lực cuộc sống.',
-      'Gia đạo hưng vượng, về hậu vận con cháu sum vầy, hưởng an lạc trường thọ.',
+      'Nền tảng sinh lực bền bỉ, hiếm khi ốm vặt nặng, khả năng tự hồi phục sau kiệt sức tương đối nhanh.',
+      'Tâm thái kiên trì, chịu được vất vả trong công việc dài hạn, có tính kỷ luật cao.',
+      'Gia đạo và hậu vận tương đối ổn định về mặt sức khỏe thể chất.',
     ],
-    advice: 'Phát huy nền tảng thể lực dồi dào để cống hiến cho đại nghiệp; giữ lối sống điều độ để duy trì nguyên khí trời ban.',
+    positives: [
+      'Thể lực dồi dào, sức đề kháng cao, chịu đựng được áp lực công việc cường độ lớn.',
+      'Khả năng tự hồi phục nhanh sau khi mệt mỏi hoặc ốm đau thông thường.',
+      'Hậu vận có phúc khí thọ mạng, giữ được sự dẻo dai đến tuổi xế chiều.',
+    ],
+    negatives: [
+      'Chủ quan với sức khỏe: Có xu hướng ỷ lại vào sức mình mà làm việc quá độ, bỏ qua các dấu hiệu cảnh báo sớm của cơ thể.',
+      'Cố chấp và bảo thủ: Quá tin vào kinh nghiệm cá nhân mà xem nhẹ các khuyến cáo y khoa hoặc lối sống lành mạnh.',
+      'Lao lực ngầm: Nguy cơ bệnh tim mạch, huyết áp hoặc xương khớp do thói quen ôm đồm không chịu nghỉ ngơi.',
+    ],
+    advice: 'Tuyệt đối không được cậy khỏe mà lao lực. Cần duy trì chế độ nghỉ ngơi khoa học, khám sức khỏe định kỳ và học cách buông bỏ bớt việc.',
   },
   ngan_manh: {
     title: 'Đường Sinh Đạo Ngắn Nhưng Đậm Nét',
-    score: 82,
-    summary: 'Sinh lực tập trung cao độ, bùng nổ mạnh mẽ, tuổi thọ không phụ thuộc độ dài mà dựa vào chất lượng sống.',
+    score: 68,
+    summary: 'Sinh lực bùng nổ mạnh mẽ từng đợt nhưng thiếu tính dẻo dai dài hạn, năng lượng tiêu hao rất nhanh.',
     details: [
-      'Cổ thư tướng pháp khẳng định: Đường sinh đạo ngắn không đồng nghĩa với đoản mệnh nếu gò Kim Tinh đầy đặn và có đường sinh đạo phụ (Hỏa Tinh).',
-      'Tính tình quyết liệt, sống hết mình với từng khoảnh khắc hiện tại, ghét sự lề mề trì hoãn.',
-      'Thời trẻ bươn chải tiêu hao nhiều năng lượng, cần chú ý cân bằng lao động và nghỉ ngơi.',
+      'Thích hợp tác chiến tốc độ, làm việc tập trung cao độ trong các mục tiêu ngắn hạn.',
+      'Nhân tướng học chỉ rõ: Đường sinh đạo ngắn không đồng nghĩa với đoản mệnh nếu gò Kim Tinh nở nang, nhưng phản ánh sức bền kém.',
+      'Thường bị hụt hơi, đuối sức khi phải theo đuổi các dự án kéo dài nhiều năm.',
     ],
-    advice: 'Nên rèn luyện dưỡng sinh, tránh thức khuya và làm việc kiệt sức; tích lũy phúc đức bằng việc thiện để tăng ích tuổi thọ.',
+    positives: [
+      'Phản xạ nhạy bén, khả năng hành động quyết liệt và tập trung cao trong thời khắc khẩn cấp.',
+      'Sống hết mình với hiện tại, không lãng phí thời gian vào những việc chần chừ do dự.',
+    ],
+    negatives: [
+      'Thể lực thiếu bền bỉ: Dễ bị suy nhược nhanh, tụt năng lượng giữa chừng khi gặp áp lực kéo dài.',
+      'Tính khí nóng nảy: Nông nổi, bốc đồng, dễ mất bình tĩnh dẫn đến quyết định sai lầm trong lúc giận dữ.',
+      'CẢNH BÁO NGUY CƠ: Dễ gặp các bệnh liên quan đến hệ tiêu hóa, dạ dày hoặc hô hấp do stress và sinh hoạt thất thường.',
+    ],
+    advice: 'Tránh thức khuya và làm việc kiệt sức. Phải rèn luyện các môn thể thao sức bền (đi bộ, bơi lội), học cách thở sâu và kiềm chế cơn nóng giận.',
   },
   re_nhanh: {
     title: 'Đường Sinh Đạo Phân Nhánh Về Cuối',
-    score: 88,
-    summary: 'Cuộc đời nhiều biến động di chuyển, thích xuất ngoại bôn ba hoặc đổi nơi sinh sống mới thành đại nghiệp.',
+    score: 75,
+    summary: 'Vận mệnh bôn ba di chuyển, số xuất ngoại hoặc lập nghiệp xa quê hương bản quán mới phát huy được tài năng.',
     details: [
-      'Tướng xuất ngoại định cư hoặc lập nghiệp xa quê hương bản quán mới phát huy hết tiềm năng.',
-      'Hậu vận có xu hướng sống ở nơi phong cảnh thanh bình, gần gũi thiên nhiên hoặc nước ngoài.',
-      'Dễ có nhiều nguồn tài lộc đa dạng từ các phương diện khác nhau.',
+      'Thường xuyên thay đổi môi trường sống hoặc tính chất công việc theo từng giai đoạn.',
+      'Hậu vận có xu hướng an cư ở vùng đất mới hoặc định cư nước ngoài, xa nơi chôn rau cắt rốn.',
+      'Mối liên kết với gia đình ruột thịt và quê quán có phần lỏng lẻo.',
     ],
-    advice: 'Chủ động đón nhận cơ hội di chuyển, đi xa làm ăn; xây dựng mối quan hệ giao hảo đa phương.',
+    positives: [
+      'Khả năng thích nghi tuyệt vời với mọi hoàn cảnh và môi trường xa lạ, kết giao bạn bè đa phương.',
+      'Nhạy bén với các cơ hội ở phương xa, đón nhận làn gió đổi mới dễ dàng.',
+    ],
+    negatives: [
+      'Thân tâm phiêu bạt: Cả đời trôi nổi, khó an cư lạc nghiệp sớm, tâm lý hay cảm thấy cô độc lạc lõng.',
+      'Tài lộc bất ổn: Tiền bạc kiếm được ở xứ người nhưng tiêu tán cũng nhiều theo các chuyến đi bôn ba.',
+      'Tình cảm gia đình xa cách: Thiếu sự kề cận chăm sóc cha mẹ khi về già do khoảng cách địa lý.',
+    ],
+    advice: 'Khi đi xa lập nghiệp cần xây dựng quỹ dự phòng tài chính vững chắc; thường xuyên kết nối và hướng về cội nguồn gia đình.',
   },
   dut_doan: {
     title: 'Đường Sinh Đạo Đứt Đoạn Nối Liền',
-    score: 75,
-    summary: 'Giai đoạn bước ngoặt lớn về sức khỏe hoặc thay đổi toàn diện về nhân sinh quan và môi trường sống.',
+    score: 52,
+    summary: 'Báo hiệu bước ngoặt biến cố lớn về sức khỏe hoặc tai nạn trong đời; vận khí từng có giai đoạn đứt đoạn lao đao.',
     details: [
-      'Đoạn đứt thường báo hiệu một biến cố về sức khỏe hoặc sự thay đổi hoàn toàn về lối sống/công việc.',
-      'Nếu có đường phụ chạy song song hoặc đoạn sau nối tiếp chồng lên nhau thì đều tai qua nạn khỏi, chuyển nguy thành an.',
-      'Sau bước ngoặt sẽ thức tỉnh tâm linh, giác ngộ đạo lý và trưởng thành vượt bậc.',
+      'Tại độ tuổi tương ứng với đoạn đứt trên lòng bàn tay thường xuất hiện một biến cố lớn về thể chất hoặc chấn động tâm lý.',
+      'Nếu đoạn sau nối lại hoặc có đường song song hỗ trợ thì sẽ qua khỏi nhưng để lại vết hằn sâu sắc.',
+      'Bắt buộc phải sống có kỷ luật và tích lũy âm đức để hóa giải hung hiểm.',
     ],
-    advice: 'Đặc biệt cẩn trọng trong các năm hạn lớn; kiểm tra sức khỏe định kỳ và tu dưỡng nội tâm an bình.',
+    positives: [
+      'Khả năng tái sinh mãnh liệt: Sau cơn thập tử nhất sinh hoặc biến cố lớn, tâm trí sẽ thức tỉnh và bản lĩnh phi thường hơn.',
+      'Có duyên ngộ đạo, thấu hiểu sâu sắc lẽ vô thường của đời người.',
+    ],
+    negatives: [
+      'CẢNH BÁO HUNG HIỂM: Nguy cơ bệnh tật hiểm nghèo, phẫu thuật hoặc tai nạn giao thông tại giai đoạn tiền trung vận.',
+      'Tâm lý hoang mang, hay lo âu, thần kinh yếu, giấc ngủ chập chờn và dễ rơi vào trạng thái hoảng loạn.',
+      'Vận khí bấp bênh: Công danh hoặc tài sản dễ bị đứt gánh giữa đường, phải làm lại từ đầu trong cảnh ngặt nghèo.',
+    ],
+    advice: 'Đặc biệt cẩn thận khi tham gia giao thông, không làm việc nguy hiểm. Kiểm tra sức khỏe toàn diện ngay lập tức. Tích cực làm việc thiện để bồi đắp phúc khí.',
   },
   uon_cong_rong: {
     title: 'Đường Sinh Đạo Uốn Vòng Rộng Bao Quanh Gò Kim Tinh',
-    score: 92,
-    summary: 'Tâm hồn bao dung rộng mở, giàu tình thương, nhân duyên thịnh vượng và có sức hút mãnh liệt với tha nhân.',
+    score: 84,
+    summary: 'Tâm tính bao dung nồng hậu, giàu lòng trắc ẩn nhưng dễ bị tình cảm lấn át lý trí và bị lợi dụng.',
     details: [
-      'Lòng bàn tay có gò Kim Tinh rất rộng lớn, biểu thị tình cảm nồng ấm và sự nhiệt thành.',
-      'Có tài lãnh đạo nhân tâm, người xung quanh luôn cảm thấy an toàn và ấm áp khi ở cạnh bạn.',
-      'Đời sống hôn nhân và gia đình giàu cảm xúc, phúc khí truyền đời cho con cái.',
+      'Lòng bàn tay có gò Kim Tinh rộng lớn, biểu thị sinh lực và nhu cầu cảm xúc rất mạnh mẽ.',
+      'Được nhiều người quý mến, luôn là chỗ dựa tình cảm cho người thân và bạn bè.',
+      'Thường gánh vác trách nhiệm nặng nề của dòng họ hoặc tập thể.',
     ],
-    advice: 'Tận dụng sức hút nhân tâm để làm các công việc cộng đồng, giáo dục hoặc dẫn dắt đội ngũ lớn.',
+    positives: [
+      'Tấm lòng nhân ái, sẵn sàng giúp đỡ tha nhân, nhân duyên sâu rộng.',
+      'Sức hút cá nhân lớn, dễ thu hút người khác phái và nhận được sự tin yêu từ cộng đồng.',
+    ],
+    negatives: [
+      'Cả nể, yếu lòng: Khó nói lời từ chối, thường bị kẻ xấu lợi dụng lòng thương hại để trục lợi hoặc mượn tiền không trả.',
+      'Gánh việc người ngoài làm khổ người nhà: Tốn quá nhiều thời gian lo chuyện bao đồng khiến bản thân kiệt quệ.',
+      'Lụy tình: Chuyện tình cảm dễ bị vướng bận, khó dứt khoát buông bỏ các mối quan hệ độc hại.',
+    ],
+    advice: 'Phải học cách thiết lập ranh giới cá nhân rõ ràng. Giúp người phải có trí tuệ và sự tỉnh táo, tránh để lòng tốt bị kẻ xấu lợi dụng.',
   },
 };
 
 // ─── Dữ Liệu Luận Giải Đường Trí Đạo (Head Line) ──────────────────
-const HEAD_LINE_DATA: Record<HeadLineType, { title: string; score: number; summary: string; details: string[]; advice: string }> = {
+const HEAD_LINE_DATA: Record<HeadLineType, {
+  title: string;
+  score: number;
+  summary: string;
+  details: string[];
+  positives: string[];
+  negatives: string[];
+  advice: string;
+}> = {
   thang_dai: {
-    title: 'Đường Trí Đạo Thẳng, Dài & Dứt Khoát',
-    score: 94,
-    summary: 'Trí tuệ duy lý, tư duy logic sắc sảo, đầu óc thực tế và khả năng phán đoán chuẩn xác tuyệt vời.',
+    title: 'Đường Trí Đạo Thẳng, Dài & Sắc Sảo',
+    score: 85,
+    summary: 'Trí tuệ duy lý sắc bén, tư duy logic thực tế nhưng khô khan và thiếu sự thấu cảm mềm mỏng.',
     details: [
       'Suy nghĩ mạch lạc, không để cảm xúc cá nhân chi phối quyết định mang tính chiến lược.',
       'Khả năng tập trung cao độ, giải quyết các bài toán hóc búa một cách có hệ thống.',
       'Phù hợp trở thành chuyên gia cấp cao, nhà quản trị dữ liệu, tài chính hoặc thẩm phán.',
     ],
-    advice: 'Tránh quá cứng nhắc trong quan hệ nhân sự; bổ sung sự đồng cảm và linh hoạt mềm mỏng.',
+    positives: [
+      'Khả năng phân tích logic xuất sắc, suy nghĩ mạch lạc, không bị cảm xúc chi phối.',
+      'Thực tế, có phương pháp làm việc khoa học, xử lý số liệu và chiến lược rất chuẩn xác.',
+    ],
+    negatives: [
+      'Cứng nhắc và độc đoán: Quá đề cao lý trí, xem nhẹ cảm xúc con người, dễ tạo khoảng cách lạnh lùng.',
+      'Thiếu linh hoạt: Khó thích nghi với các tình huống cần sự nhún nhường, dễ biến thành người thực dụng và ích kỷ.',
+      'Điểm mù tự cao: Luôn cho rằng mình đúng, coi thường ý kiến người khác khi họ không đưa ra được bằng chứng logic.',
+    ],
+    advice: 'Cần trau dồi sự đồng cảm và lắng nghe. Trí tuệ lớn nhất không phải là thắng trong tranh luận mà là thấu hiểu lòng người.',
   },
   cong_xuong: {
     title: 'Đường Trí Đạo Cong Nhẹ Về Gò Nguyệt Tinh',
-    score: 96,
-    summary: 'Tài năng sáng tạo thiên bẩm, trí tưởng tượng phong phú, kết hợp hoàn hảo giữa lý trí và nghệ thuật.',
+    score: 82,
+    summary: 'Trí tưởng tượng phong phú, có khiếu nghệ thuật và trực giác nhạy bén nhưng dễ rơi vào mơ mộng xa rời thực tế.',
     details: [
       'Trực giác bén nhạy, có khả năng nhìn thấy những điều người khác không nhận ra.',
-      'Tâm hồn lãng mạn nhưng không viển vông, biến các ý tưởng độc đáo thành sản phẩm cụ thể.',
-      'Rất thành công trong sáng tạo nội dung, nghệ thuật, thiết kế, marketing, phát minh.',
+      'Tâm hồn lãng mạn, khả năng liên tưởng và truyền cảm hứng nghệ thuật cao.',
+      'Rất có năng khiếu trong sáng tạo nội dung, nghệ thuật, thiết kế, marketing, phát minh.',
     ],
-    advice: 'Nuôi dưỡng không gian sáng tạo của riêng mình; tránh tự giam cầm bản thân trong các khuôn mẫu gò bó.',
+    positives: [
+      'Tư duy sáng tạo vượt trội, có cái nhìn thẩm mỹ tinh tế và trực giác linh cảm rất bén.',
+      'Khả năng biến các ý tưởng trừu tượng thành hình tượng sống động.',
+    ],
+    negatives: [
+      'Mơ mộng hão huyền: Dễ vạch ra những kế hoạch viển vông trên mây nhưng thiếu năng lực thực thi dưới đất.',
+      'Tâm lý bất ổn: Cảm xúc chi phối công việc, "vui thì làm, buồn thì bỏ", dễ rơi vào âu lo và trầm cảm.',
+      'Thiếu kỷ luật: Dễ bị phân tâm bởi những thứ phù phiếm, ngại đối mặt với những con số và quy trình khô khan.',
+    ],
+    advice: 'Bắt buộc phải rèn luyện tính kỷ luật và tính toán thực tế. Hãy chia nhỏ ý tưởng thành kế hoạch hành động từng bước cụ thể.',
   },
   chia_doi: {
     title: 'Đường Trí Đạo Đuôi Cá (Phân Nhánh Bút Nhà Văn)',
-    score: 98,
-    summary: 'Tướng "Nhánh Bút Nhà Văn" trứ danh - Đa tài đa nghệ, tư duy hai chiều, tài hùng biện và đàm phán xuất chúng.',
+    score: 86,
+    summary: 'Tướng "Nhánh Bút Nhà Văn" - Đa tài đa nghệ, tư duy hai chiều nhạy bén nhưng tâm trí hay phân vân, toan tính quá mức.',
     details: [
       'Một nhánh hướng về thực tế (Gò Hỏa Tinh), một nhánh hướng về sáng tạo (Gò Nguyệt Tinh).',
       'Có khả năng thích ứng linh hoạt với mọi hoàn cảnh, biến nguy thành cơ trong đàm phán.',
       'Dễ đạt thành tựu trong cả lĩnh vực học thuật lẫn kinh doanh thương trường.',
     ],
-    advice: 'Tránh phân tâm quá nhiều hướng cùng lúc; tập trung mũi nhọn chiến lược để bứt phá đỉnh cao.',
+    positives: [
+      'Khả năng thích ứng linh hoạt tuyệt vời, vừa có óc thực tế vừa có tính sáng tạo.',
+      'Khẩu tài và khả năng đàm phán xuất chúng, dễ xoay chuyển tình thế trong nghịch cảnh.',
+    ],
+    negatives: [
+      'Đa đoan và toan tính: Đầu óc luôn tính toán thiệt hơn quá mức, dễ sinh thói lươn lẹo, vụ lợi cơ hội.',
+      'Tâm trí phân vân đứng núi này trông núi nọ: Ôm đồm nhiều mục tiêu cùng lúc dẫn đến không việc nào đạt tới mức tinh hoa.',
+      'Khó tin tưởng người khác: Bản tính đa nghi khiến bản thân luôn phải sống trong tâm trạng đề phòng mệt mỏi.',
+    ],
+    advice: 'Cần chọn một mũi nhọn then chốt để dồn sức. Dùng tài đàm phán vào việc chính đạo, tránh thói khôn lỏi hại mình hại người.',
   },
   ngan_thang: {
     title: 'Đường Trí Đạo Ngắn Nhưng Cương Mãnh',
-    score: 80,
-    summary: 'Hành động nhanh như chớp, ghét lý thuyết suông, chú trọng hiệu quả tức thì.',
+    score: 62,
+    summary: 'Tác phong nhanh gọn, quyết đoán nhưng hấp tấp, thiếu tầm nhìn chiến lược sâu rộng và dễ mắc bẫy.',
     details: [
-      'Tác phong làm việc nhanh gọn, quyết đoán, không chần chừ do dự.',
+      'Tác phong làm việc nhanh gọn, quyết đoán, ghét lý thuyết suông và chú trọng hiệu quả tức thì.',
       'Thích hợp với môi trường tác chiến thực tế đòi hỏi phản xạ ngay lập tức.',
       'Cần chú ý tránh hấp tấp bỏ sót các chi tiết pháp lý hoặc kế hoạch dài hạn.',
     ],
-    advice: 'Nên tham vấn thêm các chuyên gia tư vấn chiến lược trước khi ra quyết định đầu tư quy mô lớn.',
+    positives: [
+      'Hành động quyết liệt, phản xạ nhanh, ghét nói suông và chú trọng kết quả trước mắt.',
+      'Dám làm dám chịu, phù hợp các công việc tác chiến thực địa khẩn trương.',
+    ],
+    negatives: [
+      'Nông nổi và thiển cận: Chỉ nhìn thấy lợi ích trước mắt mà không lường trước hậu quả dài hạn.',
+      'Dễ dính bẫy pháp lý: Ngại đọc kỹ hợp đồng, không xem xét chi tiết nhỏ dẫn đến mất tiền hoặc vướng kiện tụng.',
+      'Bảo thủ và nóng nảy: Khó tiếp thu lời khuyên của người khác, thường phạm sai lầm do hành động trước khi suy nghĩ.',
+    ],
+    advice: 'Quy tắc vàng: Trước mọi quyết định lớn về tiền bạc hay sự nghiệp, hãy dừng lại 24 giờ để suy xét và hỏi ý kiến chuyên gia.',
   },
   uon_luon: {
     title: 'Đường Trí Đạo Uốn Lượn Gợn Sóng',
-    score: 78,
-    summary: 'Tư duy linh hoạt biến ảo, giỏi thích nghi tình thế nhưng tâm trí dễ bị xao nhãng.',
+    score: 55,
+    summary: 'Tư duy bất định, nhiều mẹo vặt tình thế nhưng thiếu lập trường kiên định, tâm trí dễ bị xao nhãng.',
     details: [
       'Có tài xoay xở trong các tình huống khẩn cấp, nhiều mẹo vặt thông minh.',
       'Tâm lý thay đổi theo môi trường, cần có người đồng hành kiên định làm điểm tựa.',
       'Dễ tìm thấy cơ hội làm ăn ngách mà người khác bỏ qua.',
     ],
-    advice: 'Rèn luyện thói quen kiên định mục tiêu đến cùng; thiền định để tâm trí tĩnh lặng sáng suốt.',
+    positives: [
+      'Khéo léo xoay xở trong các hoàn cảnh khó khăn ngặt nghèo, nhiều mưu mẹo đối phó nhanh.',
+    ],
+    negatives: [
+      'Lập trường như con lắc: Rất dễ bị người khác thao túng, đổi ý xoành xoạch, nói một đằng làm một nẻo.',
+      'Thiếu trung thực: Dễ nói dối để né tránh trách nhiệm khi gặp sự cố.',
+      'Sự nghiệp dở dang: Thiếu sự tập trung cao độ, làm việc gì cũng chỉ được nửa chừng rồi bỏ dở.',
+    ],
+    advice: 'Bắt buộc phải rèn luyện tính chính trực và sự kiên trì. Hãy học cách giữ lời hứa và hoàn thành trọn vẹn từng việc nhỏ nhất.',
   },
 };
 
 // ─── Dữ Liệu Luận Giải Đường Tâm Đạo (Heart Line) ──────────────────
-const HEART_LINE_DATA: Record<HeartLineType, { title: string; score: number; summary: string; details: string[]; advice: string }> = {
+const HEART_LINE_DATA: Record<HeartLineType, {
+  title: string;
+  score: number;
+  summary: string;
+  details: string[];
+  positives: string[];
+  negatives: string[];
+  advice: string;
+}> = {
   dai_len_moc_tinh: {
     title: 'Đường Tâm Đạo Dài Uốn Lên Dưới Gò Mộc Tinh',
-    score: 96,
-    summary: 'Trái tim cao quý, trọng danh dự, lý tưởng tình yêu thuần khiết, chung thủy sắt son và tận tụy hy sinh.',
+    score: 86,
+    summary: 'Tình cảm sâu sắc, trọng danh dự và lý tưởng nhưng đặt tiêu chuẩn quá cao gây áp lực ngột ngạt cho người khác.',
     details: [
       'Tướng người có tình cảm sâu sắc, yêu ai thì hết lòng phụng sự và chở che cho đối phương.',
-      'Được bạn đời tôn trọng và quý mến; cuộc sống hôn nhân đầm ấm, bền chặt theo năm tháng.',
-      'Thường kết duyên với người có địa vị, trí tuệ hoặc đạo đức cao thượng.',
+      'Được bạn đời tôn trọng; cuộc sống hôn nhân gắn bó bền chặt theo năm tháng.',
+      'Thường hướng tới mẫu người có địa vị, trí tuệ hoặc đạo đức cao thượng.',
     ],
-    advice: 'Tránh đặt kỳ vọng quá hoàn hảo khiến bản thân chịu nhiều áp lực vô hình; bao dung với khuyết điểm nhỏ của người thương.',
+    positives: [
+      'Chung thủy sắt son, yêu ai thì hết lòng chở che và phụng sự gia đình.',
+      'Trọng chữ tín và đạo đức trong tình yêu, sẵn sàng hy sinh lợi ích bản thân vì người mình thương.',
+    ],
+    negatives: [
+      'Cầu toàn đến mức độc tài: Áp đặt tiêu chuẩn đạo đức khắt khe lên bạn đời, khiến đối phương luôn cảm thấy bị phán xét và ngột ngạt.',
+      'Tự làm khổ mình: Khi đối phương không hoàn hảo như kỳ vọng thì rơi vào thất vọng nặng nề, tự dằn vặt bản thân.',
+      'Cực đoan khi tổn thương: Nếu bị phản bội thì tâm hận thù rất sâu, khó tha thứ và có thể căm ghét cả đời.',
+    ],
+    advice: 'Tình yêu cần sự bao dung chứ không phải một bản án chấm điểm. Hãy học cách chấp nhận những khuyết điểm đời thường của bạn đời.',
   },
   ngan_duoi_tho_tinh: {
     title: 'Đường Tâm Đạo Ngắn Dừng Dưới Gò Thổ Tinh',
-    score: 80,
-    summary: 'Tình cảm thiên về thực tế, tỉnh táo và có xu hướng lý trí kiểm soát cảm xúc.',
+    score: 60,
+    summary: 'Tình cảm khô khan thực dụng, lý trí áp đảo trái tim, thiếu sự ấm áp và có xu hướng toan tính vật chất.',
     details: [
       'Không thích biểu lộ cảm xúc ủy mị ra ngoài, yêu thương bằng hành động thực tế và chu cấp vật chất.',
       'Ít khi bị mù quáng vì tình cảm, có ranh giới cá nhân rất rõ ràng.',
       'Cần học cách cởi mở hơn để đối phương cảm nhận được sự ấm áp từ bên trong.',
     ],
-    advice: 'Hãy chia sẻ cảm xúc và dành nhiều lời khen ngợi ngọt ngào cho người bạn đời.',
+    positives: [
+      'Tỉnh táo, không bị tình cảm làm mờ mắt, có khả năng quản lý tài chính và chu cấp vật chất ổn định cho gia đình.',
+    ],
+    negatives: [
+      'Lạnh lùng và ích kỷ: Xem trọng nhu cầu và lợi ích cá nhân hơn cảm xúc của bạn đời.',
+      'Toan tính sòng phẳng: Có xu hướng quy mọi thứ tình cảm ra giá trị vật chất, khiến hôn nhân biến thành một bản hợp đồng khô cứng.',
+      'Nguy cơ đổ vỡ cao: Khi gia đình gặp hoạn nạn khó khăn, dễ có tâm lý thoái thác hoặc tìm đường lui riêng cho mình.',
+    ],
+    advice: 'Hôn nhân không thể bền vững nếu chỉ xây trên sự tính toán. Cần mở lòng chia sẻ cảm xúc, học cách thấu hiểu và trao đi không vụ lợi.',
   },
   cong_sau: {
     title: 'Đường Tâm Đạo Uốn Cong Sâu & Đậm',
-    score: 90,
-    summary: 'Nhiệt huyết nồng nàn, cảm xúc mãnh liệt, luôn mang lại ngọn lửa ấm áp cho các mối quan hệ.',
+    score: 80,
+    summary: 'Nhiệt huyết mãnh liệt, giàu cảm xúc và sức hút đào hoa nhưng ghen tuông mù quáng và cảm xúc thất thường.',
     details: [
       'Sống chan hòa, chân tình, luôn sẵn sàng giúp đỡ bạn bè và người thân khi khó khăn.',
       'Sức hút đào hoa tự nhiên rất lớn, được nhiều người thầm thương trộm nhớ.',
       'Cần cẩn thận tránh để cảm xúc bột phát chi phối các quyết định quan trọng.',
     ],
-    advice: 'Giữ sự tỉnh táo trong việc chọn bạn tri kỷ; biến năng lượng yêu thương thành nguồn động lực xây đắp tổ ấm.',
+    positives: [
+      'Chân thành, nồng nhiệt, mang lại nguồn năng lượng sống động và ấm áp cho mối quan hệ.',
+      'Sức hút tự nhiên lớn, dễ chiếm được cảm tình của người khác phái.',
+    ],
+    negatives: [
+      'Ghen tuông bệnh hoạn: Đa nghi, thích kiểm soát từng hành động của bạn đời, dễ làm ầm ĩ vì những chuyện vụn vặt.',
+      'Cảm xúc bốc đồng: Sớm nắng chiều mưa, khi yêu thì cuồng nhiệt nhưng khi giận thì nói lời cay độc gây tổn thương sâu sắc.',
+      'Rắc rối đào hoa: Dễ bị cuốn vào những mối quan hệ phức tạp ngoài luồng, hao tiền tốn của vì chuyện tình ái.',
+    ],
+    advice: 'Kiềm chế tính ghen tuông và tôn trọng không gian riêng của người thương. Đừng để cảm xúc bộc phát phá nát nền tảng gia đình.',
   },
   duoi_en: {
-    title: 'Đường Tâm Đạo Phân Nhánh Đuôi Én Cát Tường',
-    score: 95,
-    summary: 'Biểu tượng của nhân duyên hòa hợp viên mãn, gia đạo hưng thịnh và tâm hồn quân tử.',
+    title: 'Đường Tâm Đạo Phân Nhánh Đuôi Én',
+    score: 85,
+    summary: 'Biết dung hòa tình cảm và lý trí, tính tình hòa nhã nhưng thiếu sự quyết đoán, dễ dây dưa không dứt khoát.',
     details: [
       'Một nhánh biểu trưng cho lý trí thấu hiểu, một nhánh biểu trưng cho trái tim từ ái.',
-      'Là người bạn đời lý tưởng, biết lắng nghe và dung hòa mọi xung đột trong gia đình.',
-      'Vận khí của bạn đời sẽ tăng tiến rõ rệt sau khi kết hôn cùng bạn.',
+      'Biết lắng nghe và dung hòa xung đột trong gia đình.',
+      'Vận khí của bạn đời sẽ có sự hỗ trợ tích cực sau khi kết hôn cùng bạn.',
     ],
-    advice: 'Đây là cát tướng hiếm thấy trong nhân tướng học, hãy trân trọng và vun đắp hạnh phúc hiện tại.',
+    positives: [
+      'Biết lắng nghe, dung hòa xung đột, là người bạn đời biết điều và mang lại hòa khí cho gia đình.',
+      'Đối xử công bằng và thấu hiểu tâm lý đối phương.',
+    ],
+    negatives: [
+      'Ba phải, thiếu dứt khoát: Sợ làm mất lòng người khác nên khi tình cảm xuất hiện rạn nứt thì né tránh không dám giải quyết dứt điểm.',
+      'Dễ bị lấn lướt: Bản tính quá hiền lành khiến người khác dễ lấn tới, phải chịu thiệt thòi trong im lặng.',
+      'Lưỡng lự trước các quyết định trọng đại về hôn nhân.',
+    ],
+    advice: 'Hiền lành phải đi cùng với bản lĩnh. Cần thẳng thắn bày tỏ ranh giới và lập trường của mình khi bị xâm phạm.',
   },
   thang_ngang: {
     title: 'Đường Tâm Đạo Thẳng Tắp Băng Ngang',
-    score: 82,
-    summary: 'Lòng trung kiên, nguyên tắc rõ ràng, trọng lời hứa nhưng đôi khi hơi nghiêm khắc.',
+    score: 70,
+    summary: 'Yêu ghét phân minh, trung kiên nhưng cứng nhắc, gia trưởng và tạo cảm giác ngột ngạt độc đoán.',
     details: [
       'Yêu ghét phân minh, không bao giờ lập lờ hai mặt trong chuyện tình cảm.',
       'Khi đã cam kết thì dốc lòng thực hiện, là chỗ dựa cực kỳ vững chắc cho gia đình.',
       'Đôi lúc tạo cảm giác lạnh lùng xa cách nếu người khác chưa tiếp xúc lâu dài.',
     ],
-    advice: 'Mở lòng thả lỏng hơn, học cách lắng nghe cảm xúc tế nhị của người thân yêu.',
+    positives: [
+      'Trung thành tuyệt đối, giữ trọn lời thề nguyền, là chỗ dựa vững chãi về mặt nguyên tắc cho gia đình.',
+    ],
+    negatives: [
+      'Gia trưởng và độc đoán: Thích áp đặt ý chí của mình lên bạn đời và con cái, không chấp nhận sự phản kháng.',
+      'Thiếu sự lãng mạn tinh tế: Lời nói cộc lốc, khô cứng, khó chia sẻ tâm sự khiến đời sống vợ chồng ngày càng xa cách.',
+      'Khó dung hòa khác biệt: Khi xảy ra mâu thuẫn thì chiến tranh lạnh kéo dài, không bao giờ chịu mở lời xin lỗi trước.',
+    ],
+    advice: 'Hãy hạ bớt cái tôi và sự gia trưởng. Hạnh phúc gia đình nằm ở sự lắng nghe và mềm mỏng, không phải sự phục tùng.',
   },
 };
 
 // ─── Dữ Liệu Luận Giải Đường Định Mệnh (Fate Line) ─────────────────
-const FATE_LINE_DATA: Record<FateLineType, { title: string; score: number; summary: string; details: string[]; advice: string }> = {
+const FATE_LINE_DATA: Record<FateLineType, {
+  title: string;
+  score: number;
+  summary: string;
+  details: string[];
+  positives: string[];
+  negatives: string[];
+  advice: string;
+}> = {
   ro_net_thang: {
-    title: 'Đường Định Mệnh Thẳng Tắp Từ Cổ Tay Lên Gò Thổ Tinh',
-    score: 96,
-    summary: 'Mệnh cách tự lực cánh sinh kiệt xuất, mục tiêu cuộc đời sáng rõ, sự nghiệp thăng tiến vững như bàn thạch.',
+    title: 'Đường Định Mệnh Thẳng Tắp Lên Gò Thổ Tinh',
+    score: 86,
+    summary: 'Ý chí sắt đá, sự nghiệp thăng tiến vững vàng nhưng cuộc sống cô độc trên đỉnh cao và phải đánh đổi hạnh phúc cá nhân.',
     details: [
       'Ý chí sắt đá, từ trẻ đã xác định được chí hướng và kiên trì theo đuổi tới cùng.',
-      'Công danh ngày càng rực rỡ từ tuổi 32 trở đi, nắm giữ chức vụ chỉ huy hoặc làm chủ doanh nghiệp lớn.',
-      'Tài lộc hanh thông, ít bị nghịch cảnh đánh ngã, luôn có đường hướng bứt phá.',
+      'Công danh ngày càng củng cố sau tuổi 32, nắm giữ chức vụ chỉ huy hoặc làm chủ công việc.',
+      'Tài lộc có nền móng, ít bị nghịch cảnh đánh ngã hoàn toàn.',
     ],
-    advice: 'Duy trì sự khiêm nhường khi đạt đỉnh cao; đào tạo thế hệ kế thừa để gia nghiệp trường tồn.',
+    positives: [
+      'Khả năng tự lực cánh sinh phi thường, có mục tiêu cuộc đời rõ ràng từ rất sớm.',
+      'Năng lực điều hành chỉ huy lớn, vượt qua được những giai đoạn khủng hoảng khốc liệt.',
+    ],
+    negatives: [
+      'Cô độc tột cùng: Càng lên cao càng ít bạn bè tri kỷ, luôn phải gánh vác trách nhiệm một mình trong sự cô quạnh.',
+      'Cuồng công việc: Xem sự nghiệp là mạng sống mà bỏ bê sức khỏe bản thân và tình cảm gia đình, con cái thiếu sự gắn kết.',
+      'Độc tài chuyên chế: Khó tin tưởng giao việc cho cấp dưới, luôn ôm đồm mọi quyền lực dẫn đến căng thẳng mãn tính.',
+    ],
+    advice: 'Thành công mà không có người cùng chia sẻ thì cũng chỉ là hư ảo. Hãy học cách phân quyền và dành thời gian cho những người thân yêu.',
   },
   tu_go_nguyet: {
     title: 'Đường Định Mệnh Xuất Phát Từ Gò Nguyệt Tinh',
-    score: 94,
-    summary: 'Mệnh cách quý nhân phù trợ, thành công nhờ sự trợ lực của đám đông, công chúng và tha nhân.',
+    score: 80,
+    summary: 'Thành công nhờ sự nâng đỡ của đám đông và quý nhân nhưng phụ thuộc nhiều vào hoàn cảnh bên ngoài, thiếu tính tự chủ.',
     details: [
       'Duyên may đặc biệt với người khác phái hoặc đối tác bên ngoài quê hương.',
-      'Rất đắc lợi trong các ngành nghề nghệ thuật, truyền thông, dịch vụ, ngoại giao, chính trị gia.',
-      'Mỗi khi gặp trắc trở đều xuất hiện quý nhân dang tay cứu giúp.',
+      'Rất đắc lợi trong các ngành nghề nghệ thuật, truyền thông, dịch vụ, ngoại giao.',
+      'Mỗi khi gặp trắc trở đều xuất hiện quý nhân dang tay hỗ trợ.',
     ],
-    advice: 'Luôn giữ tấm lòng tri ân và đối xử tử tế với mọi người; đó chính là nguồn cội may mắn lớn nhất của bạn.',
+    positives: [
+      'Đắc nhân tâm, dễ thu hút sự ủng hộ của công chúng, khách hàng và đối tác.',
+      'Gặp hoạn nạn thường có quý nhân ra tay giải cứu kịp thời.',
+    ],
+    negatives: [
+      'Bị động và phụ thuộc: Vận mệnh chịu ảnh hưởng quá lớn từ tâm trạng và sự đánh giá của người khác, thiếu gốc rễ tự lực.',
+      'Dễ sụp đổ khi mất chỗ dựa: Nếu người đỡ đầu hoặc đám đông quay lưng thì dễ rơi vào khủng hoảng bế tắc.',
+      'Dễ bị kẻ xấu thao túng lợi dụng tên tuổi vào những mục đích không minh bạch.',
+    ],
+    advice: 'Xây dựng năng lực cốt lõi tự thân thay vì chỉ dựa vào sự ưu ái của người khác. Tự thân lập mệnh mới là chỗ dựa vĩnh cửu.',
   },
   dut_doan: {
     title: 'Đường Định Mệnh Đứt Đoạn Nối Tiếp',
-    score: 82,
-    summary: 'Sự nghiệp trải qua nhiều lần chuyển hướng ngoạn mục, hậu vận tái sinh thành công rực rỡ.',
+    score: 58,
+    summary: 'Sự nghiệp trải qua nhiều phen gãy khúc, thăng trầm điêu đứng; tiền vận dễ trắng tay, phải làm lại từ đầu.',
     details: [
-      'Thường thay đổi ngành nghề hoặc lập nghiệp lần thứ hai mới thực sự tìm thấy thiên mệnh.',
-      'Mỗi lần đổi hướng đều tích lũy thêm một kho tàng kinh nghiệm và mạng lưới quan hệ mới.',
-      'Đại vận từ trung niên (khoảng sau 38-40 tuổi) bừng sáng ngoạn mục.',
+      'Thường thay đổi ngành nghề hoặc lập nghiệp lần thứ hai mới thực sự tìm thấy hướng đi ổn định.',
+      'Mỗi lần đổi hướng đều tiêu tốn nhiều tiền bạc, thời gian và năng lượng.',
+      'Đại vận phải đợi sau 38-40 tuổi mới dần có sự ổn định.',
     ],
-    advice: 'Đừng nản lòng khi gặp giai đoạn chững lại; coi đó là bước đệm cần thiết để tích lũy năng lượng cho bước nhảy vọt.',
+    positives: [
+      'Ý chí tái sinh kiên cường, bản lĩnh tôi luyện qua nghịch cảnh, càng về già càng dày dạn kinh nghiệm.',
+    ],
+    negatives: [
+      'CẢNH BÁO THẤT BẠI: Thường phải nếm mùi phá sản, mất chức hoặc đổ vỡ sự nghiệp ít nhất 1-2 lần ở tuổi 30-40.',
+      'Dòng tiền bấp bênh: Tụ tán thất thường, kiếm được nhiều tiền nhưng không giữ được do đầu tư sai hoặc bị phản phúc.',
+      'Tâm lý bất an, hay đổi nghề, mất nhiều năm loay hoay không tìm thấy chỗ đứng vững chắc.',
+    ],
+    advice: 'Tuyệt đối không vay mượn liều lĩnh hoặc mở rộng quy mô khi nền móng chưa vững. Phải có quỹ dự phòng khẩn cấp cho các biến cố nghề nghiệp.',
   },
   huong_thai_duong: {
     title: 'Đường Định Mệnh Rẽ Nhánh Lên Gò Thái Dương',
-    score: 98,
-    summary: 'Tướng "Danh Lợi Song Toàn" - Đạt tới đỉnh cao của danh tiếng lẫy lừng và tài phú dồi dào.',
+    score: 88,
+    summary: 'Tướng "Danh Lợi Song Toàn" nhưng đi liền với thị phi rình rập, "chữ tài liền với chữ tai", bị tiểu nhân đố kỵ.',
     details: [
       'Có tài năng độc đáo được xã hội công nhận và tôn vinh rộng rãi.',
       'Tài lộc đi liền với uy tín cá nhân, tiền tài dồi dào tự nhiên tìm đến.',
-      'Hậu vận rực rỡ, được xã hội kính trọng và lưu danh thơm.',
+      'Hậu vận có tên tuổi, nhưng áp lực giữ gìn danh tiếng rất lớn.',
     ],
-    advice: 'Dùng danh tiếng và tài lực để làm các việc công ích thiện nguyện, tạo phúc đức trường cửu cho hậu duệ.',
+    positives: [
+      'Tài năng xuất chúng được xã hội ghi nhận, danh tiếng lẫy lừng và khả năng tạo ra tài phú lớn.',
+    ],
+    negatives: [
+      'Cạm bẫy thị phi: Càng nổi tiếng càng dễ bị soi mói, bị kẻ tiểu nhân đặt điều bôi nhọ hoặc dính vào các vụ bê bối truyền thông.',
+      'Kiêu ngạo tự mãn: Dễ bị ánh hào quang làm mờ mắt, tiêu xài xa hoa hoang phí và coi thường người yếu thế.',
+      'Hậu vận có nguy cơ sụp đổ danh tiếng nếu sống thiếu đức độ hoặc vướng vào các tệ nạn xa xỉ.',
+    ],
+    advice: 'Càng ở vị trí cao càng phải cúi đầu khiêm tốn. Lấy danh tiếng làm phương tiện giúp đỡ đời, tránh phô trương của cải kẻo chiêu họa.',
   },
   mo_nhat: {
     title: 'Đường Định Mệnh Mờ Nhạt Hoặc Tự Do',
-    score: 78,
-    summary: 'Lối sống phóng khoáng tự tại, không bị trói buộc bởi khuôn mẫu truyền thống, tự tay vẽ nên số phận.',
+    score: 52,
+    summary: 'Định hướng cuộc đời mơ hồ, thiếu mục tiêu kiên định, sống theo bản năng "nước chảy bèo trôi", hậu vận dễ túng thiếu.',
     details: [
-      'Cổ thư chỉ rõ: Không có đường định mệnh rõ nét đồng nghĩa bạn là người tự do, tương lai hoàn toàn do bạn quyết định.',
-      'Thích khám phá nhiều trải nghiệm mới mẻ hơn là ngồi yên một chỗ trong văn phòng.',
-      'Khi tìm đúng đam mê đích thực, đường định mệnh sẽ tự động hằn sâu và rõ nét dần theo thời gian.',
+      'Cổ thư chỉ rõ: Không có đường định mệnh rõ nét cho thấy thiếu một lộ trình nghề nghiệp kiên định.',
+      'Thích khám phá nhiều trải nghiệm mới mẻ hơn là ngồi yên một chỗ trong khuôn khổ.',
+      'Nếu không tìm thấy kỷ luật bản thân thì thời gian trôi qua rất nhanh mà tay trắng vẫn hoàn trắng tay.',
     ],
-    advice: 'Xác định một mục tiêu cốt lõi và kiên trì tối thiểu 3 năm, bạn sẽ thấy vận mệnh thay đổi kỳ diệu.',
+    positives: [
+      'Tâm hồn tự do phóng khoáng, không màng danh lợi hư ảo, ít bị áp lực xã hội đè nặng.',
+    ],
+    negatives: [
+      'Thiếu ý chí lập thân: Dễ an phận thủ thường, ngại khó ngại khổ, thích sự an nhàn nhất thời.',
+      'Kinh tế bấp bênh: Làm đâu tiêu đó, không có tích lũy tài sản, tuổi trẻ lãng phí thời gian vào những thú vui vô bổ.',
+      'CẢNH BÁO HẬU VẬN: Nguy cơ rơi vào cảnh nghèo túng hoặc phụ thuộc vào người khác khi về già do không có sự nghiệp riêng.',
+    ],
+    advice: 'Cần thức tỉnh ngay lập tức! Cuộc đời không có mục tiêu giống như con thuyền không bánh lái. Hãy chọn ngay một nghề chuyên môn và kiên trì rèn luyện ít nhất 5 năm.',
   },
 };
 
@@ -442,24 +661,55 @@ export function analyzePalm(input: PalmInput): PalmistryResult {
       : 'Gò Nguyệt Tinh gọn gàng: Tư duy thực tế, ưa nhìn thấy kết quả cụ thể hơn là mơ mộng viển vông.',
   };
 
-  // Tính điểm tổng hòa và xếp hạng vận mệnh
-  const avgScore = Math.round((life.score + head.score + heart.score + fate.score) / 4) + (input.specialSigns.length * 3);
-  let destinyGrade: 'Thượng Cách' | 'Trung Cát Cách' | 'Cát Cách Tiềm Tàng' | 'Đại Khí Vãn Thành' = 'Trung Cát Cách';
-  let archetype = 'Bậc Tự Lập Khai Phá';
+  // Tính điểm tổng hòa và xếp hạng vận mệnh thực tế, khách quan
+  const avgScore = Math.round((life.score + head.score + heart.score + fate.score) / 4);
+  let destinyGrade: DestinyGrade = 'Trung Cát Cách (Thành Tựu Bền Vững Nhờ Thực Lực)';
+  let archetype = 'Bậc Thực Lực Vững Vàng · Tiến Từng Bước Chắc';
 
-  if (avgScore >= 95 || input.specialSigns.includes('chu_m') || input.specialSigns.includes('tam_giac_vang')) {
-    destinyGrade = 'Thượng Cách';
-    archetype = 'Bậc Kỳ Tài Danh Lợi Song Toàn';
-  } else if (avgScore >= 88) {
-    destinyGrade = 'Trung Cát Cách';
-    archetype = 'Bậc Trí Dũng Thăng Tiến Bền Vững';
-  } else if (input.fateLine === 'dut_doan' || input.lifeLine === 'dut_doan') {
-    destinyGrade = 'Đại Khí Vãn Thành';
-    archetype = 'Bậc Chuyển Họa Vi Phúc · Càng Về Già Càng Hưng Vượng';
+  const hasBrokenLine = input.lifeLine === 'dut_doan' || input.fateLine === 'dut_doan';
+  const hasFaintOrWavy = input.fateLine === 'mo_nhat' || input.headLine === 'uon_luon';
+
+  if ((hasBrokenLine && hasFaintOrWavy) || avgScore < 60) {
+    destinyGrade = 'Ba Đào Khảo Nghiệm Cách (Biến Cố Sức Khỏe & Thị Phi Rình Rập)';
+    archetype = 'Bậc Vượt Qua Bão Tố · Trọng Trách Sinh Mệnh';
+  } else if (hasBrokenLine) {
+    destinyGrade = 'Đại Khí Vãn Thành (Tiền Vận Lao Đao · Hậu Vận Hưng Phát)';
+    archetype = 'Bậc Tôi Luyện Trong Gian Khó · Hậu Vận Khởi Sắc';
+  } else if (avgScore < 68) {
+    destinyGrade = 'Bình Hòa Cách (Lao Tâm Bán Sức · Phải Tự Thân Vận Động)';
+    archetype = 'Người Bươn Chải Đời Thường · Tự Lực Cánh Sinh';
+  } else if (avgScore < 78) {
+    destinyGrade = 'Cát Hung Tương Bán (Được Mất Song Hành · Nửa Đời Sóng Gió)';
+    archetype = 'Bậc Gánh Vác Thăng Trầm · Được Mất Đi Cùng Nhau';
+  } else if (avgScore < 86) {
+    destinyGrade = 'Trung Cát Cách (Thành Tựu Bền Vững Nhờ Thực Lực)';
+    archetype = 'Bậc Thực Lực Vững Vàng · Tiến Từng Bước Chắc';
   } else {
-    destinyGrade = 'Cát Cách Tiềm Tàng';
-    archetype = 'Viên Ngọc Quý Chờ Ngày Tỏa Sáng';
+    destinyGrade = 'Thượng Cách (Kỳ Tài Danh Lợi · Cô Độc Đỉnh Cao)';
+    archetype = 'Bậc Trí Dũng Tiên Phong · Trả Giá Bằng Sự Cô Đơn';
   }
+
+  const elementFlaws: Record<HandElement, string> = {
+    kim: 'Tật xấu cốt lõi: Cương nghị thái quá dẫn đến cứng nhắc, gia trưởng, áp đặt ý chí lên người khác và khó chấp nhận sai lầm của bản thân.',
+    moc: 'Tật xấu cốt lõi: Tự tôn quá lớn, sĩ diện hảo, dễ suy nghĩ viển vông xa rời thực tế và dễ tự ái giận dỗi khi bị phê bình.',
+    thuy: 'Tật xấu cốt lõi: Tâm lý bất định, để cảm xúc lấn át lý trí quá nhiều, hay suy diễn tiêu cực, cả thèm chóng chán và thiếu lập trường kiên định.',
+    hoa: 'Tật xấu cốt lõi: Nóng nảy bột phát, hiếu thắng, "giận mất khôn", thích làm theo cảm hứng nhất thời mà không lường trước hậu quả pháp lý hay tài chính.',
+    tho: 'Tật xấu cốt lõi: Chậm chạp, ngại đổi mới, cố chấp bám lấy thói quen cũ kỹ dù đã lỗi thời, dễ bỏ lỡ thời cơ bứt phá vì quá cẩn trọng.',
+  };
+
+  const criticalFlaws: string[] = [
+    elementFlaws[input.element],
+    `Điểm mù tư duy: ${head.negatives[0]}`,
+    `Tật xấu tình cảm: ${heart.negatives[0]}`,
+    `Khuyết điểm hành động: ${fate.negatives[0] || life.negatives[0]}`,
+  ];
+
+  const majorRisks: string[] = [
+    `Cạm bẫy sự nghiệp & công danh: ${fate.negatives[1] || fate.negatives[0]}`,
+    `Rủi ro tài chính & tiền bạc: ${input.fateLine === 'mo_nhat' || input.fateLine === 'dut_doan' ? 'Nguy cơ phá sản, hao tài nặng nề hoặc tay trắng do đầu tư cảm tính, thiếu kỷ luật tài chính.' : 'Dễ bị dèm pha, tranh chấp tài sản hoặc bị người khác lợi dụng sự cả nể mà quỵt nợ.'}`,
+    `Họa tình cảm & gia đạo: ${heart.negatives[1] || heart.negatives[2] || 'Nguy cơ chiến tranh lạnh kéo dài, rạn nứt hôn nhân do bất đồng quan điểm sống.'}`,
+    `Cảnh báo sức khỏe & thân mạng: ${life.negatives[2] || life.negatives[0]}`,
+  ];
 
   return {
     input,
@@ -490,13 +740,15 @@ export function analyzePalm(input: PalmInput): PalmistryResult {
     overallVerdict: {
       archetype,
       destinyGrade,
-      summary: `Tướng tay thuộc ${elementInfo.name}, kết hợp cùng ${life.title} và ${head.title}. Cốt cách bàn tay biểu thị một tâm hồn ${elementInfo.personality}. Tổng thể đạt mức ${destinyGrade}.`,
-      careerProspect: `Sự nghiệp rất hợp với các ngành nghề: ${elementInfo.careerFit}. ${fate.summary}`,
-      loveProspect: `Vận tình cảm hôn nhân: ${heart.summary}`,
+      summary: `Tướng tay thuộc ${elementInfo.name}, kết hợp cùng ${life.title} và ${head.title}. Cốt cách bàn tay định hình nên tính cách: ${elementInfo.personality}. Đạt thế cuộc: ${destinyGrade}. Đạo tướng học luôn có hai mặt: Muốn thành tựu lớn ắt phải trải qua khảo nghiệm tương xứng; cần khắc phục triệt để các tật xấu và điểm mù để bảo toàn phúc lộc.`,
+      careerProspect: `${fate.summary} Thế mạnh: ${fate.positives[0] || 'Có ý chí lập nghiệp'}. CẢNH BÁO MẶT TRÁI: ${fate.negatives[0]} Phù hợp các ngành: ${elementInfo.careerFit}.`,
+      loveProspect: `${heart.summary} Mặt tích cực: ${heart.positives[0] || 'Chân thành trong tình cảm'}. NGUY CƠ ĐỔ VỠ: ${heart.negatives[0]}`,
       wealthProspect: input.specialSigns.includes('tam_giac_vang') || input.specialSigns.includes('chu_m')
-        ? 'Tài vận đại cát: Sở hữu dấu ấn tụ tài hiếm có, tiền bạc vào tay không bị thất thoát, càng tích lũy càng giàu có hưng thịnh.'
-        : 'Tài vận hanh thông vững vàng: Thu nhập tỷ lệ thuận với công sức và uy tín cá nhân, hậu vận điền sản dồi dào.',
-      keyAction: `Lời khuyên cốt lõi: ${head.advice} Hãy chú ý phát huy màu sắc may mắn (${elementInfo.luckyColor}) và rèn luyện tâm tính thiện lành để tướng tùy tâm chuyển, phúc khí đời đời.`,
+        ? 'Có tiềm năng tụ tài nhờ dấu hiệu cát lợi, nhưng nếu kiêu ngạo tự mãn và tiêu xài hoang phí thì của cải cũng dễ đội nón ra đi.'
+        : 'Thu nhập phụ thuộc hoàn toàn vào mồ hôi nước mắt và tính cần cù; tài lộc không bao giờ tự trên trời rơi xuống, cần đề phòng hao tài vì tin người mù quáng.',
+      criticalFlaws,
+      majorRisks,
+      keyAction: `Lời khuyên cốt lõi: ${head.advice} ${life.advice} Hãy chú ý phát huy màu sắc may mắn (${elementInfo.luckyColor}) và rèn luyện tâm tính khiêm nhường, thiện lương để tướng tùy tâm chuyển, chuyển họa vi phúc.`,
     },
   };
 }

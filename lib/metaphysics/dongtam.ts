@@ -244,6 +244,7 @@ export function calculateXunKong(ganZhiDay: string): string {
 
 /**
  * Hàm phân tích động thái câu hỏi tổng quát theo dạng câu hỏi (Có/Không, Khi nào, Thế nào, Nên làm gì)
+ * Luận giải khách quan, nói đúng sự thật, có tốt có xấu, phân định rạch ròi điềm Cát / Hung / Thận trọng.
  */
 function synthesizeGeneralVerdict(
   q: string,
@@ -259,48 +260,93 @@ function synthesizeGeneralVerdict(
   const isTiming = /(bao giờ|khi nào|bao lâu|mấy giờ|năm nay|tháng mấy|sắp tới|gần đây|thời điểm nào|chừng nào)/i.test(q);
   const isActionAdvice = /(nên làm gì|phải làm sao|làm sao|cách nào|hướng giải quyết|hành động ra sao|xử lý thế nào)/i.test(q);
 
+  const isHung = changedInfo.omen === 'hung';
+  const isCaution = changedInfo.omen === 'thận_trọng';
+  const isBalance = changedInfo.omen === 'bình_hòa';
   const isAuspicious = changedInfo.omen === 'đại_cát' || changedInfo.omen === 'cát';
 
   if (isQuantity) {
+    if (isHung) {
+      return {
+        directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ RẤT ÍT HOẶC HOÀN TOÀN KHÔNG CÓ; TÌNH HÌNH BẾ TẮC HOẶC ĐỐI TƯỢNG ĐANG CỐ TÌNH LẨN TRÁNH.`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Dòng khí bị tắc nghẽn nghiêm trọng, lượng tương tác tụt dốc, đề phòng sự việc bị đóng băng hoàn toàn.`
+      };
+    }
+    if (isCaution) {
+      return {
+        directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CHƯA NHIỀU, ĐẾN RẢI RÁC VÀ KHÔNG ĐỀU; HIỆU SUẤT ĐANG Ở MỨC THẤP.`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) mang tính trì trệ. Cần xem lại phương pháp tiếp cận vì kết quả hiện tại chưa đạt kỳ vọng.`
+      };
+    }
     if (isAuspicious) {
       return {
-        directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CÓ VÀ KHÁ NHIỀU. Tượng quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, các tương tác và cơ hội sẽ diễn ra rất nhộn nhịp, dồi dào hơn thường lệ.`,
+        directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CÓ VÀ KHÁ NHIỀU. Tượng quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, số lượng tương tác dồi dào; nhưng cần chuẩn bị năng lực đón tiếp để tránh quá tải.`,
         dichLyDetails: `Quẻ gốc ${origName} động hào ${movingLine} chuyển hóa sang ${changedName} (${changedInfo.nature}). Năng lượng quẻ biến vượng tướng báo hiệu số lượng và quy mô sự việc sẽ khởi sắc rõ nét.`
       };
     }
     return {
-      directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CHƯA NHIỀU HOẶC ĐẾN RẢI RÁC; CẦN CHỦ ĐỘNG TẠO THÊM NGUỒN LỰC VÀ TƯƠNG TÁC.`,
-      dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) cho thấy tình hình chưa dồn dập ngay lúc này. Lời khuyên của Dịch: ${changedInfo.advice}`
+      directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ Ở MỨC TRUNG BÌNH, VỪA PHẢI; KHÔNG QUÁ ĐÔNG CŨNG KHÔNG QUÁ Ế ẨM.`,
+      dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) giữ thế bình hòa. Sự việc diễn ra bình thường, cần chủ động xúc tiến thêm.`
     };
   }
 
   if (isYesNo) {
     if (changedName === 'Trạch Hỏa Cách') {
       return {
-        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ NÊN VÀ RẤT KHẢ QUAN, NHƯNG BẮT BUỘC PHẢI ĐỔI MỚI PHƯƠNG THỨC TIẾP CẬN, KHÔNG NÊN ĐI THEO LỐI MÒN CŨ.`,
-        dichLyDetails: `Quẻ biến Trạch Hỏa Cách (Canh tân đổi mới) ủng hộ sự thay đổi táo bạo. Nếu dũng cảm bứt phá và rũ bỏ cách làm cũ thì ắt thành công.`
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ NÊN VÀ RẤT KHẢ QUAN, NHƯNG BẮT BUỘC PHẢI ĐỔI MỚI PHƯƠNG THỨC TIẾP CẬN, KHÔNG NÊN ĐI THEO LỐI MÒN CŨ. NẾU BẢO THỦ GIỮ CÁCH CŨ ẮT SẼ THẤT BẠI.`,
+        dichLyDetails: `Quẻ biến Trạch Hỏa Cách (Canh tân đổi mới) ủng hộ sự thay đổi táo bạo. Nếu dũng cảm bứt phá và rũ bỏ cách làm cũ thì ắt thành công; nếu sợ hãi do dự sẽ chuốc lấy bế tắc.`
+      };
+    }
+    if (isHung) {
+      return {
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI DỨT KHOÁT LÀ KHÔNG / RẤT XẤU VÀ NGUY HIỂM. Tượng quẻ lâm Điềm Hung, mưu sự dễ gặp thất bại ê chề, hao tài tốn của hoặc vướng thị phi đố kỵ. Tuyệt đối KHÔNG NÊN tiến hành lúc này.`,
+        dichLyDetails: `Quẻ ${origName} động hào ${movingLine} biến ${changedName} (${changedInfo.nature}). Điềm quẻ cảnh báo sự gãy đổ hoặc bị tiểu nhân phản trắc. Lời khuyên của Dịch: Dừng lại ngay lập tức để bảo toàn lực lượng.`
+      };
+    }
+    if (isCaution) {
+      return {
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CHƯA NÊN / KHÔNG THUẬN LỢI. Đang bị kìm hãm, nội bộ bất hòa hoặc thời cơ chưa chín muồi. Cố chấp tiến lên sẽ chịu thiệt thòi lớn.`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) khuyên đương số: ${changedInfo.advice}. Cần quan sát thêm, không được hành động theo cảm tính.`
+      };
+    }
+    if (isBalance) {
+      return {
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CÁT HUNG TƯƠNG BÁN (50/50). Có cơ hội nhưng rủi ro đi kèm cũng ngang ngửa. Được cái này ắt phải mất cái kia; chỉ nên làm thăm dò, không được dốc hết vốn liếng.`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) báo hiệu cục diện giằng co. Phải tự lượng sức mình và chuẩn bị sẵn phương án dự phòng.`
       };
     }
     if (isAuspicious) {
       return {
-        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CÓ / RẤT THUẬN LỢI. Thời vận đang chuyển biến tích cực, sự việc sẽ diễn ra suôn sẻ đúng như mong cầu.`,
-        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, tượng quẻ thuận lý đẩy lùi trắc trở.`
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CÓ / THUẬN LỢI. Thời vận đang chuyển biến tích cực, sự việc có cơ hội thành công; TUY NHIÊN CẦN ĐỀ PHÒNG TIỂU NHÂN GANH GHÉT VÀ TRÁNH TỰ CAO TỰ ĐẠI KẺO "TRÈO CAO NGÃ ĐAU".`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, nhưng luật Âm Dương nhắc nhở khi đắc thế phải biết khiêm nhường để giữ phúc lâu dài.`
       };
     }
     return {
-      directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ TẠM THỜI CHƯA ĐẠT ĐƯỢC NHƯ Ý HOẶC CẦN THÊM THỜI GIAN; NÊN BÌNH TĨNH CHỜ THỜI ĐIỂM THÍCH HỢP HƠN.`,
+      directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CẦN TÍNH TOÁN KỸ LƯỠNG, CHƯA THỂ KHẲNG ĐỊNH NGAY VÌ PHỤ THUỘC VÀO SỰ TỈNH TÁO CỦA BẠN.`,
       dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) khuyên đương số: ${changedInfo.advice}`
     };
   }
 
   if (isTiming) {
+    if (isHung) {
+      return {
+        directConclusion: `Về mốc thời gian "${q.trim()}": GIAI ĐOẠN HIỆN TẠI VÀ SẮP TỚI ĐANG LÀ THỜI ĐIỂM BẤT LỢI NHẤT; TRÁNH KHỞI SỰ HOẶC ĐƯA RA QUYẾT ĐỊNH QUAN TRỌNG TRONG VÒNG 1 THÁNG TỚI.`,
+        dichLyDetails: `Quẻ ${origName} biến ${changedName} (${changedInfo.nature}) cảnh báo thời vận chưa tới, nóng vội ắt chuốc lấy tai họa.`
+      };
+    }
     return {
-      directConclusion: `Về mốc thời gian "${q.trim()}": THỜI CƠ ĐANG DẦN CHÍN MUỒI, DỰ BÁO CHUYỂN BIẾN RÕ RÀNG NHẤT VÀO: ${ungKy.toUpperCase()}.`,
-      dichLyDetails: `Quẻ gốc ${origName} (${origInfo.nature}) qua hào động ${movingLine} chuyển hóa sang ${changedName} (${changedInfo.nature}), giai đoạn tới sẽ là bước ngoặt bộc phát.`
+      directConclusion: `Về mốc thời gian "${q.trim()}": THỜI CƠ ĐANG DẦN CHUYỂN BIẾN, DỰ BÁO BƯỚC NGOẶT RÕ RÀNG NHẤT VÀO: ${ungKy.toUpperCase()}.`,
+      dichLyDetails: `Quẻ gốc ${origName} (${origInfo.nature}) qua hào động ${movingLine} chuyển hóa sang ${changedName} (${changedInfo.nature}). Cần kiên nhẫn tích lũy nội lực đón thời điểm này.`
     };
   }
 
   if (isActionAdvice) {
+    if (isHung) {
+      return {
+        directConclusion: `Về hướng giải quyết cho "${q.trim()}": DỪNG NGAY HÀNH ĐỘNG LIỀU LĨNH, RÚT LUI BẢO TOÀN LỰC LƯỢNG: ${changedInfo.advice.toUpperCase()}.`,
+        dichLyDetails: `Quẻ biến ${changedName} lâm hung tượng. Lúc này tiến là nguy, thoái là an. Phải giữ tâm bình tĩnh, không manh động đôi co.`
+      };
+    }
     return {
       directConclusion: `Về hướng giải quyết cho "${q.trim()}": BẠN NÊN DỰA TRÊN NGUYÊN TẮC: ${changedInfo.advice.toUpperCase()}.`,
       dichLyDetails: `Quẻ biến ${changedName} khuyên bạn giữ vững đạo trung chính, phát huy ${origInfo.nature} của quẻ gốc để tháo gỡ vấn đề.`
@@ -310,14 +356,35 @@ function synthesizeGeneralVerdict(
   // Câu hỏi thế nào / ra sao / diễn tiến
   if (changedName === 'Trạch Hỏa Cách') {
     return {
-      directConclusion: `Về vấn đề "${q.trim()}": THỜI VẬN ĐANG ĐÒI HỎI MỘT SỰ CANH TÂN, ĐỔI MỚI HOẶC LỘT XÁC MẠNH MẼ ĐỂ ĐẠT THÀNH TỰU.`,
-      dichLyDetails: `Quẻ gốc ${origName} (${origInfo.nature}) động hào ${movingLine} biến sang Trạch Hỏa Cách (${changedInfo.nature}). Điềm quẻ khẳng định sự việc của bạn sắp có bước ngoặt lớn; cần mạnh dạn thay đổi phương thức tiếp cận, dứt bỏ thói quen cũ thì ắt đón nhận thành quả tốt đẹp.`
+      directConclusion: `Về vấn đề "${q.trim()}": THỜI VẬN ĐANG ĐÒI HỎI MỘT SỰ CANH TÂN, ĐỔI MỚI HOẶC LỘT XÁC MẠNH MẼ ĐỂ THOÁT KHỎI BẾ TẮC. NẾU DO DỰ KHÔNG DÁM THAY ĐỔI THÌ TÌNH HÌNH SẼ CÀNG XẤU ĐI.`,
+      dichLyDetails: `Quẻ gốc ${origName} (${origInfo.nature}) động hào ${movingLine} biến sang Trạch Hỏa Cách (${changedInfo.nature}). Điềm quẻ khẳng định sự việc của bạn sắp có bước ngoặt lớn; cần mạnh dạn thay đổi phương thức tiếp cận, dứt bỏ thói quen cũ.`
+    };
+  }
+
+  if (isHung) {
+    return {
+      directConclusion: `Về tình hình "${q.trim()}": THỜI VẬN ĐANG VÀO ĐIỀM HUNG HIỂM BẾ TẮC. Nguy cơ bị tiểu nhân lừa gạt, gãy gánh giữa đường hoặc hao tổn nặng nề. Phải dừng ngay mọi hành động liều lĩnh để phòng ngừa rủi ro lớn.`,
+      dichLyDetails: `Quẻ gốc ${origName} biến ${changedName} (${changedInfo.nature}). Tượng quẻ hiểm trở, khuyên đương số: ${changedInfo.advice}`
+    };
+  }
+
+  if (isCaution) {
+    return {
+      directConclusion: `Về tình hình "${q.trim()}": ĐANG GẶP TRẮC TRỞ VÀ ÁP LỰC ĐÈ NẶNG. Môi trường có sự nghi kỵ, việc tiến hành gặp cản trở lớn; cần bình tâm chờ thời cơ thuận lợi hơn.`,
+      dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) báo hiệu trở ngại. Dịch lý chỉ dẫn: ${changedInfo.advice}`
+    };
+  }
+
+  if (isBalance) {
+    return {
+      directConclusion: `Về tình hình "${q.trim()}": CÁT HUNG ĐAN XEN, ĐƯỢC MẤT SONG HÀNH. Không có chuyện toàn màu hồng, muốn đạt được kết quả phải chấp nhận đánh đổi công sức và thời gian tương xứng.`,
+      dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) khuyên giữ thái độ trung dung, không quá lạc quan cũng không bi quan.`
     };
   }
 
   if (isAuspicious) {
     return {
-      directConclusion: `Về diễn biến "${q.trim()}": KẾT QUẢ ĐANG CHUYỂN HƯỚNG RẤT TÍCH CỰC, ${changedInfo.coreMeaning.toUpperCase()}`,
+      directConclusion: `Về diễn biến "${q.trim()}": KẾT QUẢ ĐANG CHUYỂN HƯỚNG TÍCH CỰC, NHƯNG BẮT BUỘC PHẢI TRẢ GIÁ BẰNG SỰ LAO LỰC NGHIÊM TÚC; CẦN ĐỀ PHÒNG THỊ PHI GHEN GHÉT SAU KHI ĐẠT ĐƯỢC MỤC TIÊU.`,
       dichLyDetails: `Quẻ gốc ${origName} (${origInfo.nature}) động hào ${movingLine} biến ${changedName} (${changedInfo.nature}). Lời khuyên của Dịch: ${changedInfo.advice}`
     };
   }
@@ -517,7 +584,10 @@ export function castDongTam(
     explanation = 'Chiêm tìm đồ thất lạc lấy hào Thê Tài làm Dụng Thần, phối hào Phụ Mẫu xem nơi cất giấu.';
     ungKy = 'Trong vòng 1-3 ngày tới hoặc tìm vào hướng quẻ chỉ dẫn';
 
-    if (isChangedAuspicious) {
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về việc tìm kiếm "${question.trim()}": KHẢ NĂNG TÌM LẠI CỰC KỲ THẤP, ĐỒ VẬT RẤT DỄ ĐÃ BỊ MẤT CẮP HOẶC BỊ TẨU TÁN ĐI RẤT XA; NÊN CHUẨN BỊ TÂM LÝ CHẤP NHẬN BUÔNG BỎ.`;
+      dichLyDetails = `Quẻ ${originalName} động hào ${movingLine} biến ${changedName} lâm Điềm Hung. Hào Thê Tài suy bại, tài vật bị tổn hại nghiêm trọng.`;
+    } else if (isChangedAuspicious) {
       directConclusion = `Về việc tìm kiếm "${question.trim()}": CƠ HỘI TÌM LẠI RẤT CAO, ĐỒ VẬT CHƯA HỀ BỊ MẤT MÀ ĐANG BỊ BỎ QUÊN HOẶC ĐỒ VẬT KHÁC CHE KHUẤT.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy tài vật vẫn còn ở trong phạm vi quen thuộc (nhà ở, nơi làm việc hoặc phương tiện đi lại). Hãy tìm ở các góc khuất, hộc tủ hoặc hỏi người thân gần gũi.`;
     } else {
@@ -532,9 +602,12 @@ export function castDongTam(
     explanation = 'Chiêm nhà đất lấy hào Phụ Mẫu làm Dụng Thần (tượng trưng cho đất đai, nhà cửa, sổ đỏ), hào Thê Tài làm giá cả giao dịch.';
     ungKy = 'Trong vòng 1-3 tháng tới hoặc vào các tháng tứ quý (Thìn, Tuất, Sửu, Mùi)';
 
-    if (isChangedAuspicious) {
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về việc nhà đất "${question.trim()}": CỰC KỲ NGUY HIỂM / DỄ DÍNH TRANH CHẤP, QUY HOẠCH TREO HOẶC LỪA ĐẢO SỔ ĐỎ GIẢ. Tuyệt đối không đặt cọc lúc này!`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Đất đai phong thủy có hung khí hoặc vướng mắc pháp lý nghiêm trọng.`;
+    } else if (isChangedAuspicious) {
       directConclusion = `Về việc nhà đất "${question.trim()}": RẤT CÁT LỢI VÀ HANH THÔNG, GIAO DỊCH DỄ THÀNH CÔNG, ĐẤT ĐAI CÓ ĐỊA KHÍ TỐT ĐEM LẠI AN CƯ HOẶC SINH LỜI.`;
-      dichLyDetails = `Quẻ gốc ${originalName} (${origInfo.nature}) biến sang ${changedName} (${changedInfo.nature}) là điềm đại cát cho điền trạch. Giấy tờ pháp lý minh bạch, đôi bên hòa hợp, có thể tự tin tiến hành.`;
+      dichLyDetails = `Quẻ gốc ${originalName} (${origInfo.nature}) biến sang ${changedName} (${changedInfo.nature}) là điềm cát cho điền trạch. Giấy tờ pháp lý minh bạch, có thể tự tin tiến hành.`;
     } else {
       directConclusion = `Về việc nhà đất "${question.trim()}": CẦN RÀ SOÁT KỸ LƯỠNG PHÁP LÝ, GIẤY TỜ VÀ QUY HOẠCH TRƯỚC KHI XUỐNG TIỀN.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} nhắc nhở cần chú ý các điều khoản hợp đồng cọc, phong thủy hướng nhà hoặc thủ tục chuyển nhượng để tránh phát sinh phiền toái.`;
@@ -548,14 +621,22 @@ export function castDongTam(
     ungKy = 'Trong vòng 1 đến 3 tháng tới';
 
     if (changedName === 'Trạch Hỏa Cách') {
-      directConclusion = `Về công việc / thi cử "${question.trim()}": CẦN MẠNH DẠN ĐỔI MỚI, THAY ĐỔI CHIẾN LƯỢC HOẶC TƯ DUY CŨ ĐỂ TẠO RA BƯỚC NGOẶT THÀNH CÔNG VƯỢT BẬC.`;
-      dichLyDetails = `Quẻ khởi ${originalName} (${origInfo.nature}) động hào ${movingLine} biến Trạch Hỏa Cách (tượng trưng cho sự canh tân, lột xác). Thời điểm này nếu bạn dám thay đổi phương thức làm việc hoặc nắm bắt hướng đi mới thì sự nghiệp và học vấn sẽ bước sang một trang rực rỡ.`;
+      directConclusion = `Về công việc / thi cử "${question.trim()}": CẦN MẠNH DẠN ĐỔI MỚI, THAY ĐỔI CHIẾN LƯỢC HOẶC TƯ DUY CŨ ĐỂ TẠO RA BƯỚC NGOẶT THÀNH CÔNG VƯỢT BẬC. NẾU CỐ CHẤP GIỮ LỐI MÒN CŨ ẮT THẤT BẠI.`;
+      dichLyDetails = `Quẻ khởi ${originalName} (${origInfo.nature}) động hào ${movingLine} biến Trạch Hỏa Cách (Canh tân đổi mới). Thời điểm này nếu bạn dám thay đổi phương thức làm việc hoặc nắm bắt hướng đi mới thì sự nghiệp và học vấn sẽ bước sang một trang rực rỡ.`;
+    } else if (changedInfo.omen === 'hung') {
+      state = 'Quan Tinh Lâm Hung Địa, Tiểu Nhân Hãm Hại';
+      directConclusion = `Về công việc / thi cử "${question.trim()}": ĐIỀM BÁO RẤT BẤT LỢI VÀ NGUY CƠ THẤT BẠI CAO. Đang có tiểu nhân đố kỵ ngáng đường, thi cử dễ trượt điểm hoặc công việc có nguy cơ bị kỷ luật, đình trệ dự án hay mất việc. Tuyệt đối không nên manh động mạo hiểm lúc này.`;
+      dichLyDetails = `Quẻ gốc ${originalName} biến thành ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Khí vận công danh bị bế tắc nặng nề. Lời khuyên: Thu mình phòng thủ, cẩn trọng lời ăn tiếng nói kẻo vướng họa thị phi pháp lý.`;
+    } else if (changedInfo.omen === 'thận_trọng') {
+      state = 'Quan Tinh Bị Kìm Hãm, Trở Ngại Rình Rập';
+      directConclusion = `Về công việc / thi cử "${question.trim()}": CHƯA THUẬN LỢI, ĐANG BỊ KÌM HÃM VÀ CẢN TRỞ LỚN. Cấp trên chưa công nhận, đồng nghiệp nghi kỵ, tiến lên lúc này sẽ chuốc lấy thất bại ê chề.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy môi trường đang có sự tái cơ cấu hoặc đối kháng ngầm. Hãy tập trung củng cố chuyên môn và giữ hòa khí, tránh tranh chấp quyền lực.`;
     } else if (isChangedAuspicious) {
-      directConclusion = `Về công việc / thi cử "${question.trim()}": RẤT CÓ TRIỂN VỌNG, ĐƯỢC CẤP TRÊN HOẶC QUÝ NHÂN HỖ TRỢ, Ý NGUYỆN DỄ ĐẠT ĐƯỢC THÀNH CÔNG.`;
-      dichLyDetails = `Quẻ gốc ${originalName} biến thành ${changedName} (${changedInfo.nature}) là điềm báo công việc có sự mở mang hoặc được tin tưởng giao trọng trách mới. Cứ tự tin thể hiện năng lực.`;
+      directConclusion = `Về công việc / thi cử "${question.trim()}": RẤT CÓ TRIỂN VỌNG VÀ DỄ ĐẠT THÀNH TỰU; NHƯNG PHẢI ĐÁNH ĐỔI BẰNG SỰ LAO LỰC CỰC NHỌC VÀ ĐỀ PHÒNG ĐỒNG NGHIỆP GHEN GHÉT SAU LƯNG.`;
+      dichLyDetails = `Quẻ gốc ${originalName} biến thành ${changedName} (${changedInfo.nature}) là điềm báo công việc có sự mở mang. Cứ tự tin thể hiện năng lực nhưng phải khiêm nhường để tránh bị dòm ngó.`;
     } else {
-      directConclusion = `Về công việc / thi cử "${question.trim()}": HIỆN TẠI NÊN KIÊN NHẪN TÍCH LŨY, CHỜ THỜI CƠ CHÍN MUỒI, TRÁNH VỘI VÀNG MANH ĐỘNG HAY TRANH CÃI.`;
-      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy môi trường đang có sự tái cơ cấu hoặc chưa vào thời điểm thuận lợi nhất. Hãy tập trung nâng cao kỹ năng và giữ hòa khí với đồng nghiệp.`;
+      directConclusion = `Về công việc / thi cử "${question.trim()}": CÁT HUNG ĐAN XEN, THÀNH BẠI PHỤ THUỘC VÀO NỖ LỰC TỰ THÂN; CHƯA THỂ CÓ BƯỚC NHẢY VỌT LỚN.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} khuyên kiên nhẫn tích lũy kinh nghiệm, làm tốt từng việc nhỏ.`;
     }
 
   } else if (isWealth) {
@@ -568,12 +649,20 @@ export function castDongTam(
     if (changedName === 'Trạch Hỏa Cách') {
       directConclusion = `Về tài chính / tiền bạc "${question.trim()}": DÒNG TIỀN SẮP CÓ SỰ THAY ĐỔI LỚN, CẦN LINH HOẠT CHUYỂN HƯỚNG MÔ HÌNH KIẾM TIỀN HOẶC ĐỔI MỚI KÊNH ĐẦU TƯ.`;
       dichLyDetails = `Quẻ khởi ${originalName} biến Trạch Hỏa Cách chỉ ra rằng tiền tài trong giai đoạn này không đến từ việc an phận, mà đến từ sự nhạy bén nắm bắt xu hướng mới và dám đổi mới phương thức sinh lời.`;
+    } else if (changedInfo.omen === 'hung') {
+      state = 'Thê Tài Tuyệt Khí, Cảnh Báo Phá Sản & Hao Hụt';
+      directConclusion = `Về tài chính / tiền bạc "${question.trim()}": ĐIỀM BÁO CỰC KỲ XẤU / CẢNH BÁO HAO TÀI, PHÁ SẢN HOẶC BỊ LỪA GẠT TRẮNG TAY. Tuyệt đối không rót vốn, không cho vay mượn và không tham gia các kênh đầu tư mạo hiểm kẻo vướng nợ nần không lối thoát.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Dòng tiền cạn kiệt, tài khí phân tán tan nát. Lời khuyên: Phải siết chặt chi tiêu và cắt lỗ khẩn cấp.`;
+    } else if (changedInfo.omen === 'thận_trọng') {
+      state = 'Tài Khí Tắc Nghẽn, Chi Phí Phát Sinh Vượt Tầm Kiểm Soát';
+      directConclusion = `Về tiền tài "${question.trim()}": DÒNG TIỀN ĐANG BẾ TẮC VÀ DỄ BỊ HAO HỤT. Các khoản thu bị chậm trễ, chi phí phát sinh ngoài ý muốn; nên thắt chặt chi tiêu tối đa, chưa nên đầu tư mới.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cảnh báo nguy cơ hao tán. Cần quản lý chặt chẽ dòng tiền và xem xét kỹ các điều khoản tài chính trước khi xuống tiền.`;
     } else if (isChangedAuspicious) {
-      directConclusion = `Về tiền tài "${question.trim()}": TÀI LỘC ĐANG CÓ CHIỀU HƯỚNG KHỞI SẮC RẤT TỐT, CÔNG VIỆC LÀM ĂN GẶP CƠ HỘI SINH LỜI ĐÁNG KỂ.`;
+      directConclusion = `Về tiền tài "${question.trim()}": TÀI LỘC KHỞI SẮC, CÓ CƠ HỘI SINH LỜI NHƯNG KHÔNG ĐƯỢC THAM LAM; CẦN CẨN TRỌNG ĐIỀU KHOẢN HỢP ĐỒNG KẺO ĐƯỢC TIỀN MẤT TÌNH HOẶC VƯỚNG THỊ PHI PHÁP LÝ.`;
       dichLyDetails = `Quẻ ${originalName} biến sang ${changedName} (${changedInfo.nature}) mang lại vượng khí tài lộc. Thích hợp mở rộng giao thương, thu hồi công nợ hoặc triển khai kế hoạch mới.`;
     } else {
-      directConclusion = `Về tiền bạc "${question.trim()}": NÊN THẬN TRỌNG QUẢN LÝ TÀI CHÍNH, CHƯA NÊN ĐẦU TƯ MẠO HIỂM HAY CHO VAY MƯỢN LÚC NÀY.`;
-      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cảnh báo nguy cơ hao tán. Cần quản lý chặt chẽ dòng tiền và xem xét kỹ các điều khoản tài chính trước khi xuống tiền.`;
+      directConclusion = `Về tiền bạc "${question.trim()}": TÀI CHÍNH Ở MỨC CÂN BẰNG, TIỀN VÀO ĐẾN ĐÂU RA ĐẾN ĐÓ, CHƯA THỂ DƯ DẢ LỚN; NÊN TIẾT KIỆM TÍCH LŨY.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy tài vận bình ổn, cần tránh xa cờ bạc hay các lời mời gọi làm giàu nhanh.`;
     }
 
   } else if (isLove) {
@@ -584,14 +673,22 @@ export function castDongTam(
     ungKy = 'Trong vòng vài tuần tới hoặc vào tiết tháng tới';
 
     if (changedName === 'Trạch Hỏa Cách') {
-      directConclusion = `Về tình duyên "${question.trim()}": MỐI QUAN HỆ SẮP BƯỚC SANG MỘT TRANG MỚI VỚI BƯỚC NGOẶT CHUYỂN DỊCH RÕ RÀNG.`;
+      directConclusion = `Về tình duyên "${question.trim()}": MỐI QUAN HỆ SẮP BƯỚC SANG MỘT TRANG MỚI VỚI BƯỚC NGOẶT CHUYỂN DỊCH RÕ RÀNG. NẾU KHÔNG DÁM THAY ĐỔI CÁCH ĐỐI XỬ THÌ ĐỔ VỠ LÀ ĐIỀU CHẮC CHẮN.`;
       dichLyDetails = `Quẻ ${originalName} biến Trạch Hỏa Cách tượng trưng cho sự lột xác, đổi mới. Cả hai cần thẳng thắn buông bỏ những hiểu lầm hay bất đồng cũ để cùng nhau tái tạo một sự gắn kết chân thành hơn.`;
+    } else if (changedInfo.omen === 'hung') {
+      state = 'Thế Ứng Tương Xung Tương Khắc, Điềm Báo Đổ Vỡ';
+      directConclusion = `Về tình duyên / hôn nhân "${question.trim()}": NGUY CƠ ĐỔ VỠ RẤT LỚN HOẶC ĐANG CÓ SỰ DỐI LỪA, PHẢN BỘI ĐAU ĐỚN. Mối quan hệ chứa đựng nhiều mâu thuẫn độc hại hoặc có sự can thiệp của người thứ ba; nếu cố chấp níu kéo chỉ chuốc lấy tổn thương kéo dài.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Lời khuyên của Dịch: Hãy dũng cảm nhìn thẳng vào sự thật, chấm dứt sự phụ thuộc cảm xúc độc hại.`;
+    } else if (changedInfo.omen === 'thận_trọng') {
+      state = 'Thế Ứng Bất Hòa, Chiến Tranh Lạnh Kéo Dài';
+      directConclusion = `Về tình cảm "${question.trim()}": TÌNH CẢM RẠN NỨT NẶNG NỀ, "BẰNG MẶT KHÔNG BẰNG LÒNG". Đôi bên thiếu sự tin tưởng, chiến tranh lạnh triền miên và bất đồng quan điểm sống sâu sắc; cần hạ bớt cái tôi nếu còn muốn hàn gắn.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy cả hai đang phòng thủ lẫn nhau. Cần đối thoại chân thành thay vì trách móc.`;
     } else if (isChangedAuspicious) {
-      directConclusion = `Về nhân duyên "${question.trim()}": TRIỂN VỌNG RẤT TỐT ĐẸP, ĐÔI BÊN HÒA HỢP, DỄ TIẾN TỚI GẮN KẾT LÂU DÀI VÀ CÓ HỶ SỰ.`;
+      directConclusion = `Về nhân duyên "${question.trim()}": DUYÊN LÀNH GẮN KẾT, TRIỂN VỌNG RẤT TỐT ĐẸP NHƯNG ĐỪNG MƠ MỘNG HOÀN HẢO; CẦN HẠ BỚT CÁI TÔI VÀ THẤU HIỂU KHUYẾT ĐIỂM CỦA ĐỐI PHƯƠNG THÌ MỚI BỀN VỮNG.`;
       dichLyDetails = `Quẻ ${originalName} chuyển hóa sang ${changedName} (${changedInfo.nature}) tượng trưng cho sự thấu hiểu và gắn bó. Hãy chân thành chia sẻ để duyên lành đơm hoa kết trái.`;
     } else {
-      directConclusion = `Về tình cảm "${question.trim()}": ĐANG CÓ CHÚT KHÚC MẮC HOẶC TRẦM LẮNG, CẦN BÌNH TÂM LẮNG NGHE VÀ DUNG HÒA TÍNH CÁCH.`;
-      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy cả hai cần thêm thời gian để thấu hiểu lẫn nhau, tránh nóng giận lời qua tiếng lại.`;
+      directConclusion = `Về tình duyên "${question.trim()}": TÌNH CẢM BÌNH THẢN ĐỜI THƯỜNG, THIẾU CHÚT LÃNG MẠN NHƯNG AN TOÀN; CẦN HÂM NÓNG LẠI CẢM XÚC.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} khuyên cả hai dành thêm thời gian quan tâm nhau.`;
     }
 
   } else if (isHealth) {
@@ -659,7 +756,10 @@ export function castDongTam(
     explanation = 'Chiêm kiện tụng tranh chấp, lấy hào Quan Quỷ làm cơ quan pháp luật, Thế hào làm bản thân, Ứng hào làm đối phương.';
     ungKy = 'Trong vòng 1-2 tháng tới';
 
-    if (isChangedAuspicious) {
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về việc tranh chấp "${question.trim()}": CỰC KỲ BẤT LỢI, NGUY CƠ THUA KIỆN HOẶC BỊ PHẠT NẶNG. Nên chủ động tìm đường hòa giải và chấp nhận nhún nhường để giảm thiểu tổn thất.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} lâm Điềm Hung. Quan Quỷ khắc Thế, đối phương chiếm ưu thế pháp lý hoặc có yếu tố bất lợi khó lường.`;
+    } else if (isChangedAuspicious) {
       directConclusion = `Về việc tranh chấp "${question.trim()}": KẾT QUẢ KHẢ QUAN, CÓ KHẢ NĂNG HÒA GIẢI HOẶC BẠN CHIẾM ĐƯỢC LỢI THẾ HỢP PHÁP RÕ RÀNG.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy mâu thuẫn sẽ từng bước được tháo gỡ ôn hòa dựa trên lý lẽ công bằng.`;
     } else {
@@ -674,8 +774,11 @@ export function castDongTam(
     explanation = 'Chiêm hợp tác lấy Thế hào làm mình, Ứng hào làm đối tác, Huynh Đệ làm người cộng sự.';
     ungKy = 'Trong vòng 1-3 tháng tới';
 
-    if (isChangedAuspicious) {
-      directConclusion = `Về việc hợp tác "${question.trim()}": ĐỐI TÁC CÓ THIỆN CHÍ, ĐÔI BÊN HỢP TÁC RẤT DỄ ĐẠT ĐƯỢC THÀNH CÔNG VÀ LỢI NHUẬN TỐT.`;
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về việc hợp tác "${question.trim()}": TUYỆT ĐỐI KHÔNG NÊN HỢP TÁC LÚC NÀY! TƯỢNG QUẺ BÁO HIỆU SỰ LỪA ĐẢO, PHẢN PHÚC HOẶC TRANH CHẤP CHIA RẼ NẶNG NỀ DẪN TỚI MẤT CẢ TIỀN LẪN BẠN BÈ.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} lâm hung tượng. Huynh Đệ khắc Thê Tài, đối tác có toan tính riêng mờ ám, hợp tác sẽ chuốc lấy thua lỗ.`;
+    } else if (isChangedAuspicious) {
+      directConclusion = `Về việc hợp tác "${question.trim()}": ĐỐI TÁC CÓ THIỆN CHÍ, ĐÔI BÊN HỢP TÁC RẤT DỄ ĐẠT ĐƯỢC THÀNH CÔNG VÀ LỢI NHUẬN TỐT; NHƯNG PHẢI MINH BẠCH TÀI CHÍNH TỪ ĐẦU.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} là tượng đồng tâm hiệp lực, có thể triển khai kế hoạch và ký kết hợp đồng.`;
     } else {
       directConclusion = `Về việc hợp tác "${question.trim()}": CẦN PHÂN ĐỊNH RÕ RÀNG QUYỀN LỢI, TRÁCH NHIỆM VÀ TÀI CHÍNH TRÊN GIẤY TỜ TRƯỚC KHI BẮT ĐẦU.`;
@@ -694,6 +797,9 @@ export function castDongTam(
     if (changedName === 'Trạch Hỏa Cách') {
       directConclusion = `Về việc liên lạc / hotline "${question.trim()}": CÓ SỰ THAY ĐỔI LỚN VỀ PHƯƠNG THỨC LIÊN HỆ, SẼ CÓ NHỮNG CUỘC GỌI BẤT NGỜ HOẶC ĐỐI TÁC MỚI CHỦ ĐỘNG KẾT NỐI.`;
       dichLyDetails = `Quẻ gốc ${originalName} biến Trạch Hỏa Cách (Canh tân đổi mới) cho thấy kênh liên lạc sẽ có làn gió mới. Cần chuẩn bị kịch bản đón tiếp chu đáo để nắm bắt cơ hội.`;
+    } else if (changedInfo.omen === 'hung') {
+      directConclusion = `Về việc liên lạc / hotline "${question.trim()}": TRẢ LỜI LÀ KHÔNG / RẤT ÍT. ĐỐI PHƯƠNG ĐANG CỐ TÌNH NÉ TRÁNH HOẶC KÊNH LIÊN LẠC BỊ GIÁN ĐOẠN, KHÔNG NÊN MẤT CÔNG CHỜ ĐỢI.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} lâm Điềm Hung. Phụ Mẫu suy bại, Ứng Hào tương khắc, báo hiệu tin tức bị đình trệ hoặc nhận tin xấu không vui.`;
     } else if (isChangedAuspicious) {
       if (isAskingAmount) {
         directConclusion = `Về việc hotline / cuộc gọi "${question.trim()}": TRẢ LỜI LÀ CÓ VÀ SẼ KHÁ NHIỀU. Lượng cuộc gọi, tin nhắn và yêu cầu liên hệ hôm nay sẽ dồn dập, khởi sắc vượt mức thường lệ.`;
@@ -713,7 +819,10 @@ export function castDongTam(
     explanation = 'Trong Lục Hào: Tử Tôn là nguồn sinh ra Tài lộc (chính là khách hàng), Thê Tài là doanh thu và tiền hàng.';
     ungKy = 'Trong ngày hôm nay hoặc các ngày tới vào giờ Thìn, Thân, Dậu';
 
-    if (isChangedAuspicious) {
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về lượng khách / bán hàng "${question.trim()}": BUÔN BÁN Ế ẨM, KHÁCH HÀNG VẮNG VẺ HOẶC BỊ HỦY ĐƠN HÀNG HÀNG LOẠT; CẦN RÀ SOÁT LẠI CHẤT LƯỢNG SẢN PHẨM VÀ DỊCH VỤ.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) lâm Điềm Hung. Tử Tôn tuyệt khí, nguồn khách bị đóng băng.`;
+    } else if (isChangedAuspicious) {
       directConclusion = `Về lượng khách / bán hàng "${question.trim()}": KHÁCH HÀNG SẼ ĐÔNG ĐÚC VÀ TƯƠNG TÁC TỐT, ĐƠN HÀNG VÀ DOANH THU CÓ CHIỀU HƯỚNG TĂNG TRƯỞNG RÕ RỆT.`;
       dichLyDetails = `Quẻ gốc ${originalName} biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp cho việc kinh doanh, buôn may bán đắt.`;
     } else {
@@ -728,7 +837,10 @@ export function castDongTam(
     explanation = 'Chiêm vận khí ngày lấy Nhật Thần phối hợp cùng Thế hào để thẩm định sinh khắc.';
     ungKy = 'Trong suốt ngày hôm nay từ sáng đến tối';
 
-    if (isChangedAuspicious) {
+    if (changedInfo.omen === 'hung') {
+      directConclusion = `Về ngày hôm nay "${question.trim()}": CẢNH BÁO MỘT NGÀY DỄ GẶP TRẮC TRỞ, BẤT HÒA HOẶC HAO TÀI TỐN CỦA; HẾT SỨC CẨN THẬN ĐI LẠI VÀ TRÁNH TRANH CÃI VỚI NGƯỜI KHÁC.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} lâm hung tượng. Trường khí trong ngày xung khắc Thế Hào. Lời khuyên: Giữ mình an phận, tránh xa thị phi.`;
+    } else if (isChangedAuspicious) {
       directConclusion = `Về vận may hôm nay "${question.trim()}": HÔM NAY LÀ MỘT NGÀY THUẬN LỢI, NĂNG LƯỢNG TÍCH CỰC, NHIỀU VIỆC HANH THÔNG NHƯ Ý NGUYỆN.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) mang lại vận may và tinh thần phấn chấn.`;
     } else {
