@@ -36,6 +36,21 @@ import {
   ZodiacSignDetail,
 } from '@/lib/metaphysics/numerology';
 
+function formatBoldMarkup(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="text-amber-300 font-bold px-0.5">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export default function MetaphysicsPage() {
   const [activeTab, setActiveTab] = useState<MetaphysicsTheme>('palmistry');
   const [hoveredTab, setHoveredTab] = useState<MetaphysicsTheme | null>(null);
@@ -122,6 +137,14 @@ export default function MetaphysicsPage() {
   const [numMonth, setNumMonth] = useState(8);
   const [numDay, setNumDay] = useState(23);
 
+  // --- STATE CHO TRÍ TUỆ NHÂN TẠO GEMINI (AI LUẬN GIẢI CHUYÊN SÂU TRỰC TIẾP) ---
+  const [userApiKey, setUserApiKey] = useState('');
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiTarotAnswer, setAiTarotAnswer] = useState<string | null>(null);
+  const [aiDongTamAnswer, setAiDongTamAnswer] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   // Tự động khôi phục dữ liệu người dùng từ localStorage và khởi tạo thời gian thực Date.now()
   useEffect(() => {
     // 1. Lấy thông tin lá số đã lập
@@ -149,6 +172,8 @@ export default function MetaphysicsPage() {
           }
         }
       }
+      const savedKey = localStorage.getItem('gemini_api_key');
+      if (savedKey) setUserApiKey(savedKey);
     } catch {}
 
     // 2. Khởi tạo ngày giờ động tâm và trạch nhật chính xác theo Date.now()
@@ -174,6 +199,8 @@ export default function MetaphysicsPage() {
   const handleCastDongTam = () => {
     if (!dongTamQuestion.trim()) return;
     setIsDongTamCasting(true);
+    setAiDongTamAnswer(null);
+    setAiError(null);
     setTimeout(() => {
       setDongTamResult(castDongTam(dongTamQuestion, dongTamDate, dongTamTime));
       setIsDongTamCasting(false);
@@ -193,10 +220,71 @@ export default function MetaphysicsPage() {
 
   const handleDrawTarot = () => {
     setIsTarotDrawing(true);
+    setAiTarotAnswer(null);
+    setAiError(null);
     setTimeout(() => {
       setTarotResult(drawTarotSpread(tarotType, tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'));
       setIsTarotDrawing(false);
     }, 500);
+  };
+
+  const handleCallAi = async (type: 'tarot' | 'iching') => {
+    setIsAiLoading(true);
+    setAiError(null);
+    try {
+      const question =
+        type === 'tarot'
+          ? tarotQuestion.trim() || 'Thông điệp dẫn lối tổng quan'
+          : dongTamQuestion.trim();
+
+      const contextData =
+        type === 'tarot'
+          ? tarotResult
+          : dongTamResult
+          ? {
+              originalName: dongTamResult.hexagram.originalName,
+              changedName: dongTamResult.hexagram.changedName,
+              movingLine: dongTamResult.hexagram.movingLine,
+              dungThan: dongTamResult.dungThan,
+              solarDate: dongTamResult.datetimeInput.solarStr,
+              lunarDate: dongTamResult.datetimeInput.lunarStr,
+              ganZhiDay: dongTamResult.datetimeInput.ganZhiDay,
+              xunKong: dongTamResult.datetimeInput.xunKong,
+            }
+          : {};
+
+      const res = await fetch('/api/ai/divine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          question,
+          contextData,
+          customApiKey: userApiKey,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        if (data.error === 'NO_API_KEY') {
+          setShowApiKeyModal(true);
+          setAiError('Vui lòng nhập API Key để kích hoạt phân tích thông minh từ Gemini AI.');
+        } else {
+          setAiError(data.message || 'Không thể kết nối đến Gemini AI lúc này.');
+        }
+        return;
+      }
+
+      if (type === 'tarot') {
+        setAiTarotAnswer(data.answer);
+      } else {
+        setAiDongTamAnswer(data.answer);
+      }
+    } catch (err: unknown) {
+      setAiError(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ AI');
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   const handleAnalyzePalm = () => {
@@ -1019,6 +1107,59 @@ export default function MetaphysicsPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Thanh gọi AI Gemini cho Quẻ Dịch */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-5 border-t border-amber-500/20">
+                    <button
+                      type="button"
+                      onClick={() => handleCallAi('iching')}
+                      disabled={isAiLoading}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-zinc-950 shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      {isAiLoading ? (
+                        <>
+                          <span className="inline-block animate-spin">🌀</span> Đang thấu suốt Dịch Lý cùng Gemini AI...
+                        </>
+                      ) : (
+                        <>
+                          <span>☯️</span> {aiDongTamAnswer ? 'Luận Giải Lại Cùng Gemini AI' : 'Luận Giải Trực Tiếp Bằng Gemini AI'}
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKeyModal(true)}
+                      className="text-[11px] text-zinc-400 hover:text-amber-300 underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>⚙️</span> {userApiKey ? '🔑 Đã cài Gemini Key' : '⚙️ Cài đặt API Key AI'}
+                    </button>
+                  </div>
+
+                  {aiError && (
+                    <div className="mt-3 p-3 rounded-lg bg-rose-950/50 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+                      <span>⚠️</span> {aiError}
+                    </div>
+                  )}
+
+                  {/* Hộp Luận Giải Dịch Lý Chuyên Sâu Từ Gemini AI */}
+                  {aiDongTamAnswer && (
+                    <div className="mt-5 p-6 rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-zinc-950 via-amber-950/30 to-zinc-950 shadow-2xl space-y-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 uppercase tracking-widest">
+                            AI DỊCH LÝ THÂU SUỐT
+                          </span>
+                          <h3 className="text-sm sm:text-base font-bold text-amber-200">
+                            LỜI GIẢI MÃ MAI HOA & LỤC HÀO TỪ TRÍ TUỆ NHÂN TẠO GEMINI
+                          </h3>
+                        </div>
+                        <span className="text-[10px] font-mono text-amber-400/80">Tương tác trực diện câu hỏi</span>
+                      </div>
+                      <div className="text-xs sm:text-sm text-zinc-100 leading-relaxed space-y-3 whitespace-pre-line font-sans font-normal">
+                        {formatBoldMarkup(aiDongTamAnswer)}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* ĐỒ HỌA TRỰC QUAN BÁT QUÁI & HÀO ĐỘNG & NGŨ HÀNH TẠNG PHỦ */}
@@ -1535,17 +1676,70 @@ export default function MetaphysicsPage() {
             {tarotResult && (
               <div className="space-y-6">
                 {/* Banner Tổng Hợp Lời Khuyên Vũ Trụ */}
-                <div className="card-glass p-5 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-r from-zinc-950 via-amber-950/30 to-zinc-950 shadow-xl space-y-2">
+                <div className="card-glass p-5 sm:p-6 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-r from-zinc-950 via-amber-950/30 to-zinc-950 shadow-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
                       <span>✨</span> THÔNG ĐIỆP TỔNG HÒA VŨ TRỤ ({tarotResult.spreadTitle})
                     </span>
                     <span className="text-[10px] font-mono text-zinc-400">{tarotResult.timestamp}</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-serif">
-                    {tarotResult.overallSynthesis}
-                  </p>
+                  <div className="text-xs sm:text-sm text-zinc-100 leading-relaxed font-sans font-normal">
+                    {formatBoldMarkup(tarotResult.overallSynthesis)}
+                  </div>
+
+                  {/* Thanh gọi AI Gemini */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-amber-500/20">
+                    <button
+                      type="button"
+                      onClick={() => handleCallAi('tarot')}
+                      disabled={isAiLoading}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-zinc-950 shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      {isAiLoading ? (
+                        <>
+                          <span className="inline-block animate-spin">🌀</span> Đang hội tụ thần niệm cùng Gemini AI...
+                        </>
+                      ) : (
+                        <>
+                          <span>🔮</span> {aiTarotAnswer ? 'Luận Giải Lại Cùng Gemini AI' : 'Luận Giải Trực Tiếp Bằng Gemini AI'}
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKeyModal(true)}
+                      className="text-[11px] text-zinc-400 hover:text-amber-300 underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>⚙️</span> {userApiKey ? '🔑 Đã cài Gemini Key' : '⚙️ Cài đặt API Key AI'}
+                    </button>
+                  </div>
+
+                  {aiError && (
+                    <div className="p-2.5 rounded-lg bg-rose-950/50 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+                      <span>⚠️</span> {aiError}
+                    </div>
+                  )}
                 </div>
+
+                {/* Hộp Luận Giải Trực Tiếp Từ Gemini AI */}
+                {aiTarotAnswer && (
+                  <div className="card-glass p-6 sm:p-7 rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-zinc-950 via-purple-950/30 to-zinc-950 shadow-2xl space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 uppercase tracking-widest">
+                          GEMINI AI INSIGHT
+                        </span>
+                        <h3 className="text-sm sm:text-base font-bold text-amber-200">
+                          GIẢI MÃ NĂNG LƯỢNG VŨ TRỤ TRỰC DIỆN THEO CÂU HỎI
+                        </h3>
+                      </div>
+                      <span className="text-[10px] font-mono text-amber-400/80">Trí tuệ nhân tạo thế hệ mới</span>
+                    </div>
+                    <div className="text-xs sm:text-sm text-zinc-100 leading-relaxed space-y-3 whitespace-pre-line font-sans font-normal">
+                      {formatBoldMarkup(aiTarotAnswer)}
+                    </div>
+                  </div>
+                )}
 
                 {/* Grid hiển thị các lá bài */}
                 <div className={`grid grid-cols-1 ${tarotResult.cards.length === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-3'} gap-4`}>
@@ -1784,6 +1978,82 @@ export default function MetaphysicsPage() {
               </div>
             </div>
           </motion.div>
+        )}
+        {/* Modal Cài Đặt Gemini API Key */}
+        {showApiKeyModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+            <div className="relative w-full max-w-md card-glass rounded-2xl p-6 border-2 border-amber-500/50 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🔑</span>
+                  <h3 className="text-sm sm:text-base font-bold text-amber-300">
+                    Cài Đặt Gemini AI API Key
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowApiKeyModal(false)}
+                  className="text-zinc-400 hover:text-white text-lg cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-xs text-zinc-300 leading-relaxed">
+                Để hệ thống AI có thể luận giải trực tiếp, sâu sắc và bám sát 100% câu hỏi của bạn (đặc biệt các chủ đề tiền kiếp, linh hồn, tình duyên, sự nghiệp), bạn có thể nhập Gemini API Key miễn phí từ Google AI Studio.
+              </p>
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-amber-300 uppercase tracking-wider block">
+                  Gemini API Key của bạn:
+                </label>
+                <input
+                  type="password"
+                  value={userApiKey}
+                  onChange={(e) => setUserApiKey(e.target.value)}
+                  placeholder="Dán API Key (AIzaSy...)"
+                  className="w-full px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-zinc-100 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200 leading-relaxed">
+                💡 <strong>Cách lấy API Key miễn phí 100%:</strong><br />
+                1. Truy cập{' '}
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-400 underline font-bold"
+                >
+                  Google AI Studio (Click vào đây)
+                </a><br />
+                2. Đăng nhập tài khoản Google và bấm <strong>&quot;Create API key&quot;</strong>.<br />
+                3. Sao chép và dán vào ô bên trên rồi bấm Lưu.
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem('gemini_api_key');
+                    setUserApiKey('');
+                    setShowApiKeyModal(false);
+                  }}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                >
+                  Xóa Key
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (userApiKey.trim()) {
+                      localStorage.setItem('gemini_api_key', userApiKey.trim());
+                    }
+                    setShowApiKeyModal(false);
+                  }}
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-zinc-950 transition-colors shadow-lg cursor-pointer"
+                >
+                  Lưu Cấu Hình
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

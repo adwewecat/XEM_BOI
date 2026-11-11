@@ -73,6 +73,35 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 21: Tích Hợp Gemini AI Luận Giải Chiêm Bốc Trực Tiếp, Khắc Phục Lệch Đề & Lỗi Font Tarot / Bói Hữu Duyên, Giải Mã Cốt Lõi Bản Mệnh - Đại Hạn - Lưu Niên
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:**
+  1. *Lá số Tử Vi:* "kiểu như xem bản mệnh là xem với ý nghĩa gì , rồi Đại hạn 24 -33 là sao, rồi lưu niên nên xem thế nào, ý nghĩa là gì , những cái khác cũng cần giải thích để biết cách xem".
+  2. *Tarot:* "thử bài tarot, hỏi xong thì trả lời không cái nào dính tới câu hỏi, thông điệp của vũ trụ thì hơi kỳ".
+  3. *Bói Hữu Duyên (Mai Hoa & Lục Hào):* "Thử bói BÓI HỮU DUYÊN · MAI HOA & LỤC HÀO CHIÊM ĐOÁN THEO GIỜ ĐỘNG TÂM , mà hỏi 1 đường trả lời 1 nẻo không liên quan gì".
+  4. *Tích hợp AI:* "Bạn test lại hết các kết quả và chất lượng của câu trả lời, có thể bổ sung thêm API key A.I để trả lời cũng được, để chính xác".
+- **Nguyên nhân cốt lõi phát hiện:**
+  1. *Lỗi font chữ gãy khoảng cách (`nề n`, `mố i`, `niề m`, `kế t`):* Trong `globals.css`, font dự phòng gốc CJK `PingFang SC` và class `font-serif` kích hoạt cơ chế fallback ký tự sang phông chữ CJK trên Windows đối với các nguyên âm có dấu kép tiếng Việt, tạo khoảng trắng ô chữ vuông giả dạng khoảng trắng. Thẻ `**` in thô không được parse sang HTML.
+  2. *Lỗi Tarot & Động Tâm trả lời lệch đề:* Khi người dùng đặt câu hỏi tâm linh / tiền kiếp ("kiếp trước tôi là ai"), bộ phân tích intent trước đây chỉ lọc các từ khóa thực tế (công việc, tài chính, bệnh tật, tình duyên thông thường). Câu hỏi rơi vào nhánh `default`, dẫn tới kết luận rập khuôn "cẩn trọng từng bước làm tốt phần việc của mình" hoặc văn mẫu Tarot về chia tay/buông bỏ.
+  3. *Thiếu giải thích cơ chế Mệnh Lý:* Người mới xem chưa hiểu mối quan hệ 3 tầng: Bản Mệnh (gốc rễ tiên thiên) -> Đại Hạn 10 năm (thời thế vĩ mô, cung đóng là Mệnh lâm thời) -> Lưu Niên (biến cố vi mô từng năm).
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Tích Hợp API Route Luận Giải Trực Tiếp Bằng Gemini AI (`app/api/ai/divine/route.ts`):**
+     - Xây dựng endpoint chuẩn Next.js Server Route Handler kết nối Google Gemini API (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-1.5-pro`).
+     - Hỗ trợ linh hoạt cả API key server (`GEMINI_API_KEY`) và API key cá nhân do người dùng nhập trên giao diện (lưu `localStorage`).
+     - System prompt tinh hoa: Nhập vai Đạo sư Dịch Lý & Chiêm Tinh Học Đông Tây, trả lời trực diện 100% vào câu hỏi (đặc biệt các chủ đề tiền kiếp, linh hồn, căn duyên, sự nghiệp, tình cảm), văn phong trang nhã, minh triết, thấu cảm.
+     - Modal Cài Đặt Gemini API Key tiện lợi kèm hướng dẫn 1-click lấy key miễn phí từ Google AI Studio.
+  2. **Nâng Cấp Engine Heuristic Bói Hữu Duyên & Tarot Bám Sát Câu Hỏi (`dongtam.ts` & `tarot.ts`):**
+     - *Bói Hữu Duyên:* Bổ sung bộ nhận diện chuyên sâu cho: Tiền kiếp / Luân hồi / Tâm linh (`isPastLife`), Đồ vật thất lạc (`isLostItem`), Nhà đất / Điền trạch (`isProperty`), Kiện tụng / Tranh chấp (`isLawsuit`), Hợp tác làm ăn (`isPartnership`). Khi hỏi về tiền kiếp, Dụng thần chuyển sang *Thần Hồn & Tiền Thân*, luận giải chuẩn mực về túc duyên và sứ mệnh linh hồn.
+     - *Tarot:* Tự động bóc tách ngữ cảnh câu hỏi, chuyển đổi tên 3 vị trí theo chủ đề (ví dụ: Tiền Thân -> Dấu Ấn Linh Hồn -> Bài Học Nghiệp Quả) và luận giải tổng hợp trực diện vấn đề.
+  3. **Khắc Phục Dứt Điểm Lỗi Font Chữ Tiếng Việt & Hiển Thị Đẳng Cấp:**
+     - Loại bỏ `PingFang SC`, thiết lập font-stack chuẩn tiếng Việt tối ưu legibility và OpenType kerning trong `globals.css` và `tailwind.config.ts`.
+     - Xóa bỏ `font-serif` gây lỗi spacing, tích hợp helper `formatBoldMarkup` chuyển đổi markdown `**từ khóa**` thành thẻ `<strong>` phát sáng vàng hoàng kim rực rỡ.
+  4. **Giải Mã Cốt Lõi Bản Mệnh, Đại Hạn 24-33 & Lưu Niên Trong Lá Số Tử Vi (`app/chart/page.tsx` & `TimeNav.tsx`):**
+     - Bổ sung thanh tóm tắt ý nghĩa thời vận ngay dưới các tab Bản Mệnh / Đại Hạn / Lưu Niên trên Mệnh bàn.
+     - Nâng cấp Modal Cẩm Nang 2 Tab: Tab 1 "5 Bước Xem Nhanh" và Tab 2 "Giải Mã Bản Mệnh, Đại Hạn 24-33 & Lưu Niên" giải thích cặn kẽ vì sao tuổi 26 lại trỏ vào Cung Phu Thê (Cung Mệnh lâm thời 10 năm), cách phối hợp xem 3 tầng Mệnh - Hạn - Niên.
+  5. **Kiểm Thử & Đóng Gói:**
+     - 17/17 test suites hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 235 routes PASS 100%.
+
 ### [2026-11-11] - Đợt 20: Tối Ưu Hóa Trực Quan Lá Số Tử Vi, Giải Thích Đại Hạn Cung Phu Thê & Tích Hợp Lộ Trình Đọc Lá Số 5 Bước
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "HÃY NHẤN mạnh những gì cần làm nổi, tôi thấy đang trỏ vào Phu Thê, nhưng mà sao lại cũng không rõ lắm. . với hình lá số tử vi thì tôi còn xem cái gì , nhiều khi không biết cần đọc gì và xem gì" (Kèm ảnh chụp màn hình lá số Nguyễn Anh Dũng - tuổi 26, đang trong đại hạn 24-33 tuổi tại Cung Phu Thê).

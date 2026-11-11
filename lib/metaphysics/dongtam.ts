@@ -248,11 +248,16 @@ export function castDongTam(
   const qClean = question.trim().toLowerCase();
 
   // Kiểm tra ý định bằng biểu thức chính quy (Word boundaries, chống lỗi so khớp substring như 'không' dính 'ông')
+  const isPastLife = /(?:^|\s|[.,?!])(kiếp trước|tiền kiếp|kiếp sau|tiền duyên|luân hồi|linh hồn|sứ mệnh|túc mệnh|túc nghiệp|căn duyên|tâm linh|chân ngã|nhân quả|đầu thai|nghiệp duyên|tu tập|kiếp xưa|túc duyên)(?:\s|$|[.,?!])/i.test(qClean);
+  const isLostItem = /(?:^|\s|[.,?!])(mất|tìm|thất lạc|ở đâu|đánh rơi|rơi đồ|để quên|tìm thấy|đồ mất)(?:\s|$|[.,?!])/i.test(qClean);
+  const isProperty = /(?:^|\s|[.,?!])(nhà đất|bất động sản|mua nhà|bán nhà|mua đất|bán đất|thuê nhà|mặt bằng|chung cư|phong thủy nhà|nhà ở)(?:\s|$|[.,?!])/i.test(qClean);
   const isTravel = /(?:^|\s|[.,?!])(về|đi|xuất hành|đi lại|trở về|xe|tàu|máy bay|đường|lộ trình|trắc trở|an toàn|bình an|thuận lợi|về quê|về nhà|đi xa)(?:\s|$|[.,?!])/i.test(qClean);
   const isHealth = /(?:^|\s|[.,?!])(bệnh|viện|nằm viện|khỏe|mổ|thuốc|bác sĩ|ung thư|viêm|phổi|tim|sốt|đau|tai qua|khỏi|nặng|sức khỏe)(?:\s|$|[.,?!])/i.test(qClean);
   const isCareer = /(?:^|\s|[.,?!])(việc|công việc|công tác|xin việc|phỏng vấn|thăng chức|tăng lương|đổi việc|nhảy việc|sếp|thi|đậu|đỗ|tuyển dụng|chức vị)(?:\s|$|[.,?!])/i.test(qClean);
   const isWealth = /(?:^|\s|[.,?!])(tiền|tài chính|tài lộc|kinh doanh|làm ăn|buôn bán|đầu tư|chứng khoán|đòi nợ|vay|mượn|lãi|lỗ|hợp đồng)(?:\s|$|[.,?!])/i.test(qClean);
   const isLove = /(?:^|\s|[.,?!])(yêu|người yêu|tình cảm|tình duyên|hẹn hò|kết hôn|cưới|ly hôn|chia tay|quay lại|tỏ tình|bạn gái|bạn trai)(?:\s|$|[.,?!])/i.test(qClean);
+  const isLawsuit = /(?:^|\s|[.,?!])(kiện|kiện cáo|tranh chấp|tòa án|pháp luật|công an|thưa gửi|bồi thường|tranh giành)(?:\s|$|[.,?!])/i.test(qClean);
+  const isPartnership = /(?:^|\s|[.,?!])(hợp tác|làm chung|góp vốn|chung vốn|đối tác|hợp tác làm ăn|hùn hạp)(?:\s|$|[.,?!])/i.test(qClean);
 
   // Quan hệ thân nhân (dùng ranh giới từ chuẩn xác)
   const isElder = /(?:^|\s|[.,?!])(ông|bà|cha|mẹ|bố|bác|chú|cô|dì|phụ mẫu)(?:\s|$|[.,?!])/i.test(qClean);
@@ -272,7 +277,55 @@ export function castDongTam(
   const isChangedAuspicious = AUSPICIOUS_HEXAGRAMS.has(changedName);
   const isChangedCaution = CAUTION_HEXAGRAMS.has(changedName);
 
-  if (isTravel) {
+  if (isPastLife) {
+    // 0. HỎI VỀ TIỀN KIẾP / TÂM LINH / SỨ MỆNH LINH HỒN / TÚC DUYÊN LUÂN HỒI
+    subject = 'Thần Hồn & Tiền Thân (Gốc Rễ Túc Nghiệp Luân Hồi)';
+    targetName = 'Túc duyên & Bản thể linh hồn tiền kiếp';
+    state = isChangedAuspicious ? 'Túc Thiện Căn Khởi Sắc, Linh Giác Tỏ Rõ' : 'Đang Chuyển Hóa Nghiệp Lực Tiền Kiếp';
+    explanation = 'Chiêm bốc về tiền kiếp và linh hồn: Lấy Thế hào làm Chân linh kiếp này, Hào Ứng & Quẻ Nội làm Túc duyên tiền kiếp, Quẻ Biến làm Bài học giác ngộ của linh hồn.';
+    ungKy = 'Hiện tiền kiếp này là thời điểm vàng để thức tỉnh và tu dưỡng tâm thức';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'VỀ TIỀN THÂN & CĂN DUYÊN CỦA BẠN: BẠN MANG TÚC DUYÊN THIỆN LÀNH TỪ NHIỀU ĐỜI TRƯỚC, TỪNG LÀ BẬC TRÍ THỨC, NGƯỜI HÀNH THIỆN HOẶC CÓ DUYÊN TU TẬP TÍCH ĐỨC; KIẾP NÀY ĐẾN ĐỂ TIẾP TỤC KHAI MỞ TRÍ TUỆ VÀ GIÚP ĐỠ MỌI NGƯỜI.';
+      dichLyDetails = `Quẻ gốc ${originalName} động hào ${movingLine} biến ${changedName} cho thấy trong tiền kiếp bạn là người có căn cơ tu dưỡng, từng gieo nhiều hạt giống phước lành. Tuy nhiên cũng từng có những nguyện ước sâu xa chưa hoàn thành trọn vẹn, nên kiếp này sinh ra với trực giác nhạy bén, sâu sắc và nhiều trăn trở với ý nghĩa nhân sinh. Hãy tự tin đi theo con đường thiện lương và phát triển tài năng chân chính.`;
+    } else {
+      directConclusion = 'VỀ TIỀN THÂN & TÚC MỆNH: TIỀN THÂN CỦA BẠN TỪNG LÀ NGƯỜI GÁNH VÁC TRỌNG TRÁCH LỚN HOẶC TRẢI QUA NHIỀU THĂNG TRẦM VỀ TÌNH CẢM & TRÁCH NHIỆM; KIẾP NÀY BÀI HỌC CỐT LÕI LÀ HỌC CÁCH BUÔNG BỎ ÁP LỰC, CHỮA LÀNH TÂM HỒN VÀ SỐNG VÌ CHÍNH MÌNH.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} là biểu tượng của sự thanh lọc và chuyển hóa nghiệp lực. Những thử thách hay cảm giác cô đơn ở hiện tại chính là dư âm từ bài học linh hồn kiếp trước trao lại. Giữ tâm tĩnh lặng, sống vị tha và bao dung sẽ giúp hóa giải trọn vẹn túc nghiệp, khai phóng vận trình tươi sáng.`;
+    }
+
+  } else if (isLostItem) {
+    // TÌM ĐỒ THẤT LẠC
+    subject = 'Thê Tài (Tài Vật Thất Lạc)';
+    targetName = 'Đồ vật / Tài sản bị mất';
+    state = isChangedAuspicious ? 'Đồ Vật Còn Nguyên, Chưa Bị Mất Hẳn' : 'Khó Tìm, Đã Bị Di Dời Hoặc Che Khuất';
+    explanation = 'Chiêm tìm đồ thất lạc lấy hào Thê Tài làm Dụng Thần, phối hào Phụ Mẫu xem nơi cất giấu.';
+    ungKy = 'Trong vòng 1-3 ngày tới hoặc tìm vào hướng quẻ chỉ dẫn';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'VỀ ĐỒ VẬT THẤT LẠC: CƠ HỘI TÌM LẠI RẤT CAO, ĐỒ VẬT CHƯA HỀ BỊ MẤT MÀ CHỈ ĐANG BỊ BỎ QUÊN HOẶC ĐỒ KHÁC CHE KHUẤT.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy tài vật vẫn còn ở gần trong phạm vi quen thuộc (nhà ở, nơi làm việc hoặc phương tiện đi lại). Hãy tìm ở các góc khuất, hộc tủ hoặc hỏi người thân gần gũi.`;
+    } else {
+      directConclusion = 'VỀ ĐỒ VẬT THẤT LẠC: TẠM THỜI KHÓ TÌM THẤY NGAY, CÓ DẤU HIỆU ĐÃ BỊ THẤT LẠC RA KHỎI NƠI QUEN THUỘC HOẶC RƠI Ở NƠI CÔNG CỘNG.';
+      dichLyDetails = `Quẻ ${originalName} động hào ${movingLine} biến ${changedName} cảnh báo tài khí bị phân tán. Cần bình tĩnh nhớ lại lộ trình di chuyển, kiểm tra camera an ninh hoặc liên hệ nơi bạn vừa rời khỏi.`;
+    }
+
+  } else if (isProperty) {
+    // NHÀ ĐẤT / BẤT ĐỘNG SẢN
+    subject = 'Phụ Mẫu (Nhà Cửa, Đất Đai, Khế Ước)';
+    targetName = 'Bất động sản / Nhà đất';
+    state = isChangedAuspicious ? 'Địa Khí Vượng Tướng, Giấy Tờ Hợp Cách' : 'Có Vướng Mắc Thủ Tục Hoặc Tranh Giá';
+    explanation = 'Chiêm nhà đất lấy hào Phụ Mẫu làm Dụng Thần (tượng trưng cho đất đai, nhà cửa, sổ đỏ), hào Thê Tài làm giá cả giao dịch.';
+    ungKy = 'Trong vòng 1-3 tháng tới hoặc vào các tháng tứ quý (Thìn, Tuất, Sửu, Mùi)';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'VỀ NHÀ ĐẤT / BẤT ĐỘNG SẢN: RẤT THUẬN LỢI, GIAO DỊCH DỄ THÀNH CÔNG, ĐẤT ĐAI CÓ ĐỊA KHÍ TỐT ĐEM LẠI AN CƯ HOẶC SINH LỜI.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} là điềm cát lợi cho điền trạch. Giấy tờ pháp lý minh bạch, đôi bên mua bán hòa hợp và có lợi.`;
+    } else {
+      directConclusion = 'VỀ GIAO DỊCH NHÀ ĐẤT: NÊN THẬN TRỌNG RÀ SOÁT KỸ PHÁP LÝ, GIẤY TỜ VÀ QUY HOẠCH TRƯỚC KHI XUỐNG TIỀN.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} nhắc nhở cần chú ý các điều khoản hợp đồng cọc, phong thủy hoặc thủ tục chuyển nhượng để tránh phát sinh phiền toái.`;
+    }
+
+  } else if (isTravel) {
     // 1. HỎI VỀ XUẤT HÀNH / ĐI LẠI / TRỞ VỀ / TRẮC TRỞ
     subject = 'Thế Hào & Hào Ứng (Bản Thân & Lộ Trình Di Chuyển)';
     targetName = 'Chuyến đi / Việc xuất hành trở về';
@@ -374,6 +427,38 @@ export function castDongTam(
     } else {
       directConclusion = 'Về tình cảm: ĐANG CÓ CHÚT BẤT ĐỒNG QUAN ĐIỂM HOẶC TRẦM LẮNG, CẦN BÌNH TÂM LẮNG NGHE ĐỐI PHƯƠNG.';
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy cả hai cần thêm thời gian để dung hòa tính cách, tránh nóng giận lời qua tiếng lại.`;
+    }
+
+  } else if (isLawsuit) {
+    // 6. HỎI VỀ TRANH CHẤP / KIỆN TỤNG / PHÁP LUẬT
+    subject = 'Quan Quỷ (Tranh Chấp, Pháp Lý & Công Quyền)';
+    targetName = 'Tranh chấp pháp lý / Thủ tục thưa gửi';
+    state = isChangedAuspicious ? 'Hòa Giải Hanh Thông, Giảm Bớt Áp Lực' : 'Khắc Phạt Khó Khăn, Cần Chuẩn Bị Bằng Chứng';
+    explanation = 'Chiêm kiện tụng tranh chấp, lấy hào Quan Quỷ làm cơ quan pháp luật, Thế hào làm bản thân, Ứng hào làm đối phương.';
+    ungKy = 'Trong vòng 1-2 tháng tới hoặc khi có phán quyết chính thức';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'VỀ VIỆC TRANH CHẤP / PHÁP LÝ: KẾT QUẢ KHẢ QUAN, CÓ KHẢ NĂNG HÒA GIẢI HOẶC BẠN CHIẾM ĐƯỢC LỢI THẾ HỢP PHÁP.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy mâu thuẫn sẽ từng bước được tháo gỡ. Nên chủ động giữ thái độ thượng tôn pháp luật và đàm phán ôn hòa.`;
+    } else {
+      directConclusion = 'VỀ VIỆC TRANH CHẤP: CẦN RẤT CẨN TRỌNG, CHUẨN BỊ KỸ CÀNG VĂN BẢN VÀ CHỨNG CỨ, TRÁNH ĐỂ BỊ ĐỘNG.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} báo hiệu quá trình giải quyết có thể kéo dài và tốn kém năng lượng. Nên nhờ luật sư hoặc chuyên gia tư vấn kỹ.`;
+    }
+
+  } else if (isPartnership) {
+    // 7. HỎI VỀ HỢP TÁC / ĐỐI TÁC / GÓP VỐN
+    subject = 'Hào Ứng & Huynh Đệ (Đối Tác & Cộng Sự)';
+    targetName = 'Đối tác hợp tác / Người cùng làm ăn';
+    state = isChangedAuspicious ? 'Thế Ứng Đồng Tâm, Tương Trợ Đôi Bên' : 'Khác Biệt Quan Điểm, Đề Phòng Tranh Lợi';
+    explanation = 'Chiêm hợp tác lấy Thế hào làm mình, Ứng hào làm đối tác, Huynh Đệ làm người cộng sự.';
+    ungKy = 'Trong vòng 1-3 tháng tới';
+
+    if (isChangedAuspicious) {
+      directConclusion = 'VỀ HỢP TÁC LÀM ĂN: ĐỐI TÁC CÓ THIỆN CHÍ, ĐÔI BÊN HỢP TÁC RẤT DỄ ĐẠT ĐƯỢC THÀNH CÔNG VÀ LỢI NHUẬN.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} là tượng đồng tâm hiệp lực. Có thể tiến hành ký kết hợp đồng và triển khai kế hoạch.`;
+    } else {
+      directConclusion = 'VỀ HỢP TÁC: CẦN PHÂN ĐỊNH RÕ RÀNG QUYỀN LỢI, TRÁCH NHIỆM VÀ ĐIỀU KHOẢN TÀI CHÍNH TRÊN GIẤY TỜ TRƯỚC KHI BẮT ĐẦU.';
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cảnh báo nguy cơ bất đồng quan điểm phân chia lợi ích về sau. Minh bạch tài chính là yếu tố sống còn.`;
     }
 
   } else {

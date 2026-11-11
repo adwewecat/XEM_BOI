@@ -146,6 +146,25 @@ export default function TimeNav({
         </div>
       </div>
 
+      {/* Dòng tóm tắt ý nghĩa chế độ xem */}
+      <div className="mt-1.5 px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] text-stone-300 bg-stone-900/60 border border-stone-800 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 truncate">
+          <span>{view === 'mingpan' ? '🌟' : view === 'daxian' ? '⏳' : '📅'}</span>
+          <span>
+            {view === 'mingpan' && 'Bản Mệnh (Gốc Tiên Thiên): Bản chất tính cách, tài năng bẩm sinh, tiềm năng trọn đời 12 cung.'}
+            {view === 'daxian' && (currentDx ? `Đại Hạn 10 năm (${currentDx.startAge}–${currentDx.endAge} tuổi): Thời thế hiện tại. Cung chứa tuổi này là Mệnh Lâm Thời.` : 'Đại Hạn: Vận thế trong chu kỳ 10 năm.')}
+            {view === 'liunian' && `Lưu Niên ${liunianYear}: Vận hạn năm nay, cơ duyên và hung cát ngắn hạn.`}
+          </span>
+        </div>
+        <button
+          type="button"
+          className="text-[9px] text-amber-400 font-semibold cursor-pointer shrink-0 ml-2 hover:underline"
+          onClick={() => onViewChange(view === 'mingpan' ? 'daxian' : view === 'daxian' ? 'liunian' : 'mingpan')}
+        >
+          Đổi Chế Độ ›
+        </button>
+      </div>
+
       {/* 叠加四化说明行 */}
       {overlayInfo && (
         <motion.div

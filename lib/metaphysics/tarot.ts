@@ -633,6 +633,12 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
   let spreadTitle = '';
   let overallSynthesis = '';
 
+  const qText = (question || 'Thông điệp vũ trụ').trim();
+  const qClean = qText.toLowerCase();
+  const isPastLife = /(?:^|\s|[.,?!])(kiếp trước|tiền kiếp|kiếp sau|tiền duyên|luân hồi|linh hồn|sứ mệnh|nghiệp|túc mệnh|túc duyên|quá khứ vô lượng|nhân quả|đầu thai)(?:\s|$|[.,?!])/i.test(qClean);
+  const isLoveQuestion = /(?:^|\s|[.,?!])(yêu|tình cảm|tình duyên|người yêu|crush|kết hôn|chia tay|quay lại|cưới|bạn gái|bạn trai)(?:\s|$|[.,?!])/i.test(qClean);
+  const isCareerQuestion = /(?:^|\s|[.,?!])(việc|công việc|sự nghiệp|xin việc|phỏng vấn|thăng chức|lương|tiền|tài chính|đầu tư|kinh doanh|sếp|thi cử)(?:\s|$|[.,?!])/i.test(qClean);
+
   if (spreadType === 'single') {
     spreadTitle = 'Trải Bài 1 Lá · Vấn Đáp & Thông Điệp Ngày Mới';
     const card = deck[0];
@@ -641,12 +647,20 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
       {
         card,
         isReversed,
-        positionName: 'Lá Bài Chủ Quản',
+        positionName: isPastLife ? 'Lá Bài Thức Tỉnh Linh Hồn' : 'Lá Bài Chủ Quản',
       },
     ];
 
     const reading = isReversed ? card.reversed : card.upright;
-    overallSynthesis = `Lá bài **${card.nameVi} (${card.name})** ở vị trí **${isReversed ? 'Ngược (Reversed)' : 'Xuôi (Upright)'}** mang đến thông điệp trọng tâm: ${reading.summary} Lời khuyên dành cho bạn: ${reading.advice}`;
+    if (isPastLife) {
+      overallSynthesis = `Đối với câu hỏi về tiền kiếp & linh hồn "${qText}": Vũ trụ hồi đáp qua lá bài **${card.nameVi} (${card.name})** (${isReversed ? 'Ngược' : 'Xuôi'}). Biểu tượng này phản chiếu tiền thân của bạn từng trải qua những trải nghiệm tâm thức sâu sắc: ${reading.summary} Thông điệp giác ngộ gửi đến bạn trong kiếp này: ${reading.advice}`;
+    } else if (isLoveQuestion) {
+      overallSynthesis = `Về thắc mắc tình cảm "${qText}": Lá bài chủ quản là **${card.nameVi} (${card.name})** (${isReversed ? 'Ngược' : 'Xuôi'}). Thông điệp dành cho bạn: ${reading.love} Lời khuyên của vũ trụ: ${reading.advice}`;
+    } else if (isCareerQuestion) {
+      overallSynthesis = `Về câu hỏi sự nghiệp "${qText}": Lá bài chủ quản là **${card.nameVi} (${card.name})** (${isReversed ? 'Ngược' : 'Xuôi'}). Năng lượng thời vận: ${reading.career} Lời khuyên hành động: ${reading.advice}`;
+    } else {
+      overallSynthesis = `Lá bài **${card.nameVi} (${card.name})** ở vị trí **${isReversed ? 'Ngược (Reversed)' : 'Xuôi (Upright)'}** mang đến thông điệp trọng tâm cho câu hỏi của bạn: ${reading.summary} Lời khuyên dành cho bạn: ${reading.advice}`;
+    }
   } else if (spreadType === 'three_cards') {
     spreadTitle = 'Trải Bài 3 Lá · Quá Khứ - Hiện Tại - Tương Lai';
     const c1 = deck[0];
@@ -658,16 +672,42 @@ export function drawTarotSpread(spreadType: 'single' | 'three_cards' | 'love', q
     const r3 = Math.random() > 0.65;
 
     drawn = [
-      { card: c1, isReversed: r1, positionName: 'Quá Khứ (Gốc Rễ Nguồn Cơn)' },
-      { card: c2, isReversed: r2, positionName: 'Hiện Tại (Thực Trạng Đương Thời)' },
-      { card: c3, isReversed: r3, positionName: 'Tương Lai (Xu Hướng & Kết Quả)' },
+      {
+        card: c1,
+        isReversed: r1,
+        positionName: isPastLife
+          ? 'Tiền Thân & Túc Duyên (Hình bóng kiếp trước)'
+          : 'Quá Khứ (Gốc Rễ Nguồn Cơn)',
+      },
+      {
+        card: c2,
+        isReversed: r2,
+        positionName: isPastLife
+          ? 'Dấu Ấn Linh Hồn (Tiềm thức kiếp này)'
+          : 'Hiện Tại (Thực Trạng Đương Thời)',
+      },
+      {
+        card: c3,
+        isReversed: r3,
+        positionName: isPastLife
+          ? 'Bài Học Nghiệp Quả & Giác Ngộ (Sứ mệnh kiếp này)'
+          : 'Tương Lai (Xu Hướng & Kết Quả)',
+      },
     ];
 
     const read1 = r1 ? c1.reversed : c1.upright;
     const read2 = r2 ? c2.reversed : c2.upright;
     const read3 = r3 ? c3.reversed : c3.upright;
 
-    overallSynthesis = `Hành trình vận mệnh chuyển dịch từ nền tảng **${c1.nameVi}** (${read1.summary.slice(0, 80)}...) sang trạng thái hiện tại dưới tác động của **${c2.nameVi}** (${read2.summary.slice(0, 80)}...), và đang tiến mạnh mẽ về phía kết quả tương lai mang sắc thái **${c3.nameVi}** (${read3.summary.slice(0, 80)}...). Lời khuyên tổng thể: ${read3.advice}`;
+    if (isPastLife) {
+      overallSynthesis = `Giải mã câu hỏi tiền kiếp "${qText}": Lá bài tiền thân **${c1.nameVi}** cho thấy ở kiếp trước bạn từng mang căn duyên đặc biệt: ${read1.summary.slice(0, 95)}... Dấu ấn tiền kiếp đó nay tiếp tục phản chiếu trong tâm thức hiện tại qua lá **${c2.nameVi}** (${read2.summary.slice(0, 95)}...). Và bài học chuyển hóa tối thượng mà vũ trụ giao phó cho linh hồn bạn ở kiếp này thể hiện qua lá **${c3.nameVi}**: ${read3.advice}`;
+    } else if (isLoveQuestion) {
+      overallSynthesis = `Về vấn đề tình duyên "${qText}": Gốc rễ cảm xúc bắt nguồn từ nền tảng **${c1.nameVi}** (${read1.love.slice(0, 90)}...), hiện tại đang chuyển động dưới tác động của **${c2.nameVi}** (${read2.love.slice(0, 90)}...), và tương lai mối quan hệ hướng về **${c3.nameVi}**: ${read3.love} Lời khuyên của vũ trụ: ${read3.advice}`;
+    } else if (isCareerQuestion) {
+      overallSynthesis = `Về câu hỏi sự nghiệp & tài chính "${qText}": Quá trình vừa qua dựa trên tiền đề **${c1.nameVi}** (${read1.career.slice(0, 90)}...), hiện tại bạn đang chịu chi phối của **${c2.nameVi}** (${read2.career.slice(0, 90)}...), và bước ngoặt tương lai sẽ đơm hoa theo năng lượng **${c3.nameVi}**: ${read3.career} Lời khuyên chiến lược: ${read3.advice}`;
+    } else {
+      overallSynthesis = `Đối với câu hỏi "${qText}": Hành trình vận mệnh chuyển dịch từ nền tảng **${c1.nameVi}** (${read1.summary.slice(0, 85)}...) sang trạng thái hiện tại dưới tác động của **${c2.nameVi}** (${read2.summary.slice(0, 85)}...), và đang tiến mạnh mẽ về phía kết quả tương lai mang sắc thái **${c3.nameVi}** (${read3.summary.slice(0, 85)}...). Lời khuyên tổng thể: ${read3.advice}`;
+    }
   } else {
     // love spread
     spreadTitle = 'Trải Bài Tình Duyên · Bản Thân - Đối Phương - Tương Lai';

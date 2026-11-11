@@ -26,6 +26,7 @@ export default function ChartPage() {
   const [liunianYear, setLiunianYear] = useState(() => new Date().getFullYear());
   const [shareOpen, setShareOpen] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [guideTab, setGuideTab] = useState<'steps' | 'terms'>('steps');
   const [rightTab, setRightTab] = useState<'patterns' | 'insights' | 'palace'>('palace');
 
   // Lưu thông tin sinh để dùng khi xuất ảnh lá số (ShareModal)
@@ -620,66 +621,152 @@ export default function ChartPage() {
                 </button>
               </div>
 
-              <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
-                {/* Bước 1 */}
-                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
-                  <div className="font-extrabold text-amber-300 flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 1</span>
-                    <span>XEM MỆNH CUNG & THÂN CƯ (GỐC RỄ CUỘC ĐỜI)</span>
-                  </div>
-                  <p className="text-stone-300 text-xs leading-relaxed">
-                    - <strong>Mệnh Cung</strong>: Quyết định cốt cách, năng lực bẩm sinh và thời niên thiếu (1–30 tuổi).<br />
-                    - <strong>Thân Cung</strong>: Xu hướng phát triển nửa đời sau (từ 30 tuổi trở đi), nơi bạn dồn tâm huyết an thân lập mệnh.
-                  </p>
-                </div>
-
-                {/* Bước 2 */}
-                <div className="p-3.5 rounded-xl bg-sky-950/30 border border-sky-500/30 space-y-1.5">
-                  <div className="font-extrabold text-sky-300 flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-xs">Bước 2</span>
-                    <span>XEM TAM PHƯƠNG TỨ CHÍNH (4 TRỤ CỘT THÀNH BẠI)</span>
-                  </div>
-                  <p className="text-stone-300 text-xs leading-relaxed">
-                    Nhấp vào Cung Mệnh để xem 4 cung liên hoàn: <strong>Mệnh (Bản thân) - Quan Lộc (Sự nghiệp) - Tài Bạch (Tiền tài) - Thiên Di (Xã hội bên ngoài)</strong>. Bốn cung này tạo nên bộ khung thành công của một con người.
-                  </p>
-                </div>
-
-                {/* Bước 3 */}
-                <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
-                  <div className="font-extrabold text-emerald-300 flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-xs">Bước 3</span>
-                    <span>XEM TỨ HÓA NĂM SINH (BÀN TAY SỐ MỆNH)</span>
-                  </div>
-                  <p className="text-stone-300 text-xs leading-relaxed">
-                    - 🟢 <strong>Hóa Lộc</strong>: Nơi có tiền bạc, cơ duyên dồi dào.<br />
-                    - 🔵 <strong>Hóa Quyền</strong>: Nơi nắm giữ thực quyền và quyền uy.<br />
-                    - 🟡 <strong>Hóa Khoa</strong>: Nơi có danh tiếng, thi cử đỗ đạt, quý nhân cứu giải.<br />
-                    - 🔴 <strong>Hóa Kỵ</strong>: Nơi có trắc trở, khảo nghiệm cần nhẫn nại tu dưỡng.
-                  </p>
-                </div>
-
-                {/* Bước 4 */}
-                <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-1.5">
-                  <div className="font-extrabold text-purple-300 flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-xs">Bước 4</span>
-                    <span>XEM ĐẠI HẠN 10 NĂM & LƯU NIÊN TỪNG NĂM</span>
-                  </div>
-                  <p className="text-stone-300 text-xs leading-relaxed">
-                    Thời gian thay đổi theo từng chu kỳ 10 năm. Ô cung nào có viền tím phát sáng và nhãn <strong>[ ⏳ ĐẠI HẠN ]</strong> chính là giai đoạn 10 năm hiện tại của bạn. Toàn bộ trọng tâm công danh, hôn nhân hay tài lộc sẽ đổ dồn vào cung này.
-                  </p>
-                </div>
-
-                {/* Bước 5 */}
-                <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-700 space-y-1.5">
-                  <div className="font-extrabold text-amber-300 flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 5</span>
-                    <span>XEM CÁC CUNG VỊ CHUYÊN BIỆT BẠN QUAN TÂM</span>
-                  </div>
-                  <p className="text-stone-300 text-xs leading-relaxed">
-                    Nhấp trực tiếp vào bất kỳ ô nào trên 12 cung (Phu Thê - Hôn nhân, Điền Trạch - Nhà đất, Tử Tức - Con cái, Phúc Đức - Tổ ấm...) để hệ thống hiển thị phân tích chuyên sâu chi tiết.
-                  </p>
-                </div>
+              {/* Tab Chuyển Đổi Trong Modal */}
+              <div className="flex rounded-xl p-1 bg-stone-900 border border-stone-800">
+                <button
+                  type="button"
+                  onClick={() => setGuideTab('steps')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    guideTab === 'steps'
+                      ? 'bg-amber-500 text-stone-950 shadow'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  🧭 5 Bước Xem Nhanh
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGuideTab('terms')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    guideTab === 'terms'
+                      ? 'bg-amber-500 text-stone-950 shadow'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  📖 Giải Mã: Bản Mệnh · Đại Hạn · Lưu Niên
+                </button>
               </div>
+
+              {guideTab === 'steps' ? (
+                <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
+                  {/* Bước 1 */}
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                    <div className="font-extrabold text-amber-300 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 1</span>
+                      <span>XEM MỆNH CUNG & THÂN CƯ (GỐC RỄ CUỘC ĐỜI)</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - <strong>Mệnh Cung</strong>: Quyết định cốt cách, năng lực bẩm sinh và thời niên thiếu (1–30 tuổi).<br />
+                      - <strong>Thân Cung</strong>: Xu hướng phát triển nửa đời sau (từ 30 tuổi trở đi), nơi bạn dồn tâm huyết an thân lập mệnh.
+                    </p>
+                  </div>
+
+                  {/* Bước 2 */}
+                  <div className="p-3.5 rounded-xl bg-sky-950/30 border border-sky-500/30 space-y-1.5">
+                    <div className="font-extrabold text-sky-300 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-xs">Bước 2</span>
+                      <span>XEM TAM PHƯƠNG TỨ CHÍNH (4 TRỤ CỘT THÀNH BẠI)</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      Nhấp vào Cung Mệnh để xem 4 cung liên hoàn: <strong>Mệnh (Bản thân) - Quan Lộc (Sự nghiệp) - Tài Bạch (Tiền tài) - Thiên Di (Xã hội bên ngoài)</strong>. Bốn cung này tạo nên bộ khung thành công của một con người.
+                    </p>
+                  </div>
+
+                  {/* Bước 3 */}
+                  <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
+                    <div className="font-extrabold text-emerald-300 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-xs">Bước 3</span>
+                      <span>XEM TỨ HÓA NĂM SINH (BÀN TAY SỐ MỆNH)</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - 🟢 <strong>Hóa Lộc</strong>: Nơi có tiền bạc, cơ duyên dồi dào.<br />
+                      - 🔵 <strong>Hóa Quyền</strong>: Nơi nắm giữ thực quyền và quyền uy.<br />
+                      - 🟡 <strong>Hóa Khoa</strong>: Nơi có danh tiếng, thi cử đỗ đạt, quý nhân cứu giải.<br />
+                      - 🔴 <strong>Hóa Kỵ</strong>: Nơi có trắc trở, khảo nghiệm cần nhẫn nại tu dưỡng.
+                    </p>
+                  </div>
+
+                  {/* Bước 4 */}
+                  <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-1.5">
+                    <div className="font-extrabold text-purple-300 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-xs">Bước 4</span>
+                      <span>XEM ĐẠI HẠN 10 NĂM & LƯU NIÊN TỪNG NĂM</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      Thời gian thay đổi theo từng chu kỳ 10 năm. Ô cung nào có viền tím phát sáng và nhãn <strong>[ ⏳ ĐẠI HẠN ]</strong> chính là giai đoạn 10 năm hiện tại của bạn. Toàn bộ trọng tâm công danh, hôn nhân hay tài lộc sẽ đổ dồn vào cung này.
+                    </p>
+                  </div>
+
+                  {/* Bước 5 */}
+                  <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-700 space-y-1.5">
+                    <div className="font-extrabold text-amber-300 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 5</span>
+                      <span>XEM CÁC CUNG VỊ CHUYÊN BIỆT BẠN QUAN TÂM</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      Nhấp trực tiếp vào bất kỳ ô nào trên 12 cung (Phu Thê - Hôn nhân, Điền Trạch - Nhà đất, Tử Tức - Con cái, Phúc Đức - Tổ ấm...) để hệ thống hiển thị phân tích chuyên sâu chi tiết.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
+                  {/* Bản Mệnh là gì */}
+                  <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-2">
+                    <div className="font-extrabold text-amber-300 flex items-center gap-2 text-sm">
+                      <span>🌟</span>
+                      <span>1. XEM BẢN MỆNH LÀ XEM VỚI Ý NGHĨA GÌ?</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - <strong>Bản Mệnh (Cung Mệnh):</strong> Là cái &quot;Gốc&quot; của toàn bộ cây số mệnh. Mệnh quyết định cốt cách tiên thiên, tính cách bẩm sinh, trí tuệ, tài năng tiềm ẩn và &quot;trần nhà&quot; thành bại lớn nhất trong đời người.<br />
+                      - <strong>Xem Mệnh để làm gì?</strong> Để thấu suốt chính mình: Biết sở trường để phát huy, biết nhược điểm để sửa đổi, biết làm ngành nghề gì thì hợp khí số.<br />
+                      - <strong>Thân Cư (Hậu Vận):</strong> Đại diện cho nửa đời sau (từ 30 tuổi trở đi). Mệnh là tư chất khi sinh ra, còn Thân là thành tựu do bạn nỗ lực tạo nên. Thân cư Phu Thê thì coi trọng gia đình bạn đời; Thân cư Quan Lộc thì cuộc đời vì sự nghiệp; Thân cư Tài Bạch thì lo toan tài chính.
+                    </p>
+                  </div>
+
+                  {/* Đại hạn 24-33 là gì */}
+                  <div className="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40 space-y-2">
+                    <div className="font-extrabold text-purple-300 flex items-center gap-2 text-sm">
+                      <span>⏳</span>
+                      <span>2. ĐẠI HẠN 24–33 TUỔI LÀ SAO? TẠI SAO TRỎ VÀO CUNG PHU THÊ?</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - <strong>Quy luật chu kỳ 10 năm:</strong> Cuộc đời con người trong Tử Vi được chia thành các nấc thang 10 năm gọi là <em>Đại Hạn</em>.<br />
+                      - <strong>Tại sao lại trỏ vào Cung Phu Thê?</strong> Đương số sinh năm 2000, hiện 26 tuổi, rơi đúng vào khoảng tuổi <strong>24 đến 33 tuổi</strong>. Trên lá số của bạn, dải số này nằm tại cung Giáp Dần — mang tên Cung Phu Thê.<br />
+                      - <strong>Ý nghĩa &quot;Cung Mệnh Lâm Thời&quot;:</strong> Trong 10 năm từ 24 đến 33 tuổi, Cung Phu Thê tạm thời đóng vai trò như Cung Mệnh của bạn! Mọi biến động lớn nhất về tâm sinh lý, các mối quan hệ tình cảm, duyên nợ hôn nhân hoặc người bạn đời/đối tác sẽ ảnh hưởng trực tiếp đến sự nghiệp và tài lộc của bạn.<br />
+                      - <strong>Tam phương tứ chính Đại Hạn:</strong> Trong 10 năm này, Quan Lộc đại hạn sẽ chiếu về, thử thách và cơ hội lập gia đình đi đôi với sự nghiệp.
+                    </p>
+                  </div>
+
+                  {/* Lưu Niên */}
+                  <div className="p-4 rounded-xl bg-sky-950/30 border border-sky-500/40 space-y-2">
+                    <div className="font-extrabold text-sky-300 flex items-center gap-2 text-sm">
+                      <span>📅</span>
+                      <span>3. LƯU NIÊN NÊN XEM THẾ NÀO? Ý NGHĨA LÀ GÌ?</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - <strong>Đại Hạn quản 10 năm (Thời thế vĩ mô), Lưu Niên quản 1 năm (Biến cố vi mô):</strong> Lưu Niên là vận trình của riêng năm đó (ví dụ năm 2026 Bính Ngọ).<br />
+                      - <strong>Cách xem chuẩn danh sư:</strong> Cung Ngọ trên lá số sẽ là gốc của năm 2026. Tứ Hóa năm 2026 kích hoạt (Đồng Lộc, Cơ Quyền, Xương Khoa, Liêm Kỵ).<br />
+                      - <strong>Nguyên lý kết hợp 3 tầng:</strong><br />
+                      &nbsp;&nbsp;+ <em>Mệnh (Gốc rễ):</em> Nội lực bên trong của bạn có vững vàng không?<br />
+                      &nbsp;&nbsp;+ <em>Đại Hạn (Thời cuộc 10 năm):</em> Đang vào giai đoạn thuận buồm xuôi gió hay gặp trắc trở?<br />
+                      &nbsp;&nbsp;+ <em>Lưu Niên (Cơ hội cụ thể năm nay):</em> Năm nay có nên đầu tư, đổi việc, kết hôn hay nên giữ mình phòng thủ?
+                    </p>
+                  </div>
+
+                  {/* Những yếu tố khác */}
+                  <div className="p-4 rounded-xl bg-stone-900 border border-stone-700 space-y-2">
+                    <div className="font-extrabold text-amber-300 flex items-center gap-2 text-sm">
+                      <span>🔮</span>
+                      <span>4. CÁC THÀNH PHẦN KHÁC TRÊN LÁ SỐ CẦN BIẾT:</span>
+                    </div>
+                    <p className="text-stone-300 text-xs leading-relaxed">
+                      - <strong>Tam Phương Tứ Chính:</strong> Tuyệt đối không xem 1 cung đơn lẻ! Đối Cung (xung chiếu) tác động tới 40%, 2 cung Tam Hợp (hội chiếu) tác động mỗi cung 30%.<br />
+                      - <strong>Cung Vô Chính Diệu:</strong> Cung không có chính tinh nào trong 14 sao lớn. Cung này linh hoạt, uyển chuyển, cần mượn sao của cung đối diện về để luận giải.<br />
+                      - <strong>Lục Sát Tinh (Kình, Đà, Hỏa, Linh, Không, Kiếp):</strong> Những ngôi sao rèn luyện bản lĩnh. Gặp cát tinh chế hóa thì bộc phát anh hùng, gặp hãm địa thì cần thận trọng phòng ngừa rủi ro.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="text-center pt-2">
                 <button
