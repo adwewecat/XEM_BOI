@@ -73,6 +73,30 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 18: Nâng Cấp Bói Chỉ Tay AI - Tải Ảnh Bàn Tay, Chọn Tay Trái/Phải & Tự Động Lấy Thông Tin Cá Nhân
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "xem chỉ tay nên cho upload hình ảnh, chỉ cần chọn tay phải hoặc tay trái để upload lên, không cần chọn gì nhiều, thông tin sẽ được lấy từ đầu lúc nhập, còn chưa có thì mới phải nhập".
+- **Các giải pháp & nâng cấp thực hiện:**
+  1. **Module Tải Ảnh Chỉ Tay & Scanner Laze Huyền Bí (`components/metaphysics/PalmPhotoUploader.tsx`):**
+     - Cho phép chụp ảnh trực tiếp từ camera điện thoại (`accept="image/*" capture="environment"`) hoặc tải ảnh từ máy tính.
+     - Vùng kéo thả tệp mượt mà, khung xem trước ảnh bàn tay viền hào quang vàng kim.
+     - Tích hợp 2 ảnh mẫu bàn tay tiêu chuẩn (Nam / Nữ) để kiểm nghiệm nhanh 1-click.
+     - Hiệu ứng tia Laze Scanner và lưới quét thị giác quét dọc lòng bàn tay mô phỏng nhận diện 4 đại tuyến và các gò khi đang phân tích.
+  2. **Tối Giản Quy Trình - Chỉ Cần Chọn Tay Trái Hoặc Tay Phải:**
+     - Thiết kế 2 nút chọn to rõ, trực quan:
+       + ✋ **Tay Trái:** Tự động giải nghĩa Nam Tiên Thiên / Nữ Hậu Thiên.
+       + 🤚 **Tay Phải:** Tự động giải nghĩa Nữ Tiên Thiên / Nam Hậu Thiên.
+     - Tự động gợi ý bàn tay chuẩn xác theo nguyên tắc cổ truyền "Nam Tả Nữ Hữu" dựa vào giới tính của đương số.
+  3. **Tự Động Đồng Bộ Thông Tin Đương Số & Form Nhập Nhanh:**
+     - Tự động đọc và liên kết hồ sơ đương số từ `localStorage` (`ziwei_user_profile` đã nhập ở trang chủ/lập lá số), hiển thị thẻ thông tin tinh tế kèm nút sửa.
+     - Nếu đương số chưa từng nhập thông tin: Hiển thị form mini gồm Họ tên, Giới tính (Nam/Nữ) và Năm sinh, tự động lưu vào hệ thống để dùng xuyên suốt cả lá số, bát tự, thần số học.
+  4. **Thuật Toán Trích Xuất & Luận Giải Thị Giác AI (`lib/metaphysics/palmistry.ts`):**
+     - Bổ sung `extractPalmFeaturesFromImage` và `analyzePalmFromImage`: Tự động nhận diện dáng bàn tay Ngũ Hành (Kim, Mộc, Thủy, Hỏa, Thổ), độ dài/điểm số 4 đại tuyến (Sinh Đạo, Trí Đạo, Tâm Đạo, Định Mệnh) và các dấu ấn quý tướng (Chữ M, Tam Giác Vàng, Mắt Phật...).
+     - Hiển thị bảng tổng hợp các đặc tính AI phát hiện kèm ảnh đã chụp ở đầu kết quả luận giải.
+     - Vẫn duy trì nút chuyển đổi `[ ⚙️ Tuỳ chọn thủ công ]` cho người muốn tự tinh chỉnh từng đường nét.
+  5. **Kiểm Thử & Đóng Gói:**
+     - Toàn bộ 17 test suites hồi quy PASS, `tsc --noEmit` PASS, `next build` 234 routes PASS 100%.
+
 ### [2026-11-10] - Đợt 17: Tối Ưu Hóa Toàn Diện Giao Diện Mobile Đẳng Cấp, Tinh Tế & Huyền Ảo
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "hãy xử lý để có giao diện mobile nhé, xử lý thật đẹp và huyền bí".

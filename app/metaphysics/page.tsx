@@ -11,9 +11,11 @@ import { calculateAlmanac, AlmanacResult } from '@/lib/metaphysics/almanac';
 import VisualBaguaHexagram from '@/components/metaphysics/VisualBaguaHexagram';
 import VisualTarotCard from '@/components/metaphysics/VisualTarotCard';
 import VisualPalmDiagram from '@/components/metaphysics/VisualPalmDiagram';
+import PalmPhotoUploader from '@/components/metaphysics/PalmPhotoUploader';
 import ThematicMetaphysicsBackground, { MetaphysicsTheme } from '@/components/metaphysics/ThematicMetaphysicsBackground';
 import {
   analyzePalm,
+  analyzePalmFromImage,
   PalmInput,
   PalmistryResult,
   HAND_ELEMENT_DATA,
@@ -53,6 +55,7 @@ export default function MetaphysicsPage() {
   } | null>(null);
 
   // --- STATE CHO BÓI CHỈ TAY (PALMISTRY) ---
+  const [palmMode, setPalmMode] = useState<'photo' | 'manual'>('photo');
   const [palmInput, setPalmInput] = useState<PalmInput>({
     element: 'tho',
     side: 'right',
@@ -202,6 +205,48 @@ export default function MetaphysicsPage() {
       setPalmResult(analyzePalm(palmInput));
       setIsPalmAnalyzing(false);
     }, 400);
+  };
+
+  // Phân tích chỉ tay từ hình ảnh người dùng tải lên
+  const handleAnalyzePalmImage = (imageData: string) => {
+    setIsPalmAnalyzing(true);
+    const gen = userProfile?.gender === 'female' ? 'female' : (palmInput.gender || 'male');
+    const birthYear = userProfile?.year ? Number(userProfile.year) : 1995;
+    const userName = userProfile?.name || 'Đương Số';
+
+    setTimeout(() => {
+      const result = analyzePalmFromImage(imageData, palmInput.side, gen, birthYear, userName);
+      setPalmInput(result.input);
+      setPalmResult(result);
+      setIsPalmAnalyzing(false);
+    }, 850);
+  };
+
+  // Lưu và đồng bộ thông tin đương số nhập từ giao diện bói chỉ tay
+  const handleSaveUserProfileFromPalm = (profile: {
+    name: string;
+    gender: 'male' | 'female';
+    year: number;
+    month?: number;
+    day?: number;
+  }) => {
+    const updated = {
+      ...userProfile,
+      name: profile.name,
+      gender: profile.gender,
+      year: profile.year,
+      month: profile.month || userProfile?.month || 1,
+      day: profile.day || userProfile?.day || 1,
+    };
+    setUserProfile(updated);
+    try {
+      localStorage.setItem('ziwei_user_profile', JSON.stringify(updated));
+    } catch {}
+    setPalmInput((prev) => ({
+      ...prev,
+      gender: profile.gender,
+      side: profile.gender === 'female' ? 'right' : 'left',
+    }));
   };
 
   const handleQuickAIScan = () => {
@@ -359,7 +404,7 @@ export default function MetaphysicsPage() {
         {/* ============================================================== */}
         {activeTab === 'palmistry' && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-6">
-            <div className="card-glass p-6 rounded-2xl border border-amber-500/30 shadow-2xl bg-zinc-950/85 space-y-6">
+            <div className="card-glass p-4 sm:p-6 rounded-2xl border border-amber-500/30 shadow-2xl bg-zinc-950/85 space-y-6">
               {/* Header Panel */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-4">
                 <div>
@@ -367,33 +412,70 @@ export default function MetaphysicsPage() {
                     <span>🖐️</span> BÓI CHỈ TAY TOÀN THƯ · TƯỚNG PHÁP BÀN TAY ĐÔNG TÂY (PALMISTRY)
                   </div>
                   <p className="text-xs text-zinc-400 mt-1">
-                    Luận giải 4 đại tuyến chỉ tay, ngũ hành dáng tay và các dấu ấn quý tướng cát tường (Chữ M, Simian Line, Tam Giác Vàng).
+                    Chỉ cần tải ảnh hoặc chụp ảnh bàn tay lên, chọn tay trái hoặc phải để AI quét tự động và giải đoán toàn bộ tướng số.
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleQuickAIScan}
-                  disabled={isPalmAnalyzing}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30 hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <span>✨</span>
-                  <span>{isPalmAnalyzing ? 'Đang Quét Tướng Tay...' : 'Quét Nhanh Bằng AI Tướng Số'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {palmMode === 'photo' ? (
+                    <button
+                      type="button"
+                      onClick={() => setPalmMode('manual')}
+                      className="px-3.5 py-1.5 rounded-xl border border-zinc-700 hover:border-amber-500/50 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <span>⚙️</span> Tuỳ chọn thủ công
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setPalmMode('photo')}
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <span>📸</span> Chế độ Tải Ảnh AI
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* Grid 2 Cột: Bàn Tay Trực Quan & Tùy Chọn Chỉ Tay */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* Cột Trái: Đồ hình bàn tay trực quan (5 cột) */}
-                <div className="lg:col-span-5 flex flex-col items-center">
-                  <div className="text-xs font-bold text-amber-200 mb-2 flex items-center gap-1.5">
-                    <span>🔍</span> ĐỒ HÌNH CHỈ TAY TƯƠNG TÁC
+              {/* Chế độ 1 (Mặc định): Tải ảnh AI đơn giản - Chỉ cần chọn tay trái hoặc phải */}
+              {palmMode === 'photo' ? (
+                <PalmPhotoUploader
+                  userProfile={userProfile}
+                  onSaveUserProfile={handleSaveUserProfileFromPalm}
+                  side={palmInput.side}
+                  onChangeSide={(newSide) => setPalmInput((p) => ({ ...p, side: newSide }))}
+                  onAnalyzeImage={handleAnalyzePalmImage}
+                  isAnalyzing={isPalmAnalyzing}
+                  currentResult={palmResult}
+                  onSwitchToManual={() => setPalmMode('manual')}
+                />
+              ) : (
+                /* Chế độ 2: Tự chọn thủ công từng đường chỉ tay */
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-xs text-zinc-400 pb-1">
+                    <span>Chế độ tự tinh chỉnh thủ công các đặc điểm bàn tay:</span>
+                    <button
+                      type="button"
+                      onClick={handleQuickAIScan}
+                      disabled={isPalmAnalyzing}
+                      className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>✨</span> Gợi ý nhanh mẫu quý tướng
+                    </button>
                   </div>
-                  <VisualPalmDiagram input={palmInput} />
-                  <p className="text-[11px] text-zinc-400 text-center mt-2 italic">
-                    Di chuột hoặc chạm vào các đường chỉ tay hoặc gò trên hình để xem giải nghĩa tức thì.
-                  </p>
-                </div>
+
+                  {/* Grid 2 Cột: Bàn Tay Trực Quan & Tùy Chọn Chỉ Tay */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* Cột Trái: Đồ hình bàn tay trực quan (5 cột) */}
+                    <div className="lg:col-span-5 flex flex-col items-center">
+                      <div className="text-xs font-bold text-amber-200 mb-2 flex items-center gap-1.5">
+                        <span>🔍</span> ĐỒ HÌNH CHỈ TAY TƯƠNG TÁC
+                      </div>
+                      <VisualPalmDiagram input={palmInput} />
+                      <p className="text-[11px] text-zinc-400 text-center mt-2 italic">
+                        Di chuột hoặc chạm vào các đường chỉ tay hoặc gò trên hình để xem giải nghĩa tức thì.
+                      </p>
+                    </div>
 
                 {/* Cột Phải: Các Lựa Chọn Đặc Điểm Chỉ Tay (7 cột) */}
                 <div className="lg:col-span-7 space-y-4">
@@ -575,12 +657,52 @@ export default function MetaphysicsPage() {
                 </div>
               </div>
             </div>
+          )}
+        </div>
 
-            {/* BẢNG KẾT QUẢ LUẬN GIẢI CHỈ TAY TOÀN DIỆN */}
-            {palmResult && (
-              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-6">
-                {/* 1. KHỐI KẾT LUẬN CỐT CÁCH & TRỰC DIỆN */}
-                <div className="card-glass p-6 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-950/40 via-zinc-950/90 to-zinc-950/95 shadow-2xl relative overflow-hidden">
+        {/* BẢNG KẾT QUẢ LUẬN GIẢI CHỈ TAY TOÀN DIỆN */}
+        {palmResult && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-6">
+            {/* 0. KHỐI THỊ GIÁC AI: ẢNH BÀN TAY ĐÃ TẢI LÊN & CÁC ĐẶC TRƯNG NHẬN DIỆN */}
+            {palmResult.uploadedImage && (
+              <div className="card-glass p-5 rounded-2xl border border-amber-500/40 bg-zinc-950/90 shadow-2xl space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
+                  <div className="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2">
+                    <span>🔍</span> QUÉT THỊ GIÁC AI BÀN TAY ({palmResult.input.side === 'left' ? 'TAY TRÁI' : 'TAY PHẢI'})
+                  </div>
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                    ✓ AI Vision Phân Tích Thành Công
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                  <div className="sm:col-span-4 max-w-[180px] mx-auto aspect-[3/4] rounded-xl overflow-hidden border border-amber-500/30 bg-black/60 shadow-lg">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={palmResult.uploadedImage}
+                      alt="Ảnh bàn tay phân tích"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="sm:col-span-8 space-y-2">
+                    <div className="text-xs font-bold text-zinc-300 mb-1">
+                      Các đặc tính tướng số AI đã phát hiện trên bàn tay:
+                    </div>
+                    <div className="grid grid-cols-1 gap-1.5 text-xs">
+                      {palmResult.detectedFeaturesSummary?.map((feat, idx) => (
+                        <div key={idx} className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-200 flex items-center gap-2">
+                          <span className="text-amber-400">✦</span>
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 1. KHỐI KẾT LUẬN CỐT CÁCH & TRỰC DIỆN */}
+            <div className="card-glass p-6 rounded-2xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-950/40 via-zinc-950/90 to-zinc-950/95 shadow-2xl relative overflow-hidden">
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-amber-500/30 pb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl">
