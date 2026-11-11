@@ -552,6 +552,7 @@ function FeatureVisual({ index, colors: c }: { index: number; colors: ReturnType
 export default function HomePage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const c = useColors(theme);
 
   const heroRef = useRef(null);
@@ -571,11 +572,9 @@ export default function HomePage() {
   }, [c.bgBase]);
 
   return (
-    <div style={{ background: c.bgBase, transition: 'background 0.35s ease' }} className="overflow-x-hidden">
+    <div style={{ background: isDark ? 'transparent' : c.bgBase, transition: 'background 0.35s ease' }} className="overflow-x-hidden relative">
       {/* 致用户公告——首次访问全屏覆盖，关闭后才进入首页 */}
       <AnnouncementModal />
-
-      <StarField />
 
       {/* 全局光晕 */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -625,13 +624,22 @@ export default function HomePage() {
 
       {/* ══ HERO ══════════════════════════════════════════ */}
       <section ref={heroRef} className="relative min-h-[82svh] lg:min-h-[92vh] flex flex-col items-center justify-center px-6 z-10 pb-24 pt-10">
+        {/* Lớp màn chắn tương phản (Hero Contrast Shield) giúp chữ nổi bật tuyệt đối trên nền sao */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center -z-10">
+          <div className="w-[92vw] max-w-[880px] h-[580px] rounded-full bg-slate-950/80 blur-3xl opacity-90" />
+        </div>
+
         <motion.div style={{ y: heroY, opacity: heroOpacity, maxWidth: '960px' }} className="text-center w-full mx-auto mt-10">
           {/* 标签行 */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex items-center justify-center gap-3 mb-6">
             <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${c.goldLine})` }} />
-            <span className="text-[11px] tracking-[0.3em] font-medium transition-colors duration-300" style={{ color: c.tagText }}>
+            <span className="text-[11px] tracking-[0.3em] font-semibold transition-colors duration-300"
+              style={{
+                color: isDark ? '#fcd34d' : c.tagText,
+                textShadow: isDark ? '0 1px 4px rgba(0,0,0,0.9)' : undefined,
+              }}>
               TỬ VI ĐẨU SỐ · HỆ PHÁI THIÊN KỶ (DANH SƯ NGHÊ HẢI HÀ)
             </span>
             <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${c.goldLine})` }} />
@@ -649,7 +657,12 @@ export default function HomePage() {
               }}>
               TỬ VI ĐẨU SỐ
             </h1>
-            <div className="text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-bold" style={{ color: c.goldSolid, opacity: 0.9 }}>
+            <div className="text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-bold"
+              style={{
+                color: isDark ? '#fde68a' : c.goldSolid,
+                opacity: 0.95,
+                textShadow: isDark ? '0 2px 10px rgba(0,0,0,0.95)' : undefined,
+              }}>
               THIÊN BÀN VẬN MỆNH · KHÁM PHÁ BẢN THÂN
             </div>
           </motion.div>
@@ -657,19 +670,30 @@ export default function HomePage() {
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.45 }}
             className="text-base md:text-lg tracking-[0.12em] mb-1.5"
-            style={{ color: c.textSecond, fontWeight: 600 }}>
+            style={{
+              color: isDark ? '#f8fafc' : c.textSecond,
+              fontWeight: 600,
+              textShadow: isDark ? '0 2px 8px rgba(0,0,0,0.95)' : undefined,
+            }}>
             Tử Vi Vi Môn · Thiên Địa Nhân Vi Lộ · Nghê Hải Hà Vi Sư
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.55 }}
             className="text-xs md:text-sm tracking-[0.2em] mb-5"
-            style={{ color: c.textMuted, opacity: 0.9 }}>
+            style={{
+              color: isDark ? '#e2e8f0' : c.textMuted,
+              fontWeight: 500,
+              textShadow: isDark ? '0 1px 6px rgba(0,0,0,0.95)' : undefined,
+            }}>
             Khai Mở Mệnh Lý · Thấu Suốt Thiên Thời · Dưỡng Tâm Lập Mệnh
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.65 }}
             className="text-sm max-w-xl mx-auto leading-relaxed mb-8"
-            style={{ color: c.textMuted }}>
+            style={{
+              color: isDark ? '#cbd5e1' : c.textMuted,
+              textShadow: isDark ? '0 1px 4px rgba(0,0,0,0.95)' : undefined,
+            }}>
             Nhập ngày tháng năm và thời khắc sinh, tự động hiệu chỉnh Giờ Chân Thái Dương (True Solar Time) theo 63 tỉnh thành để khởi tạo lá số Tử Vi 12 cung hoàn chỉnh.
           </motion.p>
 
@@ -699,12 +723,18 @@ export default function HomePage() {
                 <motion.div key={star.name}
                   initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.05 + i * 0.03, duration: 0.35 }}
-                  className="flex flex-col items-center justify-center px-2 py-1.5 rounded-xl border"
-                  style={{ background: c.starBg, borderColor: c.starBorder }}>
-                  <span className="text-[12px] font-bold tracking-tight leading-tight" style={{ color: c.starText }}>
+                  className="flex flex-col items-center justify-center px-2 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-200"
+                  style={{
+                    background: isDark ? 'rgba(8, 16, 36, 0.85)' : c.starBg,
+                    borderColor: isDark ? 'rgba(212, 168, 67, 0.3)' : c.starBorder,
+                    boxShadow: isDark ? '0 2px 10px rgba(0,0,0,0.6)' : undefined,
+                  }}>
+                  <span className="text-[12px] font-bold tracking-tight leading-tight"
+                    style={{ color: isDark ? '#fef08a' : c.starText }}>
                     {viInfo?.vi || star.name}
                   </span>
-                  <span className="text-[9px] opacity-75 font-medium leading-none mt-0.5" style={{ color: c.textMuted }}>
+                  <span className="text-[9px] font-medium leading-none mt-0.5"
+                    style={{ color: isDark ? '#94a3b8' : c.textMuted }}>
                     {elementText || star.name}
                   </span>
                 </motion.div>

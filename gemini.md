@@ -73,6 +73,31 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 19: Khắc Phục Triệt Để Background Quá Sáng, Loại Bỏ Xung Đột Đè Chữ & Tối Ưu Độ Tương Phản Cho Chữ Chính Thức
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "backgroud vẫn quá sáng, chữ chính thức không thấy gì" (Kèm ảnh chụp màn hình minh họa các vòng thiên bàn, 12 Địa Chi, 8 Quẻ Bát Quái và các chòm sao cắt thẳng qua tiêu đề chính "TỬ VI ĐẨU SỐ", làm chữ bị chìm và rối mắt).
+- **Nguyên nhân cốt lõi phát hiện:**
+  1. *Lỗi lặp đôi Canvas (Double Mount):* `<StarField />` vừa được gọi ở `app/layout.tsx` vừa bị gọi lặp lại ở `app/page.tsx`, khiến 2 canvas chồng đè lên nhau nhân đôi độ sáng và số lượng sao.
+  2. *Vòng Bát Quái & 12 Địa Chi đặt ngay tâm màn hình với độ mờ quá lớn:* `dialOpacity = 0.46` và hệ số nhân chữ `2.0 - 2.3` khiến chữ nền (DẬU, THÂN, CÀN, KHÔN) có độ sáng vàng kim gần 100%, cắt thẳng qua chữ tiêu đề "TỬ VI ĐẨU SỐ" và phần mô tả.
+  3. *Chòm sao Bắc Đẩu & Tử Vi Viên lấn vào vùng chữ:* Tọa độ các điểm sao vươn sâu vào cột giữa (xRel: 0.35, yRel: 0.35) đè lên dòng subtitle.
+  4. *Thiếu lớp chắn tương phản (Contrast Shield):* Tiêu đề và nội dung chính không có bóng đổ (drop-shadow) hay lớp màn chắn làm mờ nền phía sau, khiến chữ vàng bị lẫn vào các họa tiết vàng của background.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Hiệu Chỉnh Canvas Nền Huyền Thoại Đẳng Cấp (`components/StarField.tsx`):**
+     - Đưa Vòng Thiên Bàn Bát Quái & 12 Địa Chi về đúng bản chất **hình chìm thủy ấn vũ trụ (cosmic watermark)**: Giảm độ mờ xuống `0.06 - 0.09` (nét vẽ siêu mảnh 0.8px, chữ chi và quẻ mờ dịu `0.14 - 0.20`), xóa bỏ shadowBlur gây chói.
+     - Hạ tâm đĩa thiên văn xuống `centerY = 0.64`, thu gọn bán kính, giúp vòng tròn nằm thanh nhã ở chân trời vũ trụ phía dưới nút bấm, hoàn toàn giải phóng khu vực tiêu đề chính.
+     - Đẩy chòm sao Bắc Đẩu Thất Tinh dạt hẳn về góc Tây Bắc (`xRel <= 0.21`, `yRel <= 0.27`) và Tử Vi Viên về góc Đông Bắc (`xRel >= 0.85`), đường nét thanh mảnh chấm đứt tao nhã, không bao giờ chạm vào khối chữ trung tâm.
+     - Tinh vân vũ trụ (Cosmic Nebulae) được làm dịu sâu lắng, không gây đục nền hay lóa mắt.
+  2. **Gỡ Bỏ Hoàn Toàn Canvas Trùng Lặp & Đồng Bộ Kiến Trúc Next.js:**
+     - Xóa `<StarField />` trùng lặp trong `app/page.tsx`. Chỉ sử dụng duy nhất 1 `<StarField />` toàn cục ở `app/layout.tsx`.
+     - Cho `app/page.tsx` nền trong suốt (`transparent`) ở giao diện tối, giúp canvas toàn cục hiển thị mượt mà, tối ưu FPS và không bị chồng chéo.
+  3. **Lớp Màn Chắn Tương Phản & Nâng Cấp Độ Sáng Chữ Chính Thức (`app/page.tsx` & `globals.css`):**
+     - Bổ sung **Lớp màn chắn tương phản (Hero Contrast Shield)** với dải gradient đen sâu mềm mại (`bg-slate-950/80 blur-3xl`) ngay sau cụm văn bản Hero, đẩy toàn bộ sao và họa tiết vào chiều sâu vô cực.
+     - Nâng cấp `.grad-text-dark` trong `globals.css` với dải màu vàng hoàng kim rạng rỡ (`#ffffff 0%, #fef08a 25%, #f59e0b 65%, #d97706 100%`) cùng hiệu ứng đổ bóng đa tầng (`drop-shadow(0 4px 18px rgba(0,0,0,0.95))`), chữ nổi bật 100% sắc nét.
+     - Các dòng trích dẫn triết lý và mô tả được chuyển sang màu trắng bạc / xám sáng (`#f8fafc`, `#e2e8f0`, `#cbd5e1`) kèm bóng đổ đậm, đọc rõ mồn một.
+     - 14 thẻ Chính Tinh ở chân Hero được phủ kính tối (`rgba(8, 16, 36, 0.85) backdrop-blur-md`), không còn bị các đường tròn hay ký hiệu phía sau xuyên thủng.
+  4. **Kiểm Thử & Đóng Gói:**
+     - 17/17 bài test hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 234 trang tĩnh hoàn thành 100%.
+
 ### [2026-11-11] - Đợt 18: Nâng Cấp Bói Chỉ Tay AI - Tải Ảnh Bàn Tay, Chọn Tay Trái/Phải & Tự Động Lấy Thông Tin Cá Nhân
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "xem chỉ tay nên cho upload hình ảnh, chỉ cần chọn tay phải hoặc tay trái để upload lên, không cần chọn gì nhiều, thông tin sẽ được lấy từ đầu lúc nhập, còn chưa có thì mới phải nhập".
