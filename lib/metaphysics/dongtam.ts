@@ -254,27 +254,41 @@ function synthesizeGeneralVerdict(
   movingLine: number,
   ungKy: string
 ): { directConclusion: string; dichLyDetails: string } {
-  const isYesNo = /(có nên|liệu có|có được|thành công không|được không|có sao không|tốt không|được hay không|ổn không|được chăng|có thể|thành không)/i.test(q);
+  const isQuantity = /(nhiều không|ít không|đông không|vắng không|bao nhiêu|được mấy)/i.test(q);
+  const isYesNo = /(có nên|liệu có|có được|thành công không|được không|có sao không|tốt không|được hay không|ổn không|được chăng|có thể|thành không|nhiều không|ít không|đúng không|có\s+.*không|liệu\s+.*không|\bkhông\s*\??$)/i.test(q.trim());
   const isTiming = /(bao giờ|khi nào|bao lâu|mấy giờ|năm nay|tháng mấy|sắp tới|gần đây|thời điểm nào|chừng nào)/i.test(q);
   const isActionAdvice = /(nên làm gì|phải làm sao|làm sao|cách nào|hướng giải quyết|hành động ra sao|xử lý thế nào)/i.test(q);
 
   const isAuspicious = changedInfo.omen === 'đại_cát' || changedInfo.omen === 'cát';
 
+  if (isQuantity) {
+    if (isAuspicious) {
+      return {
+        directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CÓ VÀ KHÁ NHIỀU. Tượng quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, các tương tác và cơ hội sẽ diễn ra rất nhộn nhịp, dồi dào hơn thường lệ.`,
+        dichLyDetails: `Quẻ gốc ${origName} động hào ${movingLine} chuyển hóa sang ${changedName} (${changedInfo.nature}). Năng lượng quẻ biến vượng tướng báo hiệu số lượng và quy mô sự việc sẽ khởi sắc rõ nét.`
+      };
+    }
+    return {
+      directConclusion: `Về thắc mắc "${q.trim()}": TRẢ LỜI LÀ CHƯA NHIỀU HOẶC ĐẾN RẢI RÁC; CẦN CHỦ ĐỘNG TẠO THÊM NGUỒN LỰC VÀ TƯƠNG TÁC.`,
+      dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) cho thấy tình hình chưa dồn dập ngay lúc này. Lời khuyên của Dịch: ${changedInfo.advice}`
+    };
+  }
+
   if (isYesNo) {
     if (changedName === 'Trạch Hỏa Cách') {
       return {
-        directConclusion: `Về việc bạn hỏi "${q.trim()}": NÊN MẠNH DẠN TIẾN HÀNH NHƯNG PHẢI ĐỔI MỚI PHƯƠNG THỨC TIẾP CẬN, KHÔNG NÊN LÀM THEO LỐI MÒN CŨ.`,
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ NÊN VÀ RẤT KHẢ QUAN, NHƯNG BẮT BUỘC PHẢI ĐỔI MỚI PHƯƠNG THỨC TIẾP CẬN, KHÔNG NÊN ĐI THEO LỐI MÒN CŨ.`,
         dichLyDetails: `Quẻ biến Trạch Hỏa Cách (Canh tân đổi mới) ủng hộ sự thay đổi táo bạo. Nếu dũng cảm bứt phá và rũ bỏ cách làm cũ thì ắt thành công.`
       };
     }
     if (isAuspicious) {
       return {
-        directConclusion: `Về việc bạn hỏi "${q.trim()}": HOÀN TOÀN NÊN TIẾN HÀNH, KHẢ NĂNG THÀNH CÔNG RẤT CAO, THỜI VẬN ĐANG ỦNG HỘ BẠN.`,
-        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, mọi việc hanh thông thuận buồm xuôi gió.`
+        directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ CÓ / RẤT THUẬN LỢI. Thời vận đang chuyển biến tích cực, sự việc sẽ diễn ra suôn sẻ đúng như mong cầu.`,
+        dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp, tượng quẻ thuận lý đẩy lùi trắc trở.`
       };
     }
     return {
-      directConclusion: `Về việc bạn hỏi "${q.trim()}": TẠM THỜI CHƯA NÊN VỘI VÀNG MANH ĐỘNG LÚC NÀY, NÊN BÌNH TĨNH CHỜ THỜI ĐIỂM THÍCH HỢP HƠN.`,
+      directConclusion: `Về câu hỏi "${q.trim()}": TRẢ LỜI LÀ TẠM THỜI CHƯA ĐẠT ĐƯỢC NHƯ Ý HOẶC CẦN THÊM THỜI GIAN; NÊN BÌNH TĨNH CHỜ THỜI ĐIỂM THÍCH HỢP HƠN.`,
       dichLyDetails: `Quẻ biến ${changedName} (${changedInfo.nature}) khuyên đương số: ${changedInfo.advice}`
     };
   }
@@ -418,6 +432,9 @@ export function castDongTam(
   const qClean = question.trim().toLowerCase();
 
   const isPastLife = /(kiếp trước|tiền kiếp|kiếp sau|tiền duyên|luân hồi|linh hồn|sứ mệnh|túc mệnh|túc nghiệp|căn duyên|tâm linh|chân ngã|nhân quả|đầu thai|nghiệp duyên|tu tập|kiếp xưa|túc duyên)/i.test(qClean);
+  const isContactOrNews = /(hotline|gọi|cuộc gọi|điện thoại|alo|nhắn tin|tin nhắn|sms|zalo|inbox|chat|email|gửi thư|thư từ|tin tức|thông báo|kết quả|phản hồi|hồi âm|liên lạc|liên hệ|gọi điện|nghe máy|bắt máy|trả lời tin|ai gọi)/i.test(qClean);
+  const isBusinessCustomers = /(khách|khách hàng|khách mua|đơn hàng|chốt đơn|bán hàng|đông khách|vắng khách|ế ẩm|đắt khách|lượng khách|doanh số|mua hàng|order)/i.test(qClean);
+  const isDailyLuck = /(hôm nay|ngày nay|nay|ngày mai|hôm nay thế nào|may mắn không|vận may|vận khí ngày|ngày tốt|ngày xấu)/i.test(qClean);
   const isLostItem = /(mất|tìm|thất lạc|ở đâu|đánh rơi|rơi đồ|để quên|tìm thấy|đồ mất)/i.test(qClean);
   const isProperty = /(nhà đất|bất động sản|mua nhà|bán nhà|mua đất|bán đất|thuê nhà|thuê phòng|mặt bằng|chung cư|phong thủy nhà|căn hộ|đất đai)/i.test(qClean);
   const isCareer = /(công việc|đi làm|xin việc|phỏng vấn|thăng chức|tăng lương|đổi việc|nhảy việc|nghỉ việc|chuyển việc|bỏ việc|sếp|đồng nghiệp|công ty|dự án|chức vụ|tuyển dụng|hồ sơ|thi cử|kỳ thi|đi thi|thi đỗ|thi đậu|thi rớt|bằng lái|bằng cấp|học hành|điểm thi|đậu đại học|thi qua|thi tuyển|deal lương)/i.test(qClean);
@@ -631,6 +648,60 @@ export function castDongTam(
     } else {
       directConclusion = `Về việc hợp tác "${question.trim()}": CẦN PHÂN ĐỊNH RÕ RÀNG QUYỀN LỢI, TRÁCH NHIỆM VÀ TÀI CHÍNH TRÊN GIẤY TỜ TRƯỚC KHI BẮT ĐẦU.`;
       dichLyDetails = `Quẻ ${originalName} biến ${changedName} cảnh báo nguy cơ bất đồng quan điểm về sau, minh bạch tài chính là yếu tố quyết định.`;
+    }
+
+  } else if (isContactOrNews) {
+    subject = 'Phụ Mẫu (Tin Tức, Sóng Điện Thoại & Văn Thư) phối Hào Ứng (Khách Hàng)';
+    targetName = 'Thông tin liên lạc / Cuộc gọi Hotline / Phản hồi';
+    state = isChangedAuspicious ? 'Phụ Mẫu Vượng Tướng, Hào Ứng Tương Sinh, Tin Tức & Cuộc Gọi Dồn Dập' : 'Tin Tức Đến Chậm Rải Rác, Cần Chủ Động Trực Kênh';
+    explanation = 'Trong Lục Hào: Hào Phụ Mẫu đại diện cho thư tín, sóng điện thoại, tin tức và liên lạc; Hào Ứng đại diện cho người gọi/khách hàng đối phương.';
+    ungKy = 'Ngay trong ngày hôm nay; đặc biệt nhộn nhịp vào các khung giờ Thìn (07-09h), Tị (09-11h), Thân (15-17h), Dậu (17-19h)';
+
+    const isAskingAmount = /(nhiều không|ít không|đông không|mấy cuộc|bao nhiêu)/i.test(qClean);
+
+    if (changedName === 'Trạch Hỏa Cách') {
+      directConclusion = `Về việc liên lạc / hotline "${question.trim()}": CÓ SỰ THAY ĐỔI LỚN VỀ PHƯƠNG THỨC LIÊN HỆ, SẼ CÓ NHỮNG CUỘC GỌI BẤT NGỜ HOẶC ĐỐI TÁC MỚI CHỦ ĐỘNG KẾT NỐI.`;
+      dichLyDetails = `Quẻ gốc ${originalName} biến Trạch Hỏa Cách (Canh tân đổi mới) cho thấy kênh liên lạc sẽ có làn gió mới. Cần chuẩn bị kịch bản đón tiếp chu đáo để nắm bắt cơ hội.`;
+    } else if (isChangedAuspicious) {
+      if (isAskingAmount) {
+        directConclusion = `Về việc hotline / cuộc gọi "${question.trim()}": TRẢ LỜI LÀ CÓ VÀ SẼ KHÁ NHIỀU. Lượng cuộc gọi, tin nhắn và yêu cầu liên hệ hôm nay sẽ dồn dập, khởi sắc vượt mức thường lệ.`;
+      } else {
+        directConclusion = `Về việc hotline / cuộc gọi "${question.trim()}": CÓ PHẢN HỒI RẤT TÍCH CỰC, NGƯỜI CẦN TÌM HOẶC KHÁCH HÀNG SẼ CHỦ ĐỘNG GỌI ĐIỆN VÀ TRAO ĐỔI THUẬN LỢI.`;
+      }
+      dichLyDetails = `Quẻ gốc ${originalName} động hào ${movingLine} biến sang ${changedName} (${changedInfo.nature}). Hào Phụ Mẫu (tin tức) đắc lệnh, Hào Ứng (người gọi) có thiện cảm sinh trợ Thế Hào, báo hiệu các cuộc gọi và kênh hotline hôm nay tương tác rất thuận lợi, mang lại cơ hội tốt.`;
+    } else {
+      directConclusion = `Về việc hotline / cuộc gọi "${question.trim()}": LƯỢNG CUỘC GỌI HÔM NAY CÓ THỂ ĐẾN RẢI RÁC HOẶC ĐẾN CHẬM VÀO CUỐI NGÀY; NÊN CHỦ ĐỘNG KIỂM TRA MÁY VÀ GỌI LẠI NẾU CẦN.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} cho thấy thông tin chưa dồn dập ngay buổi sớm. Hãy chủ động rà soát danh sách liên hệ để tạo thêm kết nối.`;
+    }
+
+  } else if (isBusinessCustomers) {
+    subject = 'Tử Tôn (Nguồn Khách & Sinh Tài) phối Thê Tài (Doanh Số)';
+    targetName = 'Lượng khách hàng / Đơn hàng / Sức mua';
+    state = isChangedAuspicious ? 'Tử Tôn Trì Thế, Khách Hàng Nườm Nượp, Đơn Hàng Hanh Thông' : 'Sức Mua Chậm Lại, Cần Tăng Cường Tiếp Thị';
+    explanation = 'Trong Lục Hào: Tử Tôn là nguồn sinh ra Tài lộc (chính là khách hàng), Thê Tài là doanh thu và tiền hàng.';
+    ungKy = 'Trong ngày hôm nay hoặc các ngày tới vào giờ Thìn, Thân, Dậu';
+
+    if (isChangedAuspicious) {
+      directConclusion = `Về lượng khách / bán hàng "${question.trim()}": KHÁCH HÀNG SẼ ĐÔNG ĐÚC VÀ TƯƠNG TÁC TỐT, ĐƠN HÀNG VÀ DOANH THU CÓ CHIỀU HƯỚNG TĂNG TRƯỞNG RÕ RỆT.`;
+      dichLyDetails = `Quẻ gốc ${originalName} biến ${changedName} (${changedInfo.nature}) mang lại sinh khí tốt đẹp cho việc kinh doanh, buôn may bán đắt.`;
+    } else {
+      directConclusion = `Về lượng khách "${question.trim()}": KHÁCH CÓ THỂ ĐẾN CHẬM HOẶC XEM NHIỀU HƠN MUA; NÊN CHĂM SÓC KHÁCH HÀNG NHIỆT TÌNH ĐỂ TẠO THIỆN CẢM.`;
+      dichLyDetails = `Quẻ biến ${changedName} khuyên kiên nhẫn, tối ưu dịch vụ và giữ thái độ niềm nở.`;
+    }
+
+  } else if (isDailyLuck) {
+    subject = 'Nhật Thần & Thế Hào (Vận Khí Bản Thân Trong Ngày)';
+    targetName = 'Vận may & Năng lượng hôm nay';
+    state = isChangedAuspicious ? 'Nhật Thần Tương Trợ, Vận Khí Sáng Sủa' : 'Khí Thế Cần Cân Bằng, Tránh Nóng Vội';
+    explanation = 'Chiêm vận khí ngày lấy Nhật Thần phối hợp cùng Thế hào để thẩm định sinh khắc.';
+    ungKy = 'Trong suốt ngày hôm nay từ sáng đến tối';
+
+    if (isChangedAuspicious) {
+      directConclusion = `Về vận may hôm nay "${question.trim()}": HÔM NAY LÀ MỘT NGÀY THUẬN LỢI, NĂNG LƯỢNG TÍCH CỰC, NHIỀU VIỆC HANH THÔNG NHƯ Ý NGUYỆN.`;
+      dichLyDetails = `Quẻ ${originalName} biến ${changedName} (${changedInfo.nature}) mang lại vận may và tinh thần phấn chấn.`;
+    } else {
+      directConclusion = `Về ngày hôm nay "${question.trim()}": NÊN GIỮ TÂM BÌNH THẢN, LÀM VIỆC CẨN THẬN THEO KẾ HOẠCH, TRÁNH ĐƯA RA QUYẾT ĐỊNH NÓNG VỘI.`;
+      dichLyDetails = `Quẻ biến ${changedName} nhắc nhở giữ gìn năng lượng và điều hòa thân tâm.`;
     }
 
   } else {

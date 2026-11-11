@@ -73,6 +73,26 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 26: Khắc Phục Triệt Để Trùng Dụng Thần & Rập Khuôn Kết Luận Trong Bói Động Tâm, Đưa Khối AI Gemini Lên Vị Trí Trung Tâm
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "BÓI HỮU duyên tôi bói thử 2 câu, đều kết luận y chang , dụng thần chiêm đoán cũng y chang" (Kèm ảnh: Câu hỏi "NAY HOTLINE CÓ GỌI CHO TÔI NHIỀU KHÔNG" -> Dụng Thần rơi vào Thế Hào và ra câu văn mẫu cũ).
+- **Nguyên nhân cốt lõi phát hiện:**
+  1. *Thiếu intent cho tin tức / liên lạc / hotline:* Câu hỏi về cuộc gọi, hotline, tin tức, phản hồi không khớp với các bộ lọc cũ, rơi vào nhánh `else` -> Luôn bị gán `Thế Hào (Chủ Thể Vấn Đề)` và văn mẫu `năng lượng mạnh mẽ, tự tin hành động nhưng tránh cậy sức làm càn`.
+  2. *Regex câu hỏi Có/Không chưa bao quát:* Câu hỏi kết thúc bằng "nhiều không", "có ... không" bị bỏ sót khỏi `isYesNo`, không đưa ra câu trả lời trực diện CÓ/KHÔNG.
+  3. *Vị trí khối AI Gemini bị khuất ở đáy trang:* Khối AI nằm sau cả bảng Bát Quái và Ứng kỳ, người dùng chỉ nhìn thấy nửa trên nên không thấy câu trả lời từ Gemini AI.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Bổ Sung Các Miền Intent Chuyên Sâu Cho Engine Dịch Lý (`lib/metaphysics/dongtam.ts`):**
+     - `isContactOrNews` (Hotline, cuộc gọi, tin tức, tin nhắn, phản hồi, liên lạc): Lấy hào `Phụ Mẫu (Hào Văn Thư, Cuộc Gọi & Tin Tức) phối Hào Ứng (Khách Hàng Đối Phương)` làm Dụng Thần.
+     - `isBusinessCustomers` (Khách hàng, đơn hàng, buôn bán): Lấy `Tử Tôn (Nguồn Khách) phối Thê Tài (Doanh Số)` làm Dụng Thần.
+     - `isDailyLuck` (Vận khí trong ngày, hôm nay thế nào): Lấy `Nhật Thần & Thế Hào` làm Dụng Thần.
+  2. **Nâng Cấp Bộ Nhận Diện Câu Hỏi Có/Không (`isYesNo` & `isQuantity`):**
+     - Nhận diện toàn diện các cấu trúc `có ... không`, `... nhiều không`, `... đông không`, đưa ra phán quyết dứt khoát: **CÓ / KHẢ QUAN** hoặc **CHƯA / TẠM THỜI RẢI RÁC** dựa trên hào động và quẻ biến.
+  3. **Đưa Khối AI Gemini Lên Vị Trí Danh Dự Trung Tâm (`app/metaphysics/page.tsx`):**
+     - Đặt ngay sau Header quẻ: Hiển thị trạng thái đang luận giải bằng hiệu ứng phát sáng `Gemini 3.6 Flash`, và hiển thị ngay khối lời phán trực diện của AI ở vị trí cao nhất.
+     - Kế tiếp là phần Dịch lý Lục Hào truyền thống với Dụng Thần và Kết luận riêng biệt.
+  4. **Kiểm Thử & Đóng Gói:**
+     - 17/17 test suites hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 238 routes PASS 100%.
+
 ### [2026-11-11] - Đợt 25: Nạp API Key Dùng Chung & Cấu Hình Model Gemini 3.6 Flash Siêu Tốc Độ Cho Toàn Bộ Hệ Thống
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "hãy để gemini-3.6-flash nhé: Key là: AQ.Ab8R••••Os3A"

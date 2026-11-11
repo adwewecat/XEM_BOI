@@ -215,8 +215,7 @@ export default function MetaphysicsPage() {
           lunarDate: res.datetimeInput.lunarStr,
           ganZhiDay: res.datetimeInput.ganZhiDay,
           xunKong: res.datetimeInput.xunKong,
-        },
-        true
+        }
       );
     }, 450);
   };
@@ -243,7 +242,7 @@ export default function MetaphysicsPage() {
       setIsTarotDrawing(false);
 
       // Tự động kích hoạt Gemini AI dùng chung từ hệ thống
-      handleCallAi('tarot', q, res, true);
+      handleCallAi('tarot', q, res);
     }, 500);
   };
 
@@ -1075,17 +1074,67 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
-                  {/* KẾT LUẬN TRỰC DIỆN CỦA THẦY */}
+                  {/* 1. KHỐI TRỢ LÝ AI GEMINI 3.6 FLASH (ƯU TIÊN VỊ TRÍ TRUNG TÂM NỔI BẬT NHẤT) */}
+                  {isAiLoading && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-yellow-950/30 to-amber-950/40 border-2 border-amber-400/60 shadow-xl flex items-center gap-3 animate-pulse mb-6">
+                      <span className="text-2xl animate-spin shrink-0">🌀</span>
+                      <div>
+                        <div className="text-xs font-black uppercase text-amber-300 tracking-wider">
+                          ĐẠO SƯ AI GEMINI 3.6 FLASH ĐANG THẤU SUỐT DỊCH LÝ...
+                        </div>
+                        <p className="text-xs text-amber-100/90 mt-0.5 leading-relaxed">
+                          Đang kết nối quẻ <strong>{dongTamResult.hexagram.originalName}</strong> biến <strong>{dongTamResult.hexagram.changedName}</strong> để giải đáp trực diện cho câu hỏi: &quot;{dongTamQuestion}&quot;...
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {aiError && (
+                    <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/50 text-xs text-rose-300 flex flex-wrap items-center justify-between gap-2 mb-6">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">⚠️</span>
+                        <span>{aiError}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCallAi('iching')}
+                        className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-white font-bold transition-all"
+                      >
+                        Thử Luận Lại Bằng AI
+                      </button>
+                    </div>
+                  )}
+
+                  {aiDongTamAnswer && (
+                    <div className="p-5 sm:p-7 rounded-2xl border-2 border-amber-400/90 bg-gradient-to-br from-zinc-950 via-amber-950/40 to-zinc-950 shadow-2xl space-y-4 mb-6">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 uppercase tracking-widest shadow-sm">
+                            🔮 GEMINI 3.6 FLASH
+                          </span>
+                          <h3 className="text-sm sm:text-base font-bold text-amber-200 uppercase tracking-wide">
+                            LỜI PHÁN TRỰC DIỆN TỪ ĐẠO SƯ DỊCH LÝ AI
+                          </h3>
+                        </div>
+                        <span className="text-[10px] font-mono text-amber-400/80">Phản hồi chuẩn xác theo câu hỏi</span>
+                      </div>
+                      <div className="text-xs sm:text-sm text-zinc-100 leading-relaxed space-y-3 whitespace-pre-line font-sans font-normal">
+                        {formatBoldMarkup(aiDongTamAnswer)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. KẾT LUẬN TRỰC DIỆN THEO DỊCH LÝ LỤC HÀO CỔ TRUYỀN */}
                   <div className="p-5 rounded-xl bg-gradient-to-r from-amber-950/40 via-zinc-900 to-amber-950/30 border-2 border-amber-500/40 mb-6 shadow-lg shadow-amber-950/20">
                     <div className="text-xs font-bold text-amber-400 mb-2 flex items-center gap-2 uppercase tracking-wider">
-                      <span className="text-base">🎯</span> KẾT LUẬN TRỰC DIỆN CHO CÂU HỎI CỦA BẠN:
+                      <span className="text-base">🎯</span> KẾT LUẬN THEO DỊCH LÝ LỤC HÀO:
                     </div>
                     <div className="text-base sm:text-lg font-bold text-amber-100 leading-relaxed font-sans">
                       {dongTamResult.directConclusion || dongTamResult.thayPhan.split('\n')[2] || 'Hành sự thuận hòa, an định tâm trí.'}
                     </div>
                   </div>
 
-                  {/* LỜI THẦY PHÁN & LUẬN GIẢI DỊCH LÝ CHI TIẾT */}
+                  {/* 3. LỜI THẦY PHÁN & LUẬN GIẢI DỊCH LÝ CHI TIẾT */}
                   <div className="p-5 rounded-xl bg-zinc-900/90 border border-zinc-800 mb-6">
                     <div className="text-xs font-bold text-amber-300 mb-3 flex items-center gap-2">
                       <span>📜</span> TOÀN VĂN LUẬN GIẢI QUẺ DỊCH:
@@ -1099,7 +1148,7 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
-                  {/* Chi tiết Dụng Thần & Dịch Lý */}
+                  {/* 4. Chi tiết Dụng Thần & Dịch Lý */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs mb-4">
                     <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
                       <span className="text-zinc-500 block font-semibold">Tứ Trụ Can Chi Thời Khắc:</span>
@@ -1119,7 +1168,7 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
-                  {/* Ứng Kỳ Thời Gian */}
+                  {/* 5. Ứng Kỳ Thời Gian */}
                   <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800 flex items-start gap-3">
                     <span className="text-lg">💡</span>
                     <div>
@@ -1132,7 +1181,7 @@ export default function MetaphysicsPage() {
                     </div>
                   </div>
 
-                  {/* Thanh gọi AI Gemini cho Quẻ Dịch */}
+                  {/* Thanh gọi lại AI Gemini cho Quẻ Dịch */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-5 border-t border-amber-500/20">
                     <button
                       type="button"
@@ -1146,40 +1195,14 @@ export default function MetaphysicsPage() {
                         </>
                       ) : (
                         <>
-                          <span>☯️</span> {aiDongTamAnswer ? 'Luận Giải Lại Cùng Gemini AI' : 'Luận Giải Trực Tiếp Bằng Gemini AI'}
+                          <span>☯️</span> Luận Giải Lại Câu Hỏi Khác Bằng Gemini AI
                         </>
                       )}
                     </button>
                     <span className="text-[11px] text-zinc-500 italic">
-                      Hệ thống AI dùng chung tự động kích hoạt
+                      Hệ thống Gemini 3.6 Flash tự động kích hoạt
                     </span>
                   </div>
-
-                  {aiError && (
-                    <div className="mt-3 p-3 rounded-lg bg-rose-950/50 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
-                      <span>⚠️</span> {aiError}
-                    </div>
-                  )}
-
-                  {/* Hộp Luận Giải Dịch Lý Chuyên Sâu Từ Gemini AI */}
-                  {aiDongTamAnswer && (
-                    <div className="mt-5 p-6 rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-zinc-950 via-amber-950/30 to-zinc-950 shadow-2xl space-y-4">
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 uppercase tracking-widest">
-                            AI DỊCH LÝ THÂU SUỐT
-                          </span>
-                          <h3 className="text-sm sm:text-base font-bold text-amber-200">
-                            LỜI GIẢI MÃ MAI HOA & LỤC HÀO TỪ TRÍ TUỆ NHÂN TẠO GEMINI
-                          </h3>
-                        </div>
-                        <span className="text-[10px] font-mono text-amber-400/80">Tương tác trực diện câu hỏi</span>
-                      </div>
-                      <div className="text-xs sm:text-sm text-zinc-100 leading-relaxed space-y-3 whitespace-pre-line font-sans font-normal">
-                        {formatBoldMarkup(aiDongTamAnswer)}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* ĐỒ HỌA TRỰC QUAN BÁT QUÁI & HÀO ĐỘNG & NGŨ HÀNH TẠNG PHỦ */}
@@ -1736,6 +1759,21 @@ export default function MetaphysicsPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Trạng thái AI Loading cho Tarot */}
+                {isAiLoading && (
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-amber-950/30 to-purple-950/40 border-2 border-purple-400/60 shadow-xl flex items-center gap-3 animate-pulse">
+                    <span className="text-2xl animate-spin shrink-0">🌀</span>
+                    <div>
+                      <div className="text-xs font-black uppercase text-purple-300 tracking-wider">
+                        ĐẠO SƯ AI GEMINI 3.6 FLASH ĐANG THẤU SUỐT TRẢI BÀI...
+                      </div>
+                      <p className="text-xs text-purple-100/90 mt-0.5 leading-relaxed">
+                        Đang kết nối năng lượng các lá bài để giải mã trực diện cho câu hỏi: &quot;{tarotQuestion || 'Thông điệp dẫn lối tổng quan'}&quot;...
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Hộp Luận Giải Trực Tiếp Từ Gemini AI */}
                 {aiTarotAnswer && (
