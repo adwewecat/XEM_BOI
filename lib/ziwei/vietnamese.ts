@@ -630,3 +630,123 @@ Thời điểm này bản mệnh nên giữ tâm thế điềm tĩnh, sáng su�
 
   return `Lá số bản mệnh an Mệnh tại cung ${mingBranchVi}, ${mingStarsStr}, nạp âm ${juVi}. Cuộc đời nhiều cơ duyên cát lành, nên vững tâm phát triển tài đức.`;
 }
+
+/**
+ * Luận giải chi tiết một Cung vị cụ thể trên lá số Tử Vi (chuẩn phái Thiên Kỷ Nghê Hải Hà)
+ */
+export function generatePalaceAnalysis(palace: Palace, chart: ZiweiChart): {
+  palaceNameVi: string;
+  ganzhiVi: string;
+  roleDescription: string;
+  isDaXian: boolean;
+  daXianText?: string;
+  majorStarsText: string;
+  luckyStarsText: string;
+  shaStarsText: string;
+  sanFangText: string;
+  advice: string;
+} {
+  const palaceInfo = getPalaceName(palace.name);
+  const ganzhiInfo = getGanzhiName(palace.stem, palace.branch);
+  const palaceNameVi = palaceInfo.vi;
+
+  // 1. Ý nghĩa và vai trò cung vị
+  const PALACE_ROLES: Record<string, string> = {
+    '命宫': 'Cung Mệnh là hạt nhân tiên thiên của sinh mệnh, chủ về cốt cách, tính tình bẩm sinh, tài năng tiềm ẩn, ngoại hình và vận mệnh thời tiền vận (1–30 tuổi). Xem Mệnh là xem cái "gốc" của toàn bộ đời người.',
+    '夫妻': 'Cung Phu Thê chủ quản đường tình duyên, duyên nợ hôn nhân, tính tình và diện mạo người bạn đời, mức độ hòa hợp gia đạo, và thời điểm thành gia lập thất.',
+    '兄弟': 'Cung Huynh Đệ chủ về tình cảm anh chị em ruột thịt trong nhà, bạn bè tri kỷ chí cốt và các đối tác đồng cam cộng khổ cùng khởi nghiệp.',
+    '子女': 'Cung Tử Tức chủ về con cái, số lượng con, nhân duyên cha mẹ với con, tính cách năng khiếu của con cái và phúc lộc phụ dưỡng về sau.',
+    '财帛': 'Cung Tài Bạch chủ về tiền tài, dòng tiền lưu chuyển, phương thức kiếm tiền, năng lực quản lý chi tiêu và mức độ thụ hưởng tài lộc của bản thân.',
+    '疾厄': 'Cung Tật Ách chủ về sức khỏe, thể chất, những tạng phủ ngũ hành dễ suy nhược hoặc nhạy cảm bệnh tật, cùng những tai ách cần phòng ngừa.',
+    '迁移': 'Cung Thiên Di chủ về hoạt động ngoại giao, xuất ngoại, đi xa, môi trường xã hội bên ngoài và cơ hội quý nhân nâng đỡ khi rời xa quê hương.',
+    '交友': 'Cung Giao Hữu (Nô Bộc) chủ về bạn bè xã giao, cấp dưới, đồng nghiệp, cộng sự hợp tác và sự tương trợ của mạng lưới quan hệ xã hội.',
+    '奴仆': 'Cung Giao Hữu (Nô Bộc) chủ về bạn bè xã giao, cấp dưới, đồng nghiệp, cộng sự hợp tác và sự tương trợ của mạng lưới quan hệ xã hội.',
+    '官禄': 'Cung Quan Lộc chủ về học vấn, công danh, sự nghiệp, đường tiến thân, chức vụ quyền hạn và lĩnh vực chuyên môn phù hợp nhất trong đời.',
+    '田宅': 'Cung Điền Trạch chủ về nhà cửa, đất đai, bất động sản, cơ nghiệp tổ phụ để lại và năng lực tích lũy tài sản cố định bền vững.',
+    '福德': 'Cung Phúc Đức chủ về đời sống tinh thần, tư tưởng nội tâm, phúc đức tổ tiên, tuổi thọ, thú vui an lạc và nghiệp quả của đời người.',
+    '父母': 'Cung Phụ Mẫu chủ về cha mẹ, phúc ấm tiền nhân che chở, sự dạy dỗ gia phong và mối liên hệ với các bậc trưởng bối, cấp trên.',
+  };
+
+  const roleDescription = PALACE_ROLES[palace.name] || 'Cung vị phản ánh một phương diện trọng yếu trong cuộc đời đương số.';
+
+  // 2. Đại hạn
+  const isDaXian = !!palace.isCurrentDaXian;
+  let daXianText: string | undefined;
+  if (isDaXian && palace.daXianAge) {
+    daXianText = `Hiện tại bạn đang ở độ tuổi ${chart.currentAge} tuổi, nằm trọn trong giai đoạn Đại Hạn 10 năm từ ${palace.daXianAge[0]} đến ${palace.daXianAge[1]} tuổi đóng tại Cung ${palaceNameVi}. Theo danh sư Nghê Hải Hà, trong 10 năm này, Cung ${palaceNameVi} sẽ trở thành "Cung Mệnh lâm thời". Toàn bộ các cơ hội, bước ngoặt và biến động lớn nhất của bạn trong độ tuổi này đều chịu ảnh hưởng trực tiếp từ cung này!`;
+  }
+
+  // 3. Chính tinh
+  const majors = palace.stars.filter(s => s.type === 'major');
+  let majorStarsText = '';
+  if (majors.length === 0) {
+    const oppBranch = (palace.branch + 6) % 12;
+    const oppPalace = chart.palaces.find(p => p.branch === oppBranch);
+    const oppName = oppPalace ? getPalaceName(oppPalace.name).vi : '';
+    majorStarsText = `Cung ${palaceNameVi} Vô Chính Diệu (không có chính tinh toạ thủ). Theo khẩu quyết Thiên Kỷ của thầy Nghê Hải Hà: "Cung Vô Chính Diệu ắt phải mượn sao của Đối Cung để luận đoán". Bản cung sẽ mượn toàn bộ năng lượng từ Cung ${oppName} xung chiếu sang, tính cách linh hoạt, dễ thích nghi và cần mượn lực từ môi trường bên ngoài để thành công.`;
+  } else {
+    majorStarsText = majors.map(s => {
+      const sInfo = getStarName(s.name);
+      const bInfo = s.brightnessRaw ? `[${getBrightnessVi(s.brightnessRaw)}]` : '';
+      const hInfo = s.siHua ? `(${getSiHua(s.siHua).vi})` : '';
+      return `Sao **${sInfo.vi}** ${bInfo} ${hInfo}`.trim();
+    }).join(', ');
+  }
+
+  // 4. Cát tinh & Sát tinh
+  const luckies = palace.stars.filter(s => s.type === 'lucky');
+  const shas = palace.stars.filter(s => s.type === 'sha');
+
+  const luckyStarsText = luckies.length > 0
+    ? luckies.map(s => getStarName(s.name).vi).join(', ')
+    : 'Không có cát tinh phụ tá nổi bật tại bản cung.';
+
+  const shaStarsText = shas.length > 0
+    ? shas.map(s => getStarName(s.name).vi).join(', ')
+    : 'Không có sát tinh hung hiểm đóng tại bản cung.';
+
+  // 5. Tam phương tứ chính
+  const oppBranch = (palace.branch + 6) % 12;
+  const trine1Branch = (palace.branch + 4) % 12;
+  const trine2Branch = (palace.branch + 8) % 12;
+
+  const oppP = chart.palaces.find(p => p.branch === oppBranch);
+  const trine1P = chart.palaces.find(p => p.branch === trine1Branch);
+  const trine2P = chart.palaces.find(p => p.branch === trine2Branch);
+
+  const formatPBrief = (p?: Palace) => {
+    if (!p) return '';
+    const pName = getPalaceName(p.name).vi;
+    const mStars = p.stars.filter(s => s.type === 'major').map(s => getStarName(s.name).vi).join(' ');
+    return `Cung ${pName} (${mStars || 'Vô Chính Diệu'})`;
+  };
+
+  const sanFangText = `Đối cung xung chiếu: ${formatPBrief(oppP)} · Tam hợp hội tụ: ${formatPBrief(trine1P)} và ${formatPBrief(trine2P)}.`;
+
+  // 6. Lời khuyên
+  let advice = '';
+  if (palace.name === '夫妻') {
+    advice = 'Đối với Cung Phu Thê: Trong giao tiếp tình cảm, cần coi trọng sự đồng điệu tâm hồn và tôn trọng tự do cá nhân của nhau. Nếu có sát tinh (Đà La, Linh Tinh, Cô Thần), nên kết hôn muộn hoặc trải qua một vài khảo nghiệm thời trẻ để hôn nhân sau này viên mãn, trăm năm hạnh phúc.';
+  } else if (palace.name === '命宫') {
+    advice = 'Đối với Cung Mệnh: Cốt cách là nền móng của thành bại. Giữ vững tâm niệm lương thiện, rèn luyện chuyên môn sắt đá, biết rõ điểm mạnh điểm yếu của mình để tự tay kiến tạo vận mệnh.';
+  } else if (palace.name === '官禄') {
+    advice = 'Đối với Cung Quan Lộc: Sự nghiệp cần bền chí, không nên nóng vội nhảy việc khi chưa chuẩn bị đủ nguồn lực. Mượn sức mạnh đồng nghiệp và cấp trên để từng bước thăng tiến vững chắc.';
+  } else if (palace.name === '财帛') {
+    advice = 'Đối với Cung Tài Bạch: Tiền bạc nên đi theo con đường chính đạo, tích lũy đều đặn, chuyển hóa vào các tài sản cố định bền vững, tránh đầu cơ mạo hiểm.';
+  } else {
+    advice = 'Theo đạo lý Thiên Kỷ Nghê Hải Hà: "Số mệnh chưa bao giờ là định đoạt tuyệt đối. Người hiểu mệnh để hành xử thuận thời, biến nguy thành an, dưỡng tâm lập mệnh".';
+  }
+
+  return {
+    palaceNameVi,
+    ganzhiVi: ganzhiInfo.vi,
+    roleDescription,
+    isDaXian,
+    daXianText,
+    majorStarsText,
+    luckyStarsText,
+    shaStarsText,
+    sanFangText,
+    advice,
+  };
+}

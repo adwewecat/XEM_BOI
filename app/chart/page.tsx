@@ -13,7 +13,7 @@ import { generateChart } from '@/lib/ziwei/algorithm';
 import { FAMOUS_PERSONS, type FamousPerson } from '@/lib/ziwei/famous';
 import type { BirthInfo, ZiweiChart, Palace } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
-import { PALACE_VI, getStarName, BRANCHES_VI, STEMS_VI, BRIGHTNESS_VI } from '@/lib/ziwei/vietnamese';
+import { PALACE_VI, getPalaceName, getStarName, BRANCHES_VI, STEMS_VI, BRIGHTNESS_VI, generatePalaceAnalysis } from '@/lib/ziwei/vietnamese';
 import { useTheme } from '@/components/ThemeProvider';
 
 export default function ChartPage() {
@@ -25,7 +25,8 @@ export default function ChartPage() {
   const [view, setView] = useState<TimeView>('mingpan');
   const [liunianYear, setLiunianYear] = useState(() => new Date().getFullYear());
   const [shareOpen, setShareOpen] = useState(false);
-  const [rightTab, setRightTab] = useState<'patterns' | 'insights' | 'palace'>('patterns');
+  const [showGuideModal, setShowGuideModal] = useState(false);
+  const [rightTab, setRightTab] = useState<'patterns' | 'insights' | 'palace'>('palace');
 
   // Lưu thông tin sinh để dùng khi xuất ảnh lá số (ShareModal)
   const [birthState, setBirthState] = useState({
@@ -41,7 +42,10 @@ export default function ChartPage() {
   const handleFormSubmit = (info: BirthInfo) => {
     const generated = generateChart(info);
     setChart(generated);
-    setSelectedPalace(null);
+    // Tự động mở Cung Mệnh ngay khi vừa lập lá số để người dùng có trọng tâm đầu tiên
+    const mingP = generated.palaces.find(p => p.branch === generated.mingGongBranch);
+    setSelectedPalace(mingP || null);
+    setRightTab('palace');
   };
 
   const handleFormSave = (data: BirthFormState) => {
@@ -84,8 +88,11 @@ export default function ChartPage() {
         gender: person.gender,
       }));
     } catch {}
-    setChart(generateChart(info));
-    setSelectedPalace(null);
+    const gen = generateChart(info);
+    setChart(gen);
+    const mingP = gen.palaces.find(p => p.branch === gen.mingGongBranch);
+    setSelectedPalace(mingP || null);
+    setRightTab('palace');
   };
 
   // ─── GIAO DIỆN KHI CHƯA LẬP LÁ SỐ (MÀN HÌNH NHẬP LIỆU HUYỀN BÍ) ───
@@ -225,6 +232,26 @@ export default function ChartPage() {
   }
 
   // ─── GIAO DIỆN KHI ĐÃ LẬP LÁ SỐ (CHIÊM NGHIỆM MỆNH BÀN TOÀN DIỆN) ───
+  const currentDx = chart ? chart.daXians[chart.currentDaXianIndex] : null;
+
+  const selectPalaceByBranch = (branch: number) => {
+    if (!chart) return;
+    const p = chart.palaces.find(item => item.branch === branch);
+    if (p) {
+      setSelectedPalace(p);
+      setRightTab('palace');
+    }
+  };
+
+  const selectPalaceByName = (nameZh: string) => {
+    if (!chart) return;
+    const p = chart.palaces.find(item => item.name === nameZh);
+    if (p) {
+      setSelectedPalace(p);
+      setRightTab('palace');
+    }
+  };
+
   return (
     <main className="max-w-[1440px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
       {/* Thanh Thao Tác Đầu Trang */}
@@ -275,6 +302,103 @@ export default function ChartPage() {
         </div>
       </div>
 
+      {/* 🧭 LỘ TRÌNH ĐỌC LÁ SỐ TỬ VI CHUẨN XÁC (GIẢI TOẢ BĂN KHOĂN: ĐỌC GÌ & XEM GÌ) */}
+      <div className="mb-4 p-3 sm:p-4 rounded-xl card-glass border border-amber-500/35 flex flex-wrap items-center justify-between gap-3 shadow-md"
+        style={{ background: 'rgba(212, 168, 67, 0.07)' }}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-xl sm:text-2xl select-none">🧭</span>
+          <div>
+            <div className="text-xs sm:text-sm font-extrabold text-amber-300 flex items-center gap-2">
+              <span>LỘ TRÌNH ĐỌC LÁ SỐ THEO THỨ TỰ CHUẨN</span>
+              <span className="text-[9.5px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
+                1-Click Xem Ngay
+              </span>
+            </div>
+            <div className="text-[11px] text-stone-300 mt-0.5">
+              Bạn chưa biết bắt đầu từ đâu? Hãy nhấp theo 5 bước dưới đây để hệ thống tự động làm nổi bật và luận giải:
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          {/* Bước 1: Mệnh Cung */}
+          <button
+            type="button"
+            onClick={() => selectPalaceByBranch(chart.mingGongBranch)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+              selectedPalace?.branch === chart.mingGongBranch
+                ? 'bg-amber-500 text-stone-950 border-amber-400 shadow-md scale-105'
+                : 'bg-amber-500/15 text-amber-300 border-amber-500/35 hover:bg-amber-500/25'
+            }`}
+          >
+            <span>🌟 1. Mệnh Cung (Bản Cốt)</span>
+          </button>
+
+          {/* Bước 2: Thân Cung */}
+          <button
+            type="button"
+            onClick={() => selectPalaceByBranch(chart.shenGongBranch)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+              selectedPalace?.branch === chart.shenGongBranch
+                ? 'bg-sky-500 text-stone-950 border-sky-400 shadow-md scale-105'
+                : 'bg-sky-500/15 text-sky-300 border-sky-500/35 hover:bg-sky-500/25'
+            }`}
+          >
+            <span>⚓ 2. Thân Cư (Hậu Vận)</span>
+          </button>
+
+          {/* Bước 3: Đại Hạn Hiện Tại */}
+          {currentDx && (
+            <button
+              type="button"
+              onClick={() => selectPalaceByBranch(currentDx.palaceBranch)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+                selectedPalace?.branch === currentDx.palaceBranch
+                  ? 'bg-purple-600 text-purple-100 border-purple-400 shadow-md scale-105'
+                  : 'bg-purple-500/20 text-purple-300 border-purple-500/40 hover:bg-purple-500/30'
+              }`}
+            >
+              <span>⏳ 3. Đại Hạn {currentDx.startAge}–{currentDx.endAge}t ({getPalaceName(currentDx.palaceName).vi})</span>
+            </button>
+          )}
+
+          {/* Bước 4: Quan Lộc */}
+          <button
+            type="button"
+            onClick={() => selectPalaceByName('官禄')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+              selectedPalace?.name === '官禄'
+                ? 'bg-amber-500 text-stone-950 border-amber-400 shadow-md scale-105'
+                : 'bg-stone-800/80 text-stone-200 border-stone-700 hover:bg-stone-700'
+            }`}
+          >
+            <span>💼 4. Sự Nghiệp</span>
+          </button>
+
+          {/* Bước 5: Tài Bạch */}
+          <button
+            type="button"
+            onClick={() => selectPalaceByName('财帛')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+              selectedPalace?.name === '财帛'
+                ? 'bg-amber-500 text-stone-950 border-amber-400 shadow-md scale-105'
+                : 'bg-stone-800/80 text-stone-200 border-stone-700 hover:bg-stone-700'
+            }`}
+          >
+            <span>💰 5. Tiền Tài</span>
+          </button>
+
+          {/* Nút Xem Hướng Dẫn Chi Tiết */}
+          <button
+            type="button"
+            onClick={() => setShowGuideModal(true)}
+            className="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 border border-amber-400/60 shadow hover:brightness-110 transition-all flex items-center gap-1"
+          >
+            <span>❓ Cần Đọc Gì & Xem Gì?</span>
+          </button>
+        </div>
+      </div>
+
       {/* Khu Vực Hiển Thị Chính: 2 Cột (Lá Số & Luận Giải / Cách Cục) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Cột Trái: Bảng 12 Cung Lá Số Tử Vi (ChartBoard) */}
@@ -282,9 +406,10 @@ export default function ChartPage() {
           <div className="card-glass rounded-2xl p-2 sm:p-4">
             <ChartBoard
               chart={chart}
+              selectedBranch={selectedPalace?.branch ?? null}
               onPalaceSelect={(p) => {
                 setSelectedPalace(p);
-                setRightTab('palace');
+                if (p) setRightTab('palace');
               }}
             />
           </div>
@@ -296,6 +421,17 @@ export default function ChartPage() {
           <div className="flex rounded-xl p-1 border card-inner" style={{ borderColor: 'var(--bdr)' }}>
             <button
               type="button"
+              onClick={() => setRightTab('palace')}
+              className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
+                rightTab === 'palace'
+                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              🔍 {selectedPalace ? `Cung ${PALACE_VI[selectedPalace.name]?.short || selectedPalace.name}` : 'Chi Tiết Cung'}
+            </button>
+            <button
+              type="button"
               onClick={() => setRightTab('patterns')}
               className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all ${
                 rightTab === 'patterns'
@@ -303,7 +439,7 @@ export default function ChartPage() {
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              🏆 Cách Cục Cổ Tịch
+              🏆 Cách Cục ({chart ? '50+' : ''})
             </button>
             <button
               type="button"
@@ -314,25 +450,120 @@ export default function ChartPage() {
                   : 'text-stone-400 hover:text-stone-200'
               }`}
             >
-              📖 Luận Giải Mệnh Số
+              📖 Luận Mệnh
             </button>
-            {selectedPalace && (
-              <button
-                type="button"
-                onClick={() => setRightTab('palace')}
-                className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                  rightTab === 'palace'
-                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-              >
-                🔍 Cung {PALACE_VI[selectedPalace.name]?.short || selectedPalace.name}
-              </button>
-            )}
           </div>
 
           {/* Nội Dung Từng Tab */}
           <AnimatePresence mode="wait">
+            {rightTab === 'palace' && selectedPalace && (() => {
+              const analysis = generatePalaceAnalysis(selectedPalace, chart);
+              return (
+                <motion.div
+                  key={`tab-palace-${selectedPalace.branch}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="card-glass rounded-xl p-4 sm:p-5 space-y-3.5 shadow-xl border border-amber-500/30"
+                >
+                  {/* Header Cung */}
+                  <div className="flex items-center justify-between pb-3 border-b border-stone-700/60">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-black text-amber-400">
+                          CUNG {analysis.palaceNameVi.toUpperCase()}
+                        </span>
+                        <span className="text-xs text-stone-400">({analysis.ganzhiVi})</span>
+                      </div>
+                      <div className="text-[11px] text-stone-300 mt-0.5">
+                        Can {STEMS_VI[selectedPalace.stem]} {BRANCHES_VI[selectedPalace.branch]}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      {selectedPalace.isMingGong && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-400 text-stone-950 border border-amber-300">
+                          🌟 MỆNH CUNG
+                        </span>
+                      )}
+                      {selectedPalace.isShenGong && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded bg-sky-400 text-stone-950 border border-sky-300">
+                          ⚓ THÂN CƯ
+                        </span>
+                      )}
+                      {analysis.isDaXian && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded bg-purple-600 text-purple-100 border border-purple-400 animate-pulse">
+                          ⏳ ĐẠI HẠN {selectedPalace.daXianAge ? `${selectedPalace.daXianAge[0]}-${selectedPalace.daXianAge[1]}T` : ''}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 1. Vai trò cung vị trong đời người */}
+                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/25">
+                    <span className="text-[11px] font-bold text-amber-300 block mb-1">
+                      📖 Ý Nghĩa Cung {analysis.palaceNameVi}:
+                    </span>
+                    <p className="text-xs text-stone-200 leading-relaxed">
+                      {analysis.roleDescription}
+                    </p>
+                  </div>
+
+                  {/* 2. Cảnh báo nếu là Cung Đại Hạn Hiện Tại */}
+                  {analysis.isDaXian && analysis.daXianText && (
+                    <div className="p-3.5 rounded-lg bg-purple-950/40 border border-purple-500/50 text-purple-200 space-y-1.5 shadow-md">
+                      <div className="font-bold text-xs text-purple-300 flex items-center gap-1.5">
+                        <span>⏳ ĐÂY LÀ ĐẠI HẠN 10 NĂM HIỆN TẠI CỦA BẠN!</span>
+                      </div>
+                      <p className="text-xs leading-relaxed opacity-95">
+                        {analysis.daXianText}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 3. Chính Tinh Tọa Thủ */}
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                      <span>★</span>
+                      <span>Chính Tinh Toạ Thủ:</span>
+                    </span>
+                    <p className="text-xs text-stone-100 font-medium leading-relaxed bg-stone-900/50 p-2.5 rounded-lg border border-stone-800">
+                      {analysis.majorStarsText}
+                    </p>
+                  </div>
+
+                  {/* 4. Cát Tinh & Sát Tinh Phụ Tá */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-lg bg-sky-950/20 border border-sky-500/20 space-y-1">
+                      <span className="font-bold text-sky-300 text-[11px] block">✨ Cát Tinh Trợ Mệnh:</span>
+                      <p className="text-stone-300 text-[11.5px] leading-relaxed">{analysis.luckyStarsText}</p>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-rose-950/20 border border-rose-500/20 space-y-1">
+                      <span className="font-bold text-rose-300 text-[11px] block">⚠️ Sát Tinh Khảo Nghiệm:</span>
+                      <p className="text-stone-300 text-[11.5px] leading-relaxed">{analysis.shaStarsText}</p>
+                    </div>
+                  </div>
+
+                  {/* 5. Tam Phương Tứ Chính Chiếu Về */}
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                      <span>⚡</span>
+                      <span>Tam Phương Tứ Chính Chiếu Về:</span>
+                    </span>
+                    <p className="text-xs text-stone-300 leading-relaxed bg-stone-900/40 p-2 rounded-lg border border-stone-800">
+                      {analysis.sanFangText}
+                    </p>
+                  </div>
+
+                  {/* 6. Lời Khuyên Thực Tế */}
+                  <div className="p-3 rounded-lg bg-gradient-to-r from-amber-950/40 to-stone-900/60 border border-amber-500/30 text-xs text-amber-200 leading-relaxed space-y-1">
+                    <span className="font-bold text-amber-300 block">💡 Lời Khuyên Danh Sư Nghê Hải Hà:</span>
+                    <p className="italic">{analysis.advice}</p>
+                  </div>
+                </motion.div>
+              );
+            })()}
+
             {rightTab === 'patterns' && (
               <motion.div
                 key="tab-patterns"
@@ -354,82 +585,115 @@ export default function ChartPage() {
                 <InsightPanel chart={chart} selectedPalace={selectedPalace} />
               </motion.div>
             )}
-
-            {rightTab === 'palace' && selectedPalace && (
-              <motion.div
-                key="tab-palace"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="card-glass rounded-xl p-4 space-y-3"
-              >
-                <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: 'var(--bdr)' }}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-base font-bold text-amber-500">
-                        {PALACE_VI[selectedPalace.name]?.vi || selectedPalace.name}
-                      </span>
-                      <span className="text-[10px] opacity-60">({selectedPalace.name})</span>
-                    </div>
-                    <div className="text-[11px] text-stone-400 mt-0.5">
-                      {PALACE_VI[selectedPalace.name]?.short} · Cung {BRANCHES_VI[selectedPalace.branch]} ({BRANCHES[selectedPalace.branch]})
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/25 font-semibold">
-                      Can {STEMS_VI[selectedPalace.stem]} ({STEMS[selectedPalace.stem]})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Danh Sách Sao Trong Cung */}
-                <div>
-                  <span className="text-[11px] font-semibold block mb-2" style={{ color: 'var(--tx-2)' }}>
-                    ★ Các Tinh Diệu Toạ Thủ:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPalace.stars.map((s, idx) => {
-                      const st = getStarName(s.name);
-                      const brightVi = s.brightnessRaw ? BRIGHTNESS_VI[s.brightnessRaw] || s.brightnessRaw : '';
-
-                      return (
-                        <div
-                          key={`${s.name}-${idx}`}
-                          className={`text-xs px-2.5 py-1.5 rounded-lg border flex flex-col items-center leading-tight ${
-                            s.type === 'major'
-                              ? 'bg-amber-500/15 border-amber-500/35 text-amber-400 font-bold'
-                              : s.type === 'lucky'
-                              ? 'bg-sky-500/15 border-sky-500/35 text-sky-400'
-                              : s.type === 'sha'
-                              ? 'bg-red-500/15 border-red-500/35 text-red-400'
-                              : 'bg-stone-500/10 border-stone-500/25 text-stone-300'
-                          }`}
-                        >
-                          <div className="flex items-baseline gap-1">
-                            <span>{st.vi}</span>
-                            {brightVi && <span className="text-[9px] opacity-80 font-normal">[{brightVi}]</span>}
-                          </div>
-                          <span className="text-[8px] opacity-50 font-normal mt-0.5">
-                            {st.zh}{s.brightnessRaw ? `(${s.brightnessRaw})` : ''}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Đại Hạn Cung */}
-                {selectedPalace.daXianAge && (
-                  <div className="text-xs p-2.5 rounded-lg card-inner flex items-center justify-between" style={{ color: 'var(--tx-2)' }}>
-                    <span className="font-semibold text-amber-500">Đại Hạn:</span>
-                    <span className="font-bold">{selectedPalace.daXianAge[0]} - {selectedPalace.daXianAge[1]} tuổi</span>
-                  </div>
-                )}
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Modal Cẩm Nang 5 Bước Đọc Lá Số Dành Cho Người Mới */}
+      <AnimatePresence>
+        {showGuideModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto card-glass rounded-2xl p-5 sm:p-7 border border-amber-500/40 shadow-2xl space-y-5"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-stone-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🧭</span>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-amber-400">
+                      CẨM NANG ĐỌC LÁ SỐ TỬ VI THIÊN KỶ
+                    </h3>
+                    <p className="text-[11px] text-stone-300">
+                      Hướng dẫn 5 bước chiêm nghiệm dành cho người mới xem
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowGuideModal(false)}
+                  className="w-8 h-8 rounded-full border border-stone-700 hover:border-amber-400 text-stone-300 hover:text-white flex items-center justify-center text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4 text-xs sm:text-sm text-stone-200 leading-relaxed">
+                {/* Bước 1 */}
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                  <div className="font-extrabold text-amber-300 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 1</span>
+                    <span>XEM MỆNH CUNG & THÂN CƯ (GỐC RỄ CUỘC ĐỜI)</span>
+                  </div>
+                  <p className="text-stone-300 text-xs leading-relaxed">
+                    - <strong>Mệnh Cung</strong>: Quyết định cốt cách, năng lực bẩm sinh và thời niên thiếu (1–30 tuổi).<br />
+                    - <strong>Thân Cung</strong>: Xu hướng phát triển nửa đời sau (từ 30 tuổi trở đi), nơi bạn dồn tâm huyết an thân lập mệnh.
+                  </p>
+                </div>
+
+                {/* Bước 2 */}
+                <div className="p-3.5 rounded-xl bg-sky-950/30 border border-sky-500/30 space-y-1.5">
+                  <div className="font-extrabold text-sky-300 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-xs">Bước 2</span>
+                    <span>XEM TAM PHƯƠNG TỨ CHÍNH (4 TRỤ CỘT THÀNH BẠI)</span>
+                  </div>
+                  <p className="text-stone-300 text-xs leading-relaxed">
+                    Nhấp vào Cung Mệnh để xem 4 cung liên hoàn: <strong>Mệnh (Bản thân) - Quan Lộc (Sự nghiệp) - Tài Bạch (Tiền tài) - Thiên Di (Xã hội bên ngoài)</strong>. Bốn cung này tạo nên bộ khung thành công của một con người.
+                  </p>
+                </div>
+
+                {/* Bước 3 */}
+                <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
+                  <div className="font-extrabold text-emerald-300 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-xs">Bước 3</span>
+                    <span>XEM TỨ HÓA NĂM SINH (BÀN TAY SỐ MỆNH)</span>
+                  </div>
+                  <p className="text-stone-300 text-xs leading-relaxed">
+                    - 🟢 <strong>Hóa Lộc</strong>: Nơi có tiền bạc, cơ duyên dồi dào.<br />
+                    - 🔵 <strong>Hóa Quyền</strong>: Nơi nắm giữ thực quyền và quyền uy.<br />
+                    - 🟡 <strong>Hóa Khoa</strong>: Nơi có danh tiếng, thi cử đỗ đạt, quý nhân cứu giải.<br />
+                    - 🔴 <strong>Hóa Kỵ</strong>: Nơi có trắc trở, khảo nghiệm cần nhẫn nại tu dưỡng.
+                  </p>
+                </div>
+
+                {/* Bước 4 */}
+                <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-1.5">
+                  <div className="font-extrabold text-purple-300 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-xs">Bước 4</span>
+                    <span>XEM ĐẠI HẠN 10 NĂM & LƯU NIÊN TỪNG NĂM</span>
+                  </div>
+                  <p className="text-stone-300 text-xs leading-relaxed">
+                    Thời gian thay đổi theo từng chu kỳ 10 năm. Ô cung nào có viền tím phát sáng và nhãn <strong>[ ⏳ ĐẠI HẠN ]</strong> chính là giai đoạn 10 năm hiện tại của bạn. Toàn bộ trọng tâm công danh, hôn nhân hay tài lộc sẽ đổ dồn vào cung này.
+                  </p>
+                </div>
+
+                {/* Bước 5 */}
+                <div className="p-3.5 rounded-xl bg-stone-900/60 border border-stone-700 space-y-1.5">
+                  <div className="font-extrabold text-amber-300 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-xs">Bước 5</span>
+                    <span>XEM CÁC CUNG VỊ CHUYÊN BIỆT BẠN QUAN TÂM</span>
+                  </div>
+                  <p className="text-stone-300 text-xs leading-relaxed">
+                    Nhấp trực tiếp vào bất kỳ ô nào trên 12 cung (Phu Thê - Hôn nhân, Điền Trạch - Nhà đất, Tử Tức - Con cái, Phúc Đức - Tổ ấm...) để hệ thống hiển thị phân tích chuyên sâu chi tiết.
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowGuideModal(false)}
+                  className="px-6 py-2.5 rounded-full font-bold text-xs bg-amber-500 text-stone-950 hover:bg-amber-400 transition-colors shadow-lg"
+                >
+                  Đã Hiểu · Bắt Đầu Khám Phá Lá Số
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal Xuất Ảnh Lá Số PNG */}
       {shareOpen && (

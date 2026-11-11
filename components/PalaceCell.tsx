@@ -10,6 +10,7 @@ interface PalaceCellProps {
   onStarClick?: (star: Star) => void;
   isSelected?: boolean;
   isSanFang?: boolean;
+  sanFangRole?: 'selected' | 'opposite' | 'trine';
   delay?: number;
   /** 叠加四化：星名 → 四化类型（'禄'/'权'/'科'/'忌'） */
   overlayStarSiHua?: Record<string, string>;
@@ -56,7 +57,7 @@ const SiHuaBadge = ({
 };
 
 export default function PalaceCell({
-  palace, onClick, onStarClick, isSelected, isSanFang, delay = 0,
+  palace, onClick, onStarClick, isSelected, isSanFang, sanFangRole, delay = 0,
   overlayStarSiHua, overlayLabel, onSiHuaClick,
 }: PalaceCellProps) {
   const { branch, stem, name, stars, daXianAge, isCurrentDaXian, isMingGong, isShenGong } = palace;
@@ -67,38 +68,54 @@ export default function PalaceCell({
   const luckyStars = stars.filter(s => s.type === 'lucky');
   const shaStars = stars.filter(s => s.type === 'sha');
 
+  const isTargetSelected = isSelected || sanFangRole === 'selected';
+  const isOpposite = sanFangRole === 'opposite';
+  const isTrine = sanFangRole === 'trine';
+
+  let cellBg = 'rgba(255,255,255,0.02)';
+  let cellBoxShadow = 'none';
+  let cellBorder = '1px solid rgba(255,255,255,0.08)';
+
+  if (isTargetSelected) {
+    cellBg = 'rgba(245, 158, 11, 0.18)';
+    cellBoxShadow = '0 0 0 2px #f59e0b, 0 0 24px rgba(245,158,11,0.5)';
+    cellBorder = '1px solid #f59e0b';
+  } else if (isOpposite) {
+    cellBg = 'rgba(249, 115, 22, 0.14)';
+    cellBoxShadow = '0 0 0 2px #f97316, 0 0 16px rgba(249,115,22,0.4)';
+    cellBorder = '1px solid #f97316';
+  } else if (isTrine) {
+    cellBg = 'rgba(56, 189, 248, 0.12)';
+    cellBoxShadow = '0 0 0 1.5px #38bdf8, 0 0 14px rgba(56,189,248,0.35)';
+    cellBorder = '1px solid #38bdf8';
+  } else if (isCurrentDaXian) {
+    cellBg = 'rgba(147, 51, 234, 0.16)';
+    cellBoxShadow = '0 0 0 1.5px rgba(168,85,247,0.7), 0 0 16px rgba(168,85,247,0.3)';
+    cellBorder = '1px solid rgba(168,85,247,0.8)';
+  } else if (isMingGong) {
+    cellBg = 'rgba(212, 168, 67, 0.08)';
+    cellBorder = '1px solid rgba(212, 168, 67, 0.35)';
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.35, delay, ease: 'easeOut' }}
       onClick={onClick}
-      className="relative flex flex-col p-2 cursor-pointer transition-all duration-200 h-full border border-stone-800/40 rounded-lg hover:border-amber-500/40"
+      className="relative flex flex-col p-2 cursor-pointer transition-all duration-200 h-full rounded-lg hover:border-amber-400"
       style={{
-        minHeight: '110px',
-        background: isCurrentDaXian
-          ? 'rgba(147,51,234,0.12)'
-          : isSelected
-          ? 'rgba(37,99,235,0.22)'
-          : isSanFang
-          ? 'rgba(37,99,235,0.10)'
-          : isMingGong
-          ? 'rgba(212,168,67,0.08)'
-          : 'rgba(255,255,255,0.02)',
-        boxShadow: isCurrentDaXian
-          ? 'inset 3px 0 0 rgba(147,51,234,0.6)'
-          : isSelected
-          ? 'inset 0 0 0 1.5px rgba(212,168,67,0.8), 0 0 16px rgba(212,168,67,0.2)'
-          : isSanFang
-          ? 'inset 0 0 0 1px rgba(37,99,235,0.5)'
-          : 'none',
+        minHeight: '115px',
+        background: cellBg,
+        boxShadow: cellBoxShadow,
+        border: cellBorder,
       }}
     >
       {/* Đại hạn tuổi */}
       {daXianAge && (
         <div className={clsx(
           'absolute top-1.5 right-1.5 text-[9px] font-mono tabular-nums',
-          isCurrentDaXian ? 'text-purple-400 font-bold' : ''
+          isCurrentDaXian ? 'text-purple-300 font-bold' : ''
         )}
           style={!isCurrentDaXian ? { color: 'var(--tx-3)', opacity: 0.75 } : undefined}
         >
@@ -106,11 +123,11 @@ export default function PalaceCell({
         </div>
       )}
 
-      {/* Tên Cung & Huy hiệu Mệnh/Thân */}
+      {/* Tên Cung & Các Huy Hiệu Nổi Bật (Mệnh, Thân, Đại Hạn, Đang Xem, Đối Cung, Tam Hợp) */}
       <div className="flex items-center justify-between mb-1 pr-10">
         <div className="flex items-baseline gap-1">
-          <span className={clsx('text-[12px] sm:text-[13.5px] font-black tracking-tight',
-            isMingGong ? 'text-amber-300' : isShenGong ? 'text-sky-300' : 'text-stone-100'
+          <span className={clsx('text-[13px] sm:text-[14px] font-black tracking-tight',
+            isTargetSelected ? 'text-amber-300' : isOpposite ? 'text-orange-300' : isMingGong ? 'text-amber-300' : isShenGong ? 'text-sky-300' : 'text-stone-100'
           )}>
             {palaceInfo.vi}
           </span>
@@ -118,15 +135,36 @@ export default function PalaceCell({
             ({palaceInfo.zh})
           </span>
         </div>
-        <div className="flex items-center gap-1">
+
+        <div className="flex items-center flex-wrap gap-1 justify-end">
+          {isTargetSelected && (
+            <span className="text-[8px] font-black bg-amber-500 text-stone-950 px-1.5 py-0.5 rounded shadow animate-pulse">
+              🎯 ĐANG XEM
+            </span>
+          )}
+          {isOpposite && (
+            <span className="text-[8px] font-black bg-orange-500 text-stone-950 px-1.5 py-0.5 rounded shadow">
+              ⚡ ĐỐI CUNG
+            </span>
+          )}
+          {isTrine && (
+            <span className="text-[8px] font-black bg-sky-500 text-stone-950 px-1.5 py-0.5 rounded shadow">
+              🔺 TAM HỢP
+            </span>
+          )}
+          {isCurrentDaXian && (
+            <span className="text-[8px] font-black bg-purple-600 text-purple-100 px-1.5 py-0.5 rounded shadow border border-purple-400/50">
+              ⏳ ĐẠI HẠN
+            </span>
+          )}
           {isMingGong && (
-            <span className="text-[9px] font-black text-amber-300 border border-amber-500/50 bg-amber-500/20 px-1.5 py-0.5 rounded leading-tight shadow-sm">
-              MỆNH
+            <span className="text-[8.5px] font-black text-amber-300 border border-amber-500/60 bg-amber-500/25 px-1.5 py-0.5 rounded leading-tight shadow-sm">
+              🌟 MỆNH
             </span>
           )}
           {isShenGong && (
-            <span className="text-[9px] font-black text-sky-300 border border-sky-500/50 bg-sky-500/20 px-1.5 py-0.5 rounded leading-tight shadow-sm">
-              THÂN
+            <span className="text-[8.5px] font-black text-sky-300 border border-sky-500/60 bg-sky-500/25 px-1.5 py-0.5 rounded leading-tight shadow-sm">
+              ⚓ THÂN
             </span>
           )}
         </div>
@@ -219,19 +257,19 @@ export default function PalaceCell({
         </div>
       )}
 
-      {/* Sát Tinh (Hung Tinh - 100% TIẾNG VIỆT TO RÕ) */}
+      {/* Sát Tinh (Hung Tinh - Có badge cảnh báo đỏ tím rõ ràng) */}
       {shaStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-1 mt-1">
           {shaStars.map(s => {
             const sInfo = getStarName(s.name);
             return (
               <span
                 key={s.name}
-                className="inline-flex items-baseline text-[10px] sm:text-[10.5px] text-rose-300 hover:text-rose-100 leading-tight transition-colors cursor-pointer"
-                title={`Sao ${sInfo.vi} (${sInfo.zh})`}
+                className="inline-flex items-baseline text-[9.5px] sm:text-[10px] text-rose-300 hover:text-rose-100 font-bold bg-rose-500/15 px-1 py-0.5 rounded border border-rose-500/30 leading-tight transition-colors cursor-pointer"
+                title={`Sát tinh: ${sInfo.vi} (${sInfo.zh}) - Cần lưu ý trở ngại`}
                 onClick={e => { e.stopPropagation(); onStarClick?.(s); }}
               >
-                <span className="font-semibold">{sInfo.vi}</span>
+                <span>{sInfo.vi}</span>
                 {s.siHua && <SiHuaBadge siHua={s.siHua} />}
               </span>
             );

@@ -73,6 +73,31 @@ Sau khi quét toàn bộ mã nguồn, cấu hình và tệp phụ thuộc:
 
 ## 📋 5. NHẬT KÝ THỰC HIỆN & TIẾP QUẢN (CHANGELOG)
 
+### [2026-11-11] - Đợt 20: Tối Ưu Hóa Trực Quan Lá Số Tử Vi, Giải Thích Đại Hạn Cung Phu Thê & Tích Hợp Lộ Trình Đọc Lá Số 5 Bước
+- **Người thực hiện:** Antigravity AI Assistant & Developer.
+- **Yêu cầu người dùng:** "HÃY NHẤN mạnh những gì cần làm nổi, tôi thấy đang trỏ vào Phu Thê, nhưng mà sao lại cũng không rõ lắm. . với hình lá số tử vi thì tôi còn xem cái gì , nhiều khi không biết cần đọc gì và xem gì" (Kèm ảnh chụp màn hình lá số Nguyễn Anh Dũng - tuổi 26, đang trong đại hạn 24-33 tuổi tại Cung Phu Thê).
+- **Phân tích vấn đề:**
+  1. *Tại sao hệ thống trỏ vào Cung Phu Thê?* Đương số sinh năm 2000 (Canh Thìn), hiện 26 tuổi, rơi đúng vào Đại Hạn 10 năm từ 24 đến 33 tuổi tại Cung Phu Thê (Giáp Dần). Hệ thống tự động viền tím đại hạn nhưng thiếu giải thích rõ ràng khiến người dùng hoang mang không hiểu tại sao lại trỏ vào Phu Thê.
+  2. *Thiếu điểm nhấn trực quan (Visual Hierarchy):* Khi chọn một cung vị hoặc khi cung là Đại Hạn, viền tím trước đây đè lên viền chọn vàng; các cung Tam Phương Tứ Chính (Đối cung xung chiếu, Tam hợp hội chiếu) chưa có nhãn phân định rõ ràng.
+  3. *Người mới xem lá số không biết bắt đầu từ đâu:* Lá số 12 cung với hàng trăm tinh diệu khiến người dùng không biết thứ tự đọc, không biết Mệnh Thân nằm ở đâu, Tứ Hóa xem thế nào và Đại Hạn vận hành ra sao.
+- **Các giải pháp & nâng cấp đã hoàn tất:**
+  1. **Thanh Lộ Trình Đọc Lá Số 5 Bước Thông Minh (`app/chart/page.tsx`):**
+     - Đặt ngay trên đầu bảng lá số: `[ 🌟 1. Mệnh Cung ]` `[ ⚓ 2. Thân Cư ]` `[ ⏳ 3. Đại Hạn Hiện Tại (24-33t · Phu Thê) ]` `[ 💼 4. Sự Nghiệp ]` `[ 💰 5. Tiền Tài ]`.
+     - Chỉ cần 1-click vào bất kỳ bước nào, hệ thống tự động nhảy đến, chiếu sáng cung vị đó và mở phân tích chi tiết.
+     - Tích hợp Modal Cẩm Nang 5 Bước Đọc Lá Số dành cho người mới xem (`showGuideModal`).
+  2. **Nâng Cấp Hệ Thống Hiển Thị Cung Vị & Tam Phương Tứ Chính (`components/PalaceCell.tsx` & `ChartBoard.tsx`):**
+     - *Cung Đang Xem:* Phát sáng viền vàng kim rực rỡ (`ring-2 ring-amber-400 bg-amber-500/20`), nhãn nhấp nháy `🎯 ĐANG XEM`.
+     - *Cung Đối Chiếu (Xung Chiếu):* Viền cam hổ phách phát sáng kèm nhãn `⚡ ĐỐI CUNG`.
+     - *Hai Cung Tam Hợp (Hội Chiếu):* Viền xanh ngọc kèm nhãn `🔺 TAM HỢP`.
+     - *Cung Đại Hạn:* Luôn giữ huy hiệu tím phát sáng to rõ `⏳ ĐẠI HẠN ${daXianAge[0]}-${daXianAge[1]}t` không bị ghi đè.
+     - *Huy hiệu Mệnh/Thân:* `🌟 MỆNH CUNG` (vàng kim) và `⚓ THÂN CƯ` (xanh lam) to rõ.
+     - *Đường SVG kết nối:* Phân biệt rõ đường đối cung (cam) và tam giác tam hợp (xanh ngọc).
+     - *Trung tâm Thiên Bàn:* Cho phép nhấp trực tiếp vào "Mệnh cư", "Thân cư", và "Đại Hạn Hiện Tại" để chuyển cung tức thì.
+  3. **Module Luận Giải Cung Vị Chuyên Sâu Tự Động (`generatePalaceAnalysis` trong `lib/ziwei/vietnamese.ts`):**
+     - Phân tích vai trò cung vị, cảnh báo Đại Hạn hiện tại, luận giải Chính tinh, độ sáng, Cát tinh, Sát tinh (Lục sát), Tam phương hội chiếu và lời khuyên hành sự từ danh sư Nghê Hải Hà.
+  4. **Kiểm Thử & Đóng Gói:**
+     - 17/17 bài test hồi quy PASS, `npm run typecheck` 0 lỗi, `next build` 234 trang tĩnh hoàn thành 100%.
+
 ### [2026-11-11] - Đợt 19: Khắc Phục Triệt Để Background Quá Sáng, Loại Bỏ Xung Đột Đè Chữ & Tối Ưu Độ Tương Phản Cho Chữ Chính Thức
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "backgroud vẫn quá sáng, chữ chính thức không thấy gì" (Kèm ảnh chụp màn hình minh họa các vòng thiên bàn, 12 Địa Chi, 8 Quẻ Bát Quái và các chòm sao cắt thẳng qua tiêu đề chính "TỬ VI ĐẨU SỐ", làm chữ bị chìm và rối mắt).

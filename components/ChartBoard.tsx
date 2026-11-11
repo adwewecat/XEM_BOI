@@ -9,8 +9,9 @@ import TimeNav, { type TimeView, getYearStemIndex, buildSiHuaOverlay } from './T
 
 interface ChartBoardProps {
   chart: ZiweiChart;
+  selectedBranch?: number | null;
   onStarSelect?: (star: Star, palace: Palace) => void;
-  onPalaceSelect?: (palace: Palace) => void;
+  onPalaceSelect?: (palace: Palace | null) => void;
   onSiHuaClick?: (starName: string, siHua: string, view: TimeView) => void;
 }
 
@@ -53,8 +54,9 @@ function getSanFangSiZheng(branch: number): [number, number, number, number] {
 
 const ANIMATION_ORDER = [5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4];
 
-export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHuaClick }: ChartBoardProps) {
-  const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
+export default function ChartBoard({ chart, selectedBranch: extSelectedBranch, onStarSelect, onPalaceSelect, onSiHuaClick }: ChartBoardProps) {
+  const [internalBranch, setInternalBranch] = useState<number | null>(null);
+  const activeBranch = extSelectedBranch !== undefined ? extSelectedBranch : internalBranch;
   const [timeView, setTimeView] = useState<TimeView>('mingpan');
   const [liunianYear, setLiunianYear] = useState<number>(new Date().getFullYear());
 
@@ -76,16 +78,19 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
   const overlayLabel = timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年' : undefined;
 
   const handlePalaceClick = (branch: number) => {
-    const isDeselecting = selectedBranch === branch;
-    setSelectedBranch(prev => prev === branch ? null : branch);
+    const isDeselecting = activeBranch === branch;
+    const nextBranch = isDeselecting ? null : branch;
+    setInternalBranch(nextBranch);
     if (!isDeselecting) {
       const palace = palaceMap[branch];
       if (palace) onPalaceSelect?.(palace);
+    } else {
+      onPalaceSelect?.(null);
     }
   };
 
   // 三方四正
-  const sanFangBranches = selectedBranch !== null ? getSanFangSiZheng(selectedBranch) : null;
+  const sanFangBranches = activeBranch !== null ? getSanFangSiZheng(activeBranch) : null;
   const sanFangSet = sanFangBranches ? new Set(sanFangBranches) : null;
 
   return (
@@ -136,14 +141,24 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
           const [row, col] = BRANCH_GRID_POS[branch];
           const palace = palaceMap[branch];
           if (!palace) return null;
+
+          const sanFangRole = activeBranch === branch
+            ? 'selected'
+            : activeBranch !== null && (activeBranch + 6) % 12 === branch
+            ? 'opposite'
+            : activeBranch !== null && ((activeBranch + 4) % 12 === branch || (activeBranch + 8) % 12 === branch)
+            ? 'trine'
+            : undefined;
+
           return (
             <div key={branch} style={{ gridRow: row, gridColumn: col, background: 'var(--t-bg)' }}>
               <PalaceCell
                 palace={palace}
                 onClick={() => handlePalaceClick(branch)}
                 onStarClick={(star) => onStarSelect?.(star, palace)}
-                isSelected={selectedBranch === branch}
-                isSanFang={!!(sanFangSet?.has(branch) && selectedBranch !== branch)}
+                isSelected={activeBranch === branch}
+                isSanFang={!!(sanFangSet?.has(branch) && activeBranch !== branch)}
+                sanFangRole={sanFangRole}
                 delay={i * 0.04}
                 overlayStarSiHua={Object.keys(overlayData).length > 0 ? overlayData : undefined}
                 overlayLabel={overlayLabel}
@@ -170,12 +185,22 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
               THIÊN BÀN TỬ VI
             </div>
             <div className="text-[12px] space-y-1 font-semibold" style={{ color: 'var(--tx-2)' }}>
-              <div>
-                Mệnh cư: <span className="font-black text-amber-300 text-xs sm:text-sm">{BRANCHES_VI[chart.mingGongBranch]}</span>
-              </div>
-              <div>
-                Thân cư: <span className="font-black text-sky-300 text-xs sm:text-sm">{BRANCHES_VI[chart.shenGongBranch]}</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => handlePalaceClick(chart.mingGongBranch)}
+                className="hover:scale-105 transition-transform cursor-pointer block mx-auto text-left"
+                title="Nhấp để xem chi tiết Cung Mệnh"
+              >
+                Mệnh cư: <span className="font-black text-amber-300 text-xs sm:text-sm underline decoration-dotted decoration-amber-500/60">{BRANCHES_VI[chart.mingGongBranch]}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePalaceClick(chart.shenGongBranch)}
+                className="hover:scale-105 transition-transform cursor-pointer block mx-auto text-left"
+                title="Nhấp để xem chi tiết Cung Thân"
+              >
+                Thân cư: <span className="font-black text-sky-300 text-xs sm:text-sm underline decoration-dotted decoration-sky-500/60">{BRANCHES_VI[chart.shenGongBranch]}</span>
+              </button>
               <div className="text-[11px] font-black px-2.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/15 text-amber-300 inline-block shadow-sm">
                 {getJuName(chart.wuxingJuName)}
               </div>
@@ -186,16 +211,22 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
             const dx = chart.daXians[chart.currentDaXianIndex];
             const pInfo = getPalaceName(dx.palaceName);
             return (
-              <div className="border border-purple-500/40 rounded-lg px-3 py-1.5 text-center shadow-sm"
-                style={{ background: 'rgba(147,51,234,0.15)' }}>
-                <div className="text-[9px] text-purple-300 font-bold tracking-wider">
-                  Đại Hạn Hiện Tại
+              <button
+                type="button"
+                onClick={() => handlePalaceClick(dx.palaceBranch)}
+                className="border border-purple-500/50 hover:border-purple-400 rounded-lg px-3 py-1.5 text-center shadow-md hover:scale-105 transition-all cursor-pointer group"
+                style={{ background: 'rgba(147,51,234,0.2)' }}
+                title="Nhấp để xem chi tiết Cung Đại Hạn 10 năm hiện tại"
+              >
+                <div className="text-[9px] text-purple-300 group-hover:text-purple-200 font-bold tracking-wider flex items-center justify-center gap-1">
+                  <span>⏳ Đại Hạn Hiện Tại</span>
+                  <span className="text-[8px] bg-purple-500/30 px-1 rounded">Click xem</span>
                 </div>
                 <div className="text-[13px] text-purple-200 font-black tabular-nums">{dx.startAge}–{dx.endAge} tuổi</div>
-                <div className="text-[10px] text-purple-300 font-semibold">
+                <div className="text-[10px] text-purple-300 font-bold">
                   Cung {pInfo.vi}
                 </div>
-              </div>
+              </button>
             );
           })()}
 
@@ -208,7 +239,7 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
         <AnimatePresence>
           {sanFangBranches !== null && (
             <motion.div
-              key={`sf-${selectedBranch}`}
+              key={`sf-${activeBranch}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -232,46 +263,39 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
                   const p1 = BRANCH_SVG_POS[sanFangBranches[1]]; // 对宫
                   const p2 = BRANCH_SVG_POS[sanFangBranches[2]]; // 三合1
                   const p3 = BRANCH_SVG_POS[sanFangBranches[3]]; // 三合2
-                  const dash = "6,5";
-                  const stroke = "rgba(37,99,235,0.55)";
-                  const sw = "1.5";
                   return (
                     <>
-                      {/* 对宫直线：本宫 ↔ 对宫（穿过中心） */}
+                      {/* 对宫直线：本宫 ↔ 对宫（穿过中心，màu cam hổ phách xung chiếu） */}
                       <line
                         x1={`${p0[0]}%`} y1={`${p0[1]}%`}
                         x2={`${p1[0]}%`} y2={`${p1[1]}%`}
-                        stroke={stroke} strokeWidth={sw}
-                        strokeDasharray={dash} strokeLinecap="round"
+                        stroke="rgba(249, 115, 22, 0.85)" strokeWidth="2"
+                        strokeDasharray="5,4" strokeLinecap="round"
                       />
-                      {/* 三合三角形：本宫 → 三合1 → 三合2 → 本宫 */}
+                      {/* 三合三角形：本宫 → 三合1 → 三合2 → 本宫（màu xanh ngọc hội chiếu） */}
                       <line
                         x1={`${p0[0]}%`} y1={`${p0[1]}%`}
                         x2={`${p2[0]}%`} y2={`${p2[1]}%`}
-                        stroke={stroke} strokeWidth={sw}
-                        strokeDasharray={dash} strokeLinecap="round"
+                        stroke="rgba(56, 189, 248, 0.75)" strokeWidth="1.8"
+                        strokeDasharray="6,4" strokeLinecap="round"
                       />
                       <line
                         x1={`${p2[0]}%`} y1={`${p2[1]}%`}
                         x2={`${p3[0]}%`} y2={`${p3[1]}%`}
-                        stroke={stroke} strokeWidth={sw}
-                        strokeDasharray={dash} strokeLinecap="round"
+                        stroke="rgba(56, 189, 248, 0.75)" strokeWidth="1.8"
+                        strokeDasharray="6,4" strokeLinecap="round"
                       />
                       <line
                         x1={`${p3[0]}%`} y1={`${p3[1]}%`}
                         x2={`${p0[0]}%`} y2={`${p0[1]}%`}
-                        stroke={stroke} strokeWidth={sw}
-                        strokeDasharray={dash} strokeLinecap="round"
+                        stroke="rgba(56, 189, 248, 0.75)" strokeWidth="1.8"
+                        strokeDasharray="6,4" strokeLinecap="round"
                       />
-                      {/* 四个宫位中心标记点 */}
-                      {[p0, p1, p2, p3].map((p, i) => (
-                        <circle
-                          key={i}
-                          cx={`${p[0]}%`} cy={`${p[1]}%`}
-                          r="3"
-                          fill={i === 0 ? 'rgba(37,99,235,0.8)' : 'rgba(37,99,235,0.45)'}
-                        />
-                      ))}
+                      {/* Bốn điểm tâm cung vị */}
+                      <circle cx={`${p0[0]}%`} cy={`${p0[1]}%`} r="5" fill="#f59e0b" />
+                      <circle cx={`${p1[0]}%`} cy={`${p1[1]}%`} r="4.5" fill="#f97316" />
+                      <circle cx={`${p2[0]}%`} cy={`${p2[1]}%`} r="4" fill="#38bdf8" />
+                      <circle cx={`${p3[0]}%`} cy={`${p3[1]}%`} r="4" fill="#38bdf8" />
                     </>
                   );
                 })()}
