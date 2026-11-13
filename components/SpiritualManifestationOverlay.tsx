@@ -780,13 +780,13 @@ export default function SpiritualManifestationOverlay() {
     return () => clearTimeout(hideTimer);
   }, [activeItem, isHovered, intervalSec]);
 
-  // Chuyển đổi nhanh giữa 5s (Test) -> 240s (Chuẩn) -> Tắt
+  // Chuyển đổi nhanh giữa 60s (Mặc định) -> 240s -> Tắt
   const cycleIntervalMode = () => {
     if (!autoEnabled) {
       setAutoEnabled(true);
-      setIntervalSec(5);
-      setSecondsLeft(5);
-    } else if (intervalSec === 5) {
+      setIntervalSec(60);
+      setSecondsLeft(60);
+    } else if (intervalSec === 60) {
       setIntervalSec(240);
       setSecondsLeft(240);
     } else {
@@ -830,7 +830,7 @@ export default function SpiritualManifestationOverlay() {
           type="button"
           onClick={cycleIntervalMode}
           data-testid="toggle-auto-spiritual-btn"
-          title="Nhấp để đổi chu kỳ tự động: 5s (Test nhanh) ➔ 240s (4 phút) ➔ Tắt"
+          title="Nhấp để đổi chu kỳ tự động: 60s (1 phút) ➔ 240s (4 phút) ➔ Tắt"
           className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md ${
             autoEnabled
               ? 'bg-zinc-900/90 border-amber-500/50 text-amber-300 hover:border-amber-300'

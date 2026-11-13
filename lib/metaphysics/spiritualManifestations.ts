@@ -9,8 +9,8 @@
  *   và không trùng nhau ở điểm giao giữa hai chu kỳ.
  */
 
-export const SPIRITUAL_INTERVAL_MS = 5_000; // 5 giây (chế độ test nhanh theo yêu cầu người dùng; có thể chuyển 240s trên UI)
-export const SPIRITUAL_DISPLAY_DURATION_MS = 4_800; // Hiển thị 4.8 giây mỗi lần xuất hiện
+export const SPIRITUAL_INTERVAL_MS = 60_000; // 60 giây (1 phút) mỗi lần bung ấn hiển linh
+export const SPIRITUAL_DISPLAY_DURATION_MS = 6_500; // Hiển thị 6.5 giây mỗi lần xuất hiện
 
 export type SpiritualCategory =
   | 'talisman'       // Đạo Bùa Cổ Truyền (Linh Phù)
