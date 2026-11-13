@@ -1,0 +1,3 @@
+interface:
+  display_name: "Handoff (nghi ngoi)"
+  short_description: "Trigger via chat 'nghi ngoi' or /handoff"

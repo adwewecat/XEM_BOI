@@ -18,13 +18,17 @@ node_modules/
 .vercel/
 
 # Environment
-.env*.local
 .env
+.env.*
+.env*.local
 !.env.example
 
 # Admin persistent secret data
 /data/
 admin_config.json
+
+# Local Journal & Workflows
+.private-journal/
 
 
 # Debug logs
