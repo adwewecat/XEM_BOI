@@ -10,7 +10,9 @@
     - Áp dụng thuật toán **Shuffle Bag (Fisher-Yates kết hợp phân tách nhóm)** đảm bảo rút 30 lần liên tiếp không bao giờ trùng lặp bất kỳ linh tượng nào, kể cả tại ranh giới xáo bài chu kỳ mới.
     - Xây dựng `components/SpiritualManifestationOverlay.tsx` đặt mặc định **5 giây (`SPIRITUAL_INTERVAL_MS = 5000`)** để người dùng test nhanh (có nút chuyển đổi 1-click `⚡5s ➔ ⚡240s ➔ ⏸Tắt`), kèm hiệu ứng SVG vẽ bùa chu sa, đóng ấn triện, nối sao thiên văn, xoay vòng Bát Quái / 12 Địa Chi và nút pháp khí nổi `🧧 Linh Phù Hiển Linh` góc dưới phải.
     - Viết bộ test TDD `scripts/regression/spiritual-manifestations.test.ts` (19/19 test suites PASS) và xác minh tự động hiển thị sau 5s bằng Playwright MCP.
-  - **Issues Fixed:** Đặt nút pháp khí ở góc dưới phải và nâng `z-[120]` cho modal để không bao giờ va chạm với huy hiệu Next.js hoặc modal chào mừng.
+  - **Issues Fixed:**
+    - Khắc phục triệt để lỗi Hydration Mismatch (`bis_skin_checked="1"` do browser extension tự chèn vào DOM trước khi React hydrate) bằng cơ chế client-mount (`mounted`) cho `SideCouplets` / `SpiritualManifestationOverlay`, khởi tạo `deckRef` thuần client và bộ lọc `MutationObserver` dọn sạch thuộc tính rác trước khi hydrate trong `app/layout.tsx`.
+    - Khắc phục cảnh báo container `useScroll` bằng `className="relative"` trên thẻ `<html>`, bổ sung `app/icon.svg` (biểu tượng Thái Cực) và tắt `devIndicators` gây vướng giao diện.
   - **Next:** Tiếp tục tối ưu trải nghiệm huyền học theo yêu cầu người dùng.
 
 - **[2026-11-13] Tích hợp Skill_Workflow_A.I + 3 MCP Servers (Playwright, Private-Journal, Context7)**

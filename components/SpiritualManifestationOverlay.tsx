@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   SPIRITUAL_INTERVAL_MS,
   SPIRITUAL_DISPLAY_DURATION_MS,
+  SPIRITUAL_MANIFESTATIONS,
   createSpiritualManifestationDeck,
   type SpiritualManifestation,
+  type SpiritualManifestationDeck,
 } from '@/lib/metaphysics/spiritualManifestations';
 
 // ============================================================================
@@ -718,7 +720,8 @@ function FiveElementsArtwork({ item }: { item: SpiritualManifestation }) {
 // COMPONENT CHÍNH: HIỂN LINH ĐỊNH KỲ MỖI 240 GIÂY + NÚT THỈNH LINH TƯỢNG NGAY
 // ============================================================================
 export default function SpiritualManifestationOverlay() {
-  const deckRef = useRef(createSpiritualManifestationDeck());
+  const [mounted, setMounted] = useState(false);
+  const deckRef = useRef<SpiritualManifestationDeck | null>(null);
   const [activeItem, setActiveItem] = useState<SpiritualManifestation | null>(null);
   const [drawCounter, setDrawCounter] = useState(0);
   const [autoEnabled, setAutoEnabled] = useState(true);
@@ -726,22 +729,34 @@ export default function SpiritualManifestationOverlay() {
   const [secondsLeft, setSecondsLeft] = useState(SPIRITUAL_INTERVAL_MS / 1000);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Khởi tạo deck chỉ trên client để tránh gọi Math.random() trong quá trình SSR gây Hydration Mismatch
+  const getDeck = useCallback(() => {
+    if (!deckRef.current) {
+      deckRef.current = createSpiritualManifestationDeck();
+    }
+    return deckRef.current;
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Hàm rút linh tượng tiếp theo từ bộ bài không trùng lặp
   const summonNextManifestation = useCallback(() => {
-    const nextItem = deckRef.current.next();
+    const nextItem = getDeck().next();
     setActiveItem(nextItem);
     setDrawCounter(prev => prev + 1);
     setSecondsLeft(intervalSec);
-  }, [intervalSec]);
+  }, [getDeck, intervalSec]);
 
-  // Bộ đếm ngược tự động hiển linh (chỉ đếm khi chưa có linh tượng nào đang mở để không chồng chéo)
+  // Bộ đếm ngược tự động hiển linh (chỉ đếm khi đã mount và chưa có linh tượng nào đang mở)
   useEffect(() => {
-    if (!autoEnabled || activeItem) return;
+    if (!mounted || !autoEnabled || activeItem) return;
 
     const countdownTimer = setInterval(() => {
       setSecondsLeft(prev => {
         if (prev <= 1) {
-          const nextItem = deckRef.current.next();
+          const nextItem = getDeck().next();
           setActiveItem(nextItem);
           setDrawCounter(c => c + 1);
           return intervalSec;
@@ -751,7 +766,7 @@ export default function SpiritualManifestationOverlay() {
     }, 1000);
 
     return () => clearInterval(countdownTimer);
-  }, [autoEnabled, activeItem, intervalSec]);
+  }, [mounted, autoEnabled, activeItem, intervalSec, getDeck]);
 
   // Tự động thu ấn sau SPIRITUAL_DISPLAY_DURATION_MS (tạm dừng nếu người dùng đang di chuột vào xem)
   useEffect(() => {
@@ -780,6 +795,10 @@ export default function SpiritualManifestationOverlay() {
   };
 
   const style = activeItem ? ACCENT_STYLES[activeItem.accentColor] : ACCENT_STYLES.gold;
+  const totalManifestations = SPIRITUAL_MANIFESTATIONS.length;
+  const remainingCount = deckRef.current ? deckRef.current.remainingInCycle() : totalManifestations;
+
+  if (!mounted) return null;
 
   return (
     <>
@@ -892,7 +911,7 @@ export default function SpiritualManifestationOverlay() {
 
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-zinc-400 font-mono">
-                    #{((drawCounter - 1) % deckRef.current.totalCount) + 1}/{deckRef.current.totalCount}
+                    #{((drawCounter - 1) % totalManifestations) + 1}/{totalManifestations}
                   </span>
                   <button
                     type="button"
@@ -957,7 +976,7 @@ export default function SpiritualManifestationOverlay() {
                   data-testid="next-spiritual-btn"
                   className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 font-extrabold text-xs shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all cursor-pointer"
                 >
-                  🎲 Linh Tượng Khác ({deckRef.current.remainingInCycle()} còn lại)
+                  🎲 Linh Tượng Khác ({remainingCount} còn lại)
                 </button>
                 <button
                   type="button"

@@ -39,9 +39,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className="relative" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();` }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');var clean=function(root){var els=(root||document).querySelectorAll('[bis_skin_checked],[bis_register],[data-bis-config]');for(var i=0;i<els.length;i++){els[i].removeAttribute('bis_skin_checked');els[i].removeAttribute('bis_register');els[i].removeAttribute('data-bis-config');}};clean(document);if(typeof MutationObserver!=='undefined'){var obs=new MutationObserver(function(muts){for(var i=0;i<muts.length;i++){var m=muts[i];if(m.type==='attributes'&&m.target&&m.target.removeAttribute){m.target.removeAttribute('bis_skin_checked');m.target.removeAttribute('bis_register');m.target.removeAttribute('data-bis-config');}else if(m.addedNodes&&m.addedNodes.length){for(var j=0;j<m.addedNodes.length;j++){var n=m.addedNodes[j];if(n.nodeType===1){if(n.removeAttribute){n.removeAttribute('bis_skin_checked');n.removeAttribute('bis_register');}if(n.querySelectorAll)clean(n);}}}}});obs.observe(document.documentElement,{attributes:true,childList:true,subtree:true,attributeFilter:['bis_skin_checked','bis_register','data-bis-config']});setTimeout(function(){obs.disconnect();},5000);}}catch(e){}})();`,
+          }}
+        />
       </head>
       <body suppressHydrationWarning className="min-h-screen relative overflow-x-hidden flex flex-col">
         <ThemeProvider>

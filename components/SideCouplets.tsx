@@ -1,11 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SideCouplets() {
+  const [mounted, setMounted] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  // Chỉ render sau khi client đã mount để tránh lỗi Hydration Mismatch
+  // khi trình duyệt của người dùng cài extension tự chèn thuộc tính (như bis_skin_checked="1")
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <>
