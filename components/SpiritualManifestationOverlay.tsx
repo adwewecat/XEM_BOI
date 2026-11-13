@@ -722,6 +722,7 @@ export default function SpiritualManifestationOverlay() {
   const [activeItem, setActiveItem] = useState<SpiritualManifestation | null>(null);
   const [drawCounter, setDrawCounter] = useState(0);
   const [autoEnabled, setAutoEnabled] = useState(true);
+  const [intervalSec, setIntervalSec] = useState(SPIRITUAL_INTERVAL_MS / 1000); // Mặc định 5s để test nhanh
   const [secondsLeft, setSecondsLeft] = useState(SPIRITUAL_INTERVAL_MS / 1000);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -730,12 +731,12 @@ export default function SpiritualManifestationOverlay() {
     const nextItem = deckRef.current.next();
     setActiveItem(nextItem);
     setDrawCounter(prev => prev + 1);
-    setSecondsLeft(SPIRITUAL_INTERVAL_MS / 1000);
-  }, []);
+    setSecondsLeft(intervalSec);
+  }, [intervalSec]);
 
-  // Bộ đếm ngược 240s tự động hiển linh
+  // Bộ đếm ngược tự động hiển linh (chỉ đếm khi chưa có linh tượng nào đang mở để không chồng chéo)
   useEffect(() => {
-    if (!autoEnabled) return;
+    if (!autoEnabled || activeItem) return;
 
     const countdownTimer = setInterval(() => {
       setSecondsLeft(prev => {
@@ -743,32 +744,47 @@ export default function SpiritualManifestationOverlay() {
           const nextItem = deckRef.current.next();
           setActiveItem(nextItem);
           setDrawCounter(c => c + 1);
-          return SPIRITUAL_INTERVAL_MS / 1000;
+          return intervalSec;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(countdownTimer);
-  }, [autoEnabled]);
+  }, [autoEnabled, activeItem, intervalSec]);
 
-  // Tự động thu ấn sau 7.5 giây (tạm dừng nếu người dùng đang di chuột vào xem)
+  // Tự động thu ấn sau SPIRITUAL_DISPLAY_DURATION_MS (tạm dừng nếu người dùng đang di chuột vào xem)
   useEffect(() => {
     if (!activeItem || isHovered) return;
 
     const hideTimer = setTimeout(() => {
       setActiveItem(null);
+      setSecondsLeft(intervalSec);
     }, SPIRITUAL_DISPLAY_DURATION_MS);
 
     return () => clearTimeout(hideTimer);
-  }, [activeItem, isHovered]);
+  }, [activeItem, isHovered, intervalSec]);
+
+  // Chuyển đổi nhanh giữa 5s (Test) -> 240s (Chuẩn) -> Tắt
+  const cycleIntervalMode = () => {
+    if (!autoEnabled) {
+      setAutoEnabled(true);
+      setIntervalSec(5);
+      setSecondsLeft(5);
+    } else if (intervalSec === 5) {
+      setIntervalSec(240);
+      setSecondsLeft(240);
+    } else {
+      setAutoEnabled(false);
+    }
+  };
 
   const style = activeItem ? ACCENT_STYLES[activeItem.accentColor] : ACCENT_STYLES.gold;
 
   return (
     <>
       {/* ==================================================================== */}
-      {/* NÚT PHÁP KHÍ NỔI GÓC DƯỚI BÊN PHẢI: THỈNH LINH TƯỢNG NGAY & HẸN GIỜ 240S */}
+      {/* NÚT PHÁP KHÍ NỔI GÓC DƯỚI BÊN PHẢI: THỈNH LINH TƯỢNG NGAY & HẸN GIỜ */}
       {/* ==================================================================== */}
       <div className="fixed bottom-20 md:bottom-11 xl:bottom-5 right-3 sm:right-5 z-[60] flex items-center gap-1.5 select-none">
         <button
@@ -786,27 +802,23 @@ export default function SpiritualManifestationOverlay() {
           </span>
           {autoEnabled && (
             <span className="text-[10px] font-mono text-amber-300 bg-black/50 px-1.5 py-0.5 rounded-full border border-amber-500/30">
-              {secondsLeft}s
+              {activeItem ? 'Đang hiện' : `${secondsLeft}s`}
             </span>
           )}
         </button>
 
         <button
           type="button"
-          onClick={() => setAutoEnabled(prev => !prev)}
+          onClick={cycleIntervalMode}
           data-testid="toggle-auto-spiritual-btn"
-          title={
-            autoEnabled
-              ? 'Đang bật tự động hiển linh mỗi 240s (Nhấp để tạm dừng)'
-              : 'Đang tắt tự động hiển linh 240s (Nhấp để bật lại)'
-          }
+          title="Nhấp để đổi chu kỳ tự động: 5s (Test nhanh) ➔ 240s (4 phút) ➔ Tắt"
           className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md ${
             autoEnabled
               ? 'bg-zinc-900/90 border-amber-500/50 text-amber-300 hover:border-amber-300'
               : 'bg-zinc-950/85 border-zinc-700 text-zinc-500 hover:text-zinc-300'
           }`}
         >
-          {autoEnabled ? '⚡240s' : '⏸Tắt'}
+          {autoEnabled ? `⚡${intervalSec}s` : '⏸Tắt'}
         </button>
       </div>
 

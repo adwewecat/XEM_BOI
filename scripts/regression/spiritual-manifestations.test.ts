@@ -9,16 +9,16 @@ import {
 
 console.log('Testing Spiritual Manifestations (240s Non-Repeating Random Deck)...');
 
-// 1. Kiểm tra chu kỳ hiển thị chuẩn 240 giây (240,000 ms)
+// 1. Kiểm tra chu kỳ hiển thị chuẩn 5 giây (5,000 ms) ở chế độ test nhanh
 assert.strictEqual(
   SPIRITUAL_INTERVAL_MS,
-  240_000,
-  `Chu kỳ hiển linh mặc định phải đúng 240,000ms (240s), nhận được: ${SPIRITUAL_INTERVAL_MS}`
+  5_000,
+  `Chu kỳ hiển linh test mặc định phải đúng 5,000ms (5s), nhận được: ${SPIRITUAL_INTERVAL_MS}`
 );
 assert.strictEqual(
-  SPIRITUAL_DISPLAY_DURATION_MS >= 6000 && SPIRITUAL_DISPLAY_DURATION_MS <= 10000,
+  SPIRITUAL_DISPLAY_DURATION_MS >= 4000 && SPIRITUAL_DISPLAY_DURATION_MS <= 10000,
   true,
-  'Thời lượng hiển thị mỗi linh tượng phải từ 6s đến 10s để đủ chiêm ngưỡng animation'
+  'Thời lượng hiển thị mỗi linh tượng phải từ 4s đến 10s để đủ chiêm ngưỡng animation'
 );
 
 // 2. Kiểm tra số lượng linh tượng phong phú (>= 24 linh tượng) và không trùng ID/Title

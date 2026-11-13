@@ -4,12 +4,12 @@
 
 ## Recent Milestones
 
-- **[2026-11-13] Đợt 30: Hệ Thống Linh Tượng Tâm Linh Hiển Linh Định Kỳ (240s Random Không Trùng Lặp)**
+- **[2026-11-13] Đợt 30: Hệ Thống Linh Tượng Tâm Linh Hiển Linh Định Kỳ (Chế Độ Test 5s / Chuẩn 240s Random Không Trùng Lặp)**
   - **Done:**
     - Xây dựng engine `lib/metaphysics/spiritualManifestations.ts` với **30 linh tượng tâm linh** chia làm 6 nhóm: Đạo Bùa Cổ Truyền (Linh Phù), Các Sao Tinh Tú (Bắc Đẩu, Tử Vi, Nam Đẩu, Nhị Thập Bát Tú, Nhật Nguyệt), 12 Con Giáp Địa Chi Linh Thú, Bát Quái & Thái Cực Trận Đồ, Tứ Linh Thần Thú & Bảo Ấn, Ngũ Hành Tương Sinh & Kim Liên Pháp Trận.
     - Áp dụng thuật toán **Shuffle Bag (Fisher-Yates kết hợp phân tách nhóm)** đảm bảo rút 30 lần liên tiếp không bao giờ trùng lặp bất kỳ linh tượng nào, kể cả tại ranh giới xáo bài chu kỳ mới.
-    - Xây dựng `components/SpiritualManifestationOverlay.tsx` tự động hiển thị giữa màn hình mỗi **240 giây (4 phút)** kèm hiệu ứng SVG vẽ bùa chu sa, đóng ấn triện, nối sao thiên văn, xoay vòng Bát Quái / 12 Địa Chi và nút pháp khí nổi `🧧 Linh Phù Hiển Linh` góc dưới phải để thỉnh ngay bất kỳ lúc nào.
-    - Viết bộ test TDD `scripts/regression/spiritual-manifestations.test.ts` (19/19 test suites PASS) và xác minh trực quan bằng Playwright MCP.
+    - Xây dựng `components/SpiritualManifestationOverlay.tsx` đặt mặc định **5 giây (`SPIRITUAL_INTERVAL_MS = 5000`)** để người dùng test nhanh (có nút chuyển đổi 1-click `⚡5s ➔ ⚡240s ➔ ⏸Tắt`), kèm hiệu ứng SVG vẽ bùa chu sa, đóng ấn triện, nối sao thiên văn, xoay vòng Bát Quái / 12 Địa Chi và nút pháp khí nổi `🧧 Linh Phù Hiển Linh` góc dưới phải.
+    - Viết bộ test TDD `scripts/regression/spiritual-manifestations.test.ts` (19/19 test suites PASS) và xác minh tự động hiển thị sau 5s bằng Playwright MCP.
   - **Issues Fixed:** Đặt nút pháp khí ở góc dưới phải và nâng `z-[120]` cho modal để không bao giờ va chạm với huy hiệu Next.js hoặc modal chào mừng.
   - **Next:** Tiếp tục tối ưu trải nghiệm huyền học theo yêu cầu người dùng.
 
