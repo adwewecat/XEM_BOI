@@ -4,6 +4,9 @@
 
 <!-- Archived entries go below, newest archived at top -->
 
+### [2026-11-11] - Đợt 21: Tích Hợp Gemini AI Luận Giải Chiêm Bốc Trực Tiếp, Giải Mã Bản Mệnh - Đại Hạn
+- **Done:** Tích hợp trực tiếp trợ lý AI Gemini vào giao diện chiêm đoán; bổ sung hướng dẫn chi tiết giải mã Bản Mệnh, Đại Hạn 10 năm và Lưu Niên trên lá số Tử Vi.
+
 ### [2026-11-11] - Đợt 20: Tối Ưu Hóa Trực Quan Lá Số Tử Vi, Giải Thích Đại Hạn Cung Phu Thê & Tích Hợp Lộ Trình Đọc Lá Số 5 Bước
 - **Người thực hiện:** Antigravity AI Assistant & Developer.
 - **Yêu cầu người dùng:** "HÃY NHẤN mạnh những gì cần làm nổi, tôi thấy đang trỏ vào Phu Thê, nhưng mà sao lại cũng không rõ lắm. . với hình lá số tử vi thì tôi còn xem cái gì , nhiều khi không biết cần đọc gì và xem gì" (Kèm ảnh chụp màn hình lá số Nguyễn Anh Dũng - tuổi 26, đang trong đại hạn 24-33 tuổi tại Cung Phu Thê).

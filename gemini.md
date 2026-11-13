@@ -1,4 +1,4 @@
-﻿# 📜 SỔ TAY DỰ ÁN VÀ QUY TẮC PHÁT TRIỂN (GEMINI.MD)
+# 📜 SỔ TAY DỰ ÁN VÀ QUY TẮC PHÁT TRIỂN (GEMINI.MD)
 
 > **Quy tắc đọc phân tầng bắt buộc:** Khi mở đầu mỗi phiên làm việc, AI Agents **CHỈ ĐƯỢC ĐỌC DUY NHẤT 2 TỆP: `GEMINI.MD` VÀ `PROGRESS.MD`**. Tuyệt đối không tự ý đọc lan man `ARCHIVE.md` hay các tệp `.md` khác trừ khi nhiệm vụ nêu đích danh. File này phải giữ **dưới 300 dòng**.
 
@@ -9,12 +9,12 @@
 - **Bản chất dự án:** Hệ thống lập lá số và giải đoán vận mệnh cổ truyền Đông Phương chuẩn phái **Tử Vi Đẩu Số Thiên Kỷ** (danh sư Nghê Hải Hà / Ni Haixia & Trần Đoàn tổ sư) kết hợp siêu module huyền học **Kim Cổ Đông Tây** (Bói Chỉ Tay Palmistry, Kinh Dịch Lục Hào Động Tâm, Tarot 22 Ẩn Chính, Trạch Nhật, Thần Số Học Pitago, Bát Tự Hà Lạc).
 - **Cấu trúc thư mục trọng tâm:**
   - `app/`: Next.js App Router (lập lá số `/chart`, hợp mệnh `/heming`, thư viện `/library`, tra cứu `/knowledge`, bói tổng hợp `/metaphysics`, quản trị `/admin`, API AI `/api/ai/divine`, API admin `/api/admin/config`).
-  - `components/`: React component hiển thị lá số (`PalaceCell`, `ChartBoard`, `BirthForm`), overlay nét vẽ chỉ tay neon (`PalmLinesOverlay`, `PalmPhotoUploader`), modal cẩm nang luận giải.
+  - `components/`: React component hiển thị lá số (`PalaceCell`, `ChartBoard`, `BirthForm`), overlay nét vẽ chỉ tay neon (`PalmLinesOverlay`, `PalmPhotoUploader`), hệ thống hiển linh 240s (`SpiritualManifestationOverlay`), modal cẩm nang luận giải.
   - `lib/ziwei/`: Lõi thuật toán Tử Vi (an sao 12 cung, 14 chính tinh, Tứ Hóa, Giờ Chân Thái Dương bù trừ kinh độ & phương trình thời gian EoT chuẩn NOAA, xử lý Dạ Tý 23h-24h, nhận diện 50+ cách cục cổ tịch).
-  - `lib/metaphysics/`: Các engine chiêm đoán độc lập (`palmistry.ts`, `dongtam.ts`, `tarot.ts`, `almanac.ts`, `bazi.ts`, `numerology.ts`).
+  - `lib/metaphysics/`: Các engine chiêm đoán độc lập (`palmistry.ts`, `dongtam.ts`, `tarot.ts`, `almanac.ts`, `bazi.ts`, `numerology.ts`, `spiritualManifestations.ts`).
   - `lib/classics/`: Cổ thư kinh điển (Tử Vi Đẩu Số Toàn Thư, Toàn Tập, Cốt Tủy Phú).
   - `lib/server/`: Quản lý cấu hình máy chủ & Gemini API Key dùng chung (`adminConfig.ts`).
-  - `scripts/regression/`: Hệ thống 18 test suite hồi quy nghiêm ngặt (768 lá số mẫu, ranh giới Lập Xuân, Chân Thái Dương, Intent Dịch lý...).
+  - `scripts/regression/`: Hệ thống 19 test suite hồi quy nghiêm ngặt (768 lá số mẫu, ranh giới Lập Xuân, Chân Thái Dương, Intent Dịch lý, Shuffle Bag 30 Linh Tượng...).
   - `data/`: Tệp cấu hình bảo mật của Admin (`admin_config.json`, luôn được gitignore).
 
 ---

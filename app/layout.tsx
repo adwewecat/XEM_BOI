@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import StarField from '@/components/StarField';
 import SideCouplets from '@/components/SideCouplets';
+import SpiritualManifestationOverlay from '@/components/SpiritualManifestationOverlay';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </div>
           <MobileBottomNav />
+          <SpiritualManifestationOverlay />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

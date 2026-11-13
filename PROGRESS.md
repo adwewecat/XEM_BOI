@@ -1,8 +1,17 @@
-﻿# Project Progress
+# Project Progress
 
 > **Rotation Rule:** Prepend new entries to the top of **Recent Milestones**. Keep at most **10 entries** here; move older entries (#11+) to `ARCHIVE.md`.
 
 ## Recent Milestones
+
+- **[2026-11-13] Đợt 30: Hệ Thống Linh Tượng Tâm Linh Hiển Linh Định Kỳ (240s Random Không Trùng Lặp)**
+  - **Done:**
+    - Xây dựng engine `lib/metaphysics/spiritualManifestations.ts` với **30 linh tượng tâm linh** chia làm 6 nhóm: Đạo Bùa Cổ Truyền (Linh Phù), Các Sao Tinh Tú (Bắc Đẩu, Tử Vi, Nam Đẩu, Nhị Thập Bát Tú, Nhật Nguyệt), 12 Con Giáp Địa Chi Linh Thú, Bát Quái & Thái Cực Trận Đồ, Tứ Linh Thần Thú & Bảo Ấn, Ngũ Hành Tương Sinh & Kim Liên Pháp Trận.
+    - Áp dụng thuật toán **Shuffle Bag (Fisher-Yates kết hợp phân tách nhóm)** đảm bảo rút 30 lần liên tiếp không bao giờ trùng lặp bất kỳ linh tượng nào, kể cả tại ranh giới xáo bài chu kỳ mới.
+    - Xây dựng `components/SpiritualManifestationOverlay.tsx` tự động hiển thị giữa màn hình mỗi **240 giây (4 phút)** kèm hiệu ứng SVG vẽ bùa chu sa, đóng ấn triện, nối sao thiên văn, xoay vòng Bát Quái / 12 Địa Chi và nút pháp khí nổi `🧧 Linh Phù Hiển Linh` góc dưới phải để thỉnh ngay bất kỳ lúc nào.
+    - Viết bộ test TDD `scripts/regression/spiritual-manifestations.test.ts` (19/19 test suites PASS) và xác minh trực quan bằng Playwright MCP.
+  - **Issues Fixed:** Đặt nút pháp khí ở góc dưới phải và nâng `z-[120]` cho modal để không bao giờ va chạm với huy hiệu Next.js hoặc modal chào mừng.
+  - **Next:** Tiếp tục tối ưu trải nghiệm huyền học theo yêu cầu người dùng.
 
 - **[2026-11-13] Tích hợp Skill_Workflow_A.I + 3 MCP Servers (Playwright, Private-Journal, Context7)**
   - **Done:**
@@ -41,5 +50,3 @@
 - **[2026-11-11] Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời Trong Bói Động Tâm / Tarot**
   - **Done:** Tự động kết nối Gemini AI tạo lời phán độc bản 100% cho từng câu hỏi chiêm bốc; khắc phục lỗi trùng lặp văn mẫu và lỗi font tiếng Việt.
 
-- **[2026-11-11] Đợt 21: Tích Hợp Gemini AI Luận Giải Chiêm Bốc Trực Tiếp, Giải Mã Bản Mệnh - Đại Hạn**
-  - **Done:** Tích hợp trực tiếp trợ lý AI Gemini vào giao diện chiêm đoán; bổ sung hướng dẫn chi tiết giải mã Bản Mệnh, Đại Hạn 10 năm và Lưu Niên trên lá số Tử Vi.
