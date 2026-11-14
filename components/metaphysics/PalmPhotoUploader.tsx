@@ -17,14 +17,17 @@ interface UserProfileData {
   city?: string;
 }
 
+export type PalmUploadMode = 'both' | 'left' | 'right';
+
 interface PalmPhotoUploaderProps {
   userProfile: UserProfileData | null;
   onSaveUserProfile: (profile: { name: string; gender: 'male' | 'female'; year: number; month?: number; day?: number }) => void;
   side: HandSide;
   onChangeSide: (side: HandSide) => void;
-  onAnalyzeImage: (imageData: string) => void;
+  onAnalyzeImages: (images: { left?: string; right?: string }) => void;
   isAnalyzing: boolean;
-  currentResult: PalmistryResult | null;
+  leftResult: PalmistryResult | null;
+  rightResult: PalmistryResult | null;
   onSwitchToManual: () => void;
 }
 
@@ -51,16 +54,26 @@ export default function PalmPhotoUploader({
   onSaveUserProfile,
   side,
   onChangeSide,
-  onAnalyzeImage,
+  onAnalyzeImages,
   isAnalyzing,
-  currentResult,
+  leftResult,
+  rightResult,
   onSwitchToManual,
 }: PalmPhotoUploaderProps) {
-  // Quản lý ảnh tải lên
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [imageFileName, setImageFileName] = useState<string>('');
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Chế độ tải ảnh: 2 tay, chỉ tay trái, hoặc chỉ tay phải
+  const [uploadMode, setUploadMode] = useState<PalmUploadMode>('both');
+
+  // Quản lý ảnh tải lên cho từng bàn tay
+  const [leftImage, setLeftImage] = useState<string | null>(null);
+  const [leftFileName, setLeftFileName] = useState<string>('');
+  const [rightImage, setRightImage] = useState<string | null>(null);
+  const [rightFileName, setRightFileName] = useState<string>('');
+  const [dragOverSide, setDragOverSide] = useState<HandSide | null>(null);
+
+  const leftGalleryRef = useRef<HTMLInputElement>(null);
+  const leftCameraRef = useRef<HTMLInputElement>(null);
+  const rightGalleryRef = useRef<HTMLInputElement>(null);
+  const rightCameraRef = useRef<HTMLInputElement>(null);
 
   // Quản lý form nhập thông tin đương số (khi chưa có)
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -117,44 +130,58 @@ export default function PalmPhotoUploader({
     setIsEditingProfile(false);
   };
 
-  // Xử lý khi chọn file ảnh
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    processSelectedFile(file);
-  };
-
-  const processSelectedFile = (file: File) => {
-    setImageFileName(file.name);
+  // Xử lý khi chọn hoặc chụp ảnh cho từng bàn tay
+  const processSelectedFile = (file: File, targetSide: HandSide) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setSelectedImage(dataUrl);
+      if (!dataUrl) return;
+      if (targetSide === 'left') {
+        setLeftImage(dataUrl);
+        setLeftFileName(file.name || 'Ảnh Tay Trái');
+      } else {
+        setRightImage(dataUrl);
+        setRightFileName(file.name || 'Ảnh Tay Phải');
       }
+      onChangeSide(targetSide);
     };
     reader.readAsDataURL(file);
   };
 
-  // Kéo thả file
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, targetSide: HandSide) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processSelectedFile(file, targetSide);
+    }
+    // Reset value để có thể chụp/chọn lại cùng 1 tệp nếu muốn
+    e.target.value = '';
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetSide: HandSide) => {
     e.preventDefault();
-    setIsDragOver(true);
+    setDragOverSide(targetSide);
   };
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(false);
+    setDragOverSide(null);
   };
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent, targetSide: HandSide) => {
     e.preventDefault();
-    setIsDragOver(false);
+    setDragOverSide(null);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      processSelectedFile(file);
+      processSelectedFile(file, targetSide);
     }
   };
 
-  // Kích hoạt phân tích ảnh
+  const handleSelectMode = (mode: PalmUploadMode) => {
+    setUploadMode(mode);
+    if (mode === 'left' || mode === 'right') {
+      onChangeSide(mode);
+    }
+  };
+
+  // Kích hoạt phân tích 1 tay hoặc cả 2 tay
   const handleTriggerAnalysis = () => {
     if (!hasProfile && !inputYear) {
       setIsEditingProfile(true);
@@ -163,13 +190,44 @@ export default function PalmPhotoUploader({
     if (!hasProfile) {
       handleSaveProfile();
     }
-    // Nếu chưa có ảnh, dùng mẫu mặc định để người dùng xem luôn
-    const imageToAnalyze = selectedImage || (side === 'left' ? SAMPLE_PALM_IMAGES[1].dataUrl : SAMPLE_PALM_IMAGES[0].dataUrl);
-    if (!selectedImage) {
-      setSelectedImage(imageToAnalyze);
-      setImageFileName('Ảnh mẫu bàn tay tiêu chuẩn');
+
+    if (uploadMode === 'left') {
+      const img = leftImage || SAMPLE_PALM_IMAGES[1].dataUrl;
+      if (!leftImage) {
+        setLeftImage(img);
+        setLeftFileName(SAMPLE_PALM_IMAGES[1].label);
+      }
+      onAnalyzeImages({ left: img });
+      return;
     }
-    onAnalyzeImage(imageToAnalyze);
+
+    if (uploadMode === 'right') {
+      const img = rightImage || SAMPLE_PALM_IMAGES[0].dataUrl;
+      if (!rightImage) {
+        setRightImage(img);
+        setRightFileName(SAMPLE_PALM_IMAGES[0].label);
+      }
+      onAnalyzeImages({ right: img });
+      return;
+    }
+
+    // Chế độ cả 2 tay: nếu mới đăng 1 tay thì vẫn phân tích tay đó; nếu chưa đăng ảnh nào thì nạp cả 2 mẫu
+    if (leftImage && rightImage) {
+      onAnalyzeImages({ left: leftImage, right: rightImage });
+    } else if (leftImage) {
+      onAnalyzeImages({ left: leftImage });
+    } else if (rightImage) {
+      onAnalyzeImages({ right: rightImage });
+    } else {
+      setLeftImage(SAMPLE_PALM_IMAGES[1].dataUrl);
+      setLeftFileName(SAMPLE_PALM_IMAGES[1].label);
+      setRightImage(SAMPLE_PALM_IMAGES[0].dataUrl);
+      setRightFileName(SAMPLE_PALM_IMAGES[0].label);
+      onAnalyzeImages({
+        left: SAMPLE_PALM_IMAGES[1].dataUrl,
+        right: SAMPLE_PALM_IMAGES[0].dataUrl,
+      });
+    }
   };
 
   const currentGender = userProfile?.gender === 'female' ? 'female' : inputGender;
@@ -307,83 +365,78 @@ export default function PalmPhotoUploader({
         )}
       </div>
 
-      {/* ─── KHỐI 2: CHỌN TAY XEM (CHỈ CẦN CHỌN TAY TRÁI HOẶC TAY PHẢI) ─── */}
+      {/* ─── KHỐI 2: CHỌN CHẾ ĐỘ XEM (2 TAY HOẶC 1 TAY TRÁI / PHẢI TÙY Ý) ─── */}
       <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border border-amber-500/30 backdrop-blur-md shadow-xl space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
           <label className="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
-            <span>✋</span> CHỌN BÀN TAY BẠN MUỐN XEM:
+            <span>✋</span> CHỌN CHẾ ĐỘ XEM CHỈ TAY:
           </label>
           <span className="text-[11px] text-zinc-400">
-            Khuyên dùng theo cổ pháp: <strong className="text-amber-400">{isFemale ? 'Nữ xem Tay Phải trước' : 'Nam xem Tay Trái trước'}</strong>
+            Cổ pháp: <strong className="text-amber-400">{isFemale ? 'Nữ Hữu (Tiên Thiên) · Tả (Hậu Thiên)' : 'Nam Tả (Tiên Thiên) · Hữu (Hậu Thiên)'}</strong>
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          {/* Nút Tay Trái */}
-          <button
-            type="button"
-            onClick={() => onChangeSide('left')}
-            className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-              side === 'left'
-                ? 'bg-gradient-to-br from-amber-500/20 to-amber-950/40 border-amber-400 shadow-lg shadow-amber-500/25 ring-1 ring-amber-400'
-                : 'bg-zinc-950/70 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/50'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-base sm:text-lg font-black text-amber-200 flex items-center gap-2">
-                <span>✋</span> TAY TRÁI
-              </span>
-              {side === 'left' && (
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-zinc-950 flex items-center justify-center text-xs font-black">
-                  ✓
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-zinc-300">
-              {isFemale
-                ? 'Hậu Thiên Vận Trình (Sự nghiệp thực tế, nỗ lực tự thân và thành tựu sau 30 tuổi)'
-                : 'Tiên Thiên Bản Mệnh (Căn cơ bẩm sinh trời ban, tính cách gốc rễ và phúc ấm tổ tiên)'}
-            </p>
-          </button>
-
-          {/* Nút Tay Phải */}
-          <button
-            type="button"
-            onClick={() => onChangeSide('right')}
-            className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-              side === 'right'
-                ? 'bg-gradient-to-br from-amber-500/20 to-amber-950/40 border-amber-400 shadow-lg shadow-amber-500/25 ring-1 ring-amber-400'
-                : 'bg-zinc-950/70 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/50'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-base sm:text-lg font-black text-amber-200 flex items-center gap-2">
-                <span>🤚</span> TAY PHẢI
-              </span>
-              {side === 'right' && (
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-zinc-950 flex items-center justify-center text-xs font-black">
-                  ✓
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-zinc-300">
-              {isFemale
-                ? 'Tiên Thiên Bản Mệnh (Cốt cách căn nguyên, trực giác và vận số bẩm sinh)'
-                : 'Hậu Thiên Vận Trình (Công danh xã hội, tài vận tích lũy và nỗ lực đời người)'}
-            </p>
-          </button>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {[
+            {
+              id: 'both' as PalmUploadMode,
+              icon: '🤲',
+              title: 'Cả 2 Tay (Song Thủ)',
+              desc: 'Đối chiếu Tiên Thiên & Hậu Thiên toàn diện nhất',
+            },
+            {
+              id: 'left' as PalmUploadMode,
+              icon: '✋',
+              title: 'Chỉ Tay Trái',
+              desc: isFemale ? 'Xem Hậu Thiên Vận Trình' : 'Xem Tiên Thiên Bản Mệnh',
+            },
+            {
+              id: 'right' as PalmUploadMode,
+              icon: '🤚',
+              title: 'Chỉ Tay Phải',
+              desc: isFemale ? 'Xem Tiên Thiên Bản Mệnh' : 'Xem Hậu Thiên Vận Trình',
+            },
+          ].map((opt) => {
+            const active = uploadMode === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => handleSelectMode(opt.id)}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  active
+                    ? 'bg-gradient-to-br from-amber-500/20 to-amber-950/40 border-amber-400 shadow-lg shadow-amber-500/20 ring-1 ring-amber-400'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-black text-amber-200 flex items-center gap-1.5">
+                    <span>{opt.icon}</span> {opt.title}
+                  </span>
+                  {active && (
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-zinc-950 flex items-center justify-center text-xs font-black">
+                      ✓
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-zinc-300 leading-snug">{opt.desc}</p>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* ─── KHỐI 3: UPLOAD HÌNH ẢNH BÀN TAY (HOẶC CHỤP TRỰC TIẾP TỪ ĐIỆN THOẠI) ─── */}
+      {/* ─── KHỐI 3: UPLOAD / CHỤP ẢNH BÀN TAY (HỖ TRỢ CAMERA ĐIỆN THOẠI & THƯ VIỆN) ─── */}
       <div className="p-4 sm:p-6 rounded-2xl bg-zinc-900/90 border border-amber-500/30 backdrop-blur-md shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">
           <div>
             <div className="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2">
-              <span>📸</span> TẢI LÊN HOẶC CHỤP ẢNH BÀN TAY
+              <span>📸</span> TẢI ẢNH HOẶC CHỤP TRỰC TIẾP BÀN TAY
             </div>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Chụp thẳng lòng bàn tay rõ nét dưới ánh sáng tự nhiên. Hệ thống AI sẽ tự động dò tìm các đường chỉ tay.
+              {uploadMode === 'both'
+                ? 'Bạn có thể tải cả 2 tay để đối chiếu Song Thủ, hoặc chỉ tải 1 tay bất kỳ đều được.'
+                : 'Chụp thẳng lòng bàn tay rõ nét dưới ánh sáng tự nhiên hoặc chọn ảnh có sẵn trong máy.'}
             </p>
           </div>
           <button
@@ -395,105 +448,190 @@ export default function PalmPhotoUploader({
           </button>
         </div>
 
-        {/* Khung Upload / Preview */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        {/* Các ô upload theo chế độ đã chọn */}
+        <div className={`grid gap-4 ${uploadMode === 'both' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+          {(['left', 'right'] as HandSide[])
+            .filter((s) => uploadMode === 'both' || uploadMode === s)
+            .map((targetSide) => {
+              const isLeft = targetSide === 'left';
+              const img = isLeft ? leftImage : rightImage;
+              const fileName = isLeft ? leftFileName : rightFileName;
+              const res = isLeft ? leftResult : rightResult;
+              const galleryRef = isLeft ? leftGalleryRef : rightGalleryRef;
+              const cameraRef = isLeft ? leftCameraRef : rightCameraRef;
+              const roleBadge = isLeft
+                ? isFemale
+                  ? 'Hậu Thiên · Vận Thực Tế'
+                  : 'Tiên Thiên · Căn Cơ Gốc'
+                : isFemale
+                  ? 'Tiên Thiên · Căn Cơ Gốc'
+                  : 'Hậu Thiên · Vận Thực Tế';
 
-        {!selectedImage ? (
-          /* Trạng thái chưa có ảnh: Vùng kéo thả hoặc bấm để chọn */
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
-              isDragOver
-                ? 'border-amber-400 bg-amber-500/10 scale-[1.01]'
-                : 'border-zinc-700 hover:border-amber-500/60 bg-zinc-950/60 hover:bg-zinc-950/90'
-            }`}
-          >
-            <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl shadow-lg shadow-amber-500/10">
-              🖐️
-            </div>
-            <div>
-              <div className="text-sm sm:text-base font-bold text-amber-200">
-                Nhấn để chụp ảnh hoặc chọn ảnh từ thiết bị
-              </div>
-              <p className="text-xs text-zinc-400 mt-1">
-                Hỗ trợ định dạng JPG, PNG, WEBP. Trên điện thoại hỗ trợ mở trực tiếp camera.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
-              <span>📷</span> Chọn Tệp / Chụp Ảnh Bàn Tay
-            </div>
-          </div>
-        ) : (
-          /* Trạng thái đã chọn ảnh: HIỂN THỊ NÉT VẼ CHỈ TAY PHÁT SÁNG TRỰC TIẾP TRÊN ẢNH ĐÃ ĐĂNG */
-          <div className="space-y-3">
-            <PalmLinesOverlay
-              imageUrl={selectedImage}
-              side={side}
-              result={currentResult}
-              isAnalyzing={isAnalyzing}
-              allowCalibration={true}
-              showLabels={true}
-            />
+              return (
+                <div
+                  key={targetSide}
+                  className="p-3.5 sm:p-4 rounded-2xl bg-zinc-950/70 border border-zinc-800 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{isLeft ? '✋' : '🤚'}</span>
+                      <span className="text-xs sm:text-sm font-black text-amber-200">
+                        {isLeft ? 'TAY TRÁI' : 'TAY PHẢI'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
+                      {roleBadge}
+                    </span>
+                  </div>
 
-            {/* Thông tin file & nút thao tác */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs">
-              <span className="text-zinc-300 truncate max-w-[240px] flex items-center gap-1.5 font-medium">
-                <span>📸</span> {imageFileName || 'Ảnh bàn tay đã tải lên'}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1"
-                >
-                  <span>📷</span> Đổi ảnh khác
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage(null);
-                    setImageFileName('');
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 text-rose-300 text-xs font-semibold cursor-pointer transition-all"
-                >
-                  ✕ Gỡ ảnh
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                  {/* Input chọn từ thư viện / tệp (không ép camera) */}
+                  <input
+                    ref={galleryRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, targetSide)}
+                    className="hidden"
+                  />
+                  {/* Input chụp trực tiếp bằng camera điện thoại */}
+                  <input
+                    ref={cameraRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => handleFileChange(e, targetSide)}
+                    className="hidden"
+                  />
+
+                  {!img ? (
+                    <div
+                      onDragOver={(e) => handleDragOver(e, targetSide)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, targetSide)}
+                      className={`border-2 border-dashed rounded-xl p-4 sm:p-5 text-center transition-all flex flex-col items-center justify-center gap-3 ${
+                        dragOverSide === targetSide
+                          ? 'border-amber-400 bg-amber-500/10 scale-[1.01]'
+                          : 'border-zinc-700 hover:border-amber-500/50 bg-zinc-900/40'
+                      }`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl">
+                        {isLeft ? '✋' : '🤚'}
+                      </div>
+                      <p className="text-xs text-zinc-400">
+                        Chụp trực tiếp trên điện thoại hoặc chọn ảnh {isLeft ? 'Tay Trái' : 'Tay Phải'}
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 w-full">
+                        <button
+                          type="button"
+                          onClick={() => cameraRef.current?.click()}
+                          className="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-xs font-bold border border-amber-500/40 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <span>📷</span> Chụp Ảnh
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => galleryRef.current?.click()}
+                          className="px-3 py-2 rounded-xl bg-zinc-800/90 hover:bg-zinc-700 text-zinc-200 text-xs font-bold border border-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <span>🖼️</span> Chọn Ảnh
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      <PalmLinesOverlay
+                        imageUrl={img}
+                        side={targetSide}
+                        result={res}
+                        isAnalyzing={isAnalyzing}
+                        allowCalibration={true}
+                        showLabels={true}
+                      />
+                      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-xs">
+                        <span className="text-zinc-300 truncate max-w-[160px] font-medium">
+                          📸 {fileName || (isLeft ? 'Tay Trái' : 'Tay Phải')}
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => cameraRef.current?.click()}
+                            className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-semibold cursor-pointer"
+                          >
+                            📷 Chụp lại
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => galleryRef.current?.click()}
+                            className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-semibold cursor-pointer"
+                          >
+                            🖼️ Đổi ảnh
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isLeft) {
+                                setLeftImage(null);
+                                setLeftFileName('');
+                              } else {
+                                setRightImage(null);
+                                setRightFileName('');
+                              }
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 text-rose-300 text-[11px] font-semibold cursor-pointer"
+                          >
+                            ✕ Gỡ
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </div>
 
         {/* Khối ảnh mẫu thử nghiệm nhanh 1-click */}
         <div className="pt-1">
           <div className="text-[11px] text-zinc-400 mb-2 flex items-center gap-1">
             <span>💡</span> Hoặc dùng nhanh ảnh mẫu bàn tay tiêu chuẩn để kiểm nghiệm:
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {SAMPLE_PALM_IMAGES.map((sample) => (
               <button
                 key={sample.id}
                 type="button"
                 onClick={() => {
-                  setSelectedImage(sample.dataUrl);
-                  setImageFileName(sample.label);
+                  if (sample.side === 'left') {
+                    setLeftImage(sample.dataUrl);
+                    setLeftFileName(sample.label);
+                  } else {
+                    setRightImage(sample.dataUrl);
+                    setRightFileName(sample.label);
+                  }
+                  if (uploadMode !== 'both') {
+                    setUploadMode(sample.side);
+                  }
                   onChangeSide(sample.side);
                 }}
                 className="p-2 sm:p-2.5 rounded-xl bg-zinc-950/80 hover:bg-zinc-800/60 border border-zinc-800 hover:border-amber-500/40 text-left transition-all cursor-pointer flex items-center gap-2"
               >
-                <span className="text-lg">🖐️</span>
+                <span className="text-base">{sample.side === 'left' ? '✋' : '🤚'}</span>
                 <span className="text-xs font-semibold text-zinc-300 truncate">{sample.label}</span>
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setUploadMode('both');
+                setLeftImage(SAMPLE_PALM_IMAGES[1].dataUrl);
+                setLeftFileName(SAMPLE_PALM_IMAGES[1].label);
+                setRightImage(SAMPLE_PALM_IMAGES[0].dataUrl);
+                setRightFileName(SAMPLE_PALM_IMAGES[0].label);
+              }}
+              className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition-all cursor-pointer flex items-center gap-2"
+            >
+              <span className="text-base">🤲</span>
+              <span className="text-xs font-bold text-amber-300 truncate">Nạp Cả 2 Tay Mẫu</span>
+            </button>
           </div>
         </div>
 
@@ -507,7 +645,13 @@ export default function PalmPhotoUploader({
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">{isAnalyzing ? '⏳' : '🔮'}</span>
-              <span>{isAnalyzing ? 'HỆ THỐNG AI ĐANG QUÉT CHỈ TAY...' : 'LUẬN GIẢI CHỈ TAY BẰNG AI →'}</span>
+              <span>
+                {isAnalyzing
+                  ? 'HỆ THỐNG AI ĐANG QUÉT CHỈ TAY...'
+                  : uploadMode === 'both' && leftImage && rightImage
+                    ? 'LUẬN GIẢI SONG THỦ (2 TAY) BẰNG AI →'
+                    : 'LUẬN GIẢI CHỈ TAY BẰNG AI →'}
+              </span>
             </div>
             {isAnalyzing && (
               <span className="text-xs font-semibold text-zinc-900 animate-pulse">

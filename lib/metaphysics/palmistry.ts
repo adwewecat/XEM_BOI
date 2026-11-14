@@ -856,3 +856,86 @@ export function analyzePalmFromImage(
   };
 }
 
+export interface DualPalmistryResult {
+  primary: PalmistryResult;
+  leftResult: PalmistryResult;
+  rightResult: PalmistryResult;
+  dualSynthesis: {
+    title: string;
+    innateHand: HandSide;
+    acquiredHand: HandSide;
+    innateScore: number;
+    acquiredScore: number;
+    balanceLabel: string;
+    innateVsAcquired: string;
+    harmonySummary: string;
+    keyAdvice: string;
+  };
+}
+
+function avgPalmScore(res: PalmistryResult): number {
+  return Math.round(
+    (res.lifeLine.score + res.headLine.score + res.heartLine.score + res.fateLine.score) / 4
+  );
+}
+
+/**
+ * Luận giải song thủ (cả Tay Trái & Tay Phải) đối chiếu Tiên Thiên - Hậu Thiên theo cổ pháp Nam Tả Nữ Hữu
+ */
+export function analyzeDualPalms(
+  leftImage: string,
+  rightImage: string,
+  gender: 'male' | 'female',
+  birthYear?: number,
+  name?: string
+): DualPalmistryResult {
+  const leftResult = analyzePalmFromImage(leftImage, 'left', gender, birthYear, name);
+  const rightResult = analyzePalmFromImage(rightImage, 'right', gender, birthYear, name);
+
+  // Nam Tả (Tiên Thiên) - Hữu (Hậu Thiên); Nữ Hữu (Tiên Thiên) - Tả (Hậu Thiên)
+  const innateHand: HandSide = gender === 'female' ? 'right' : 'left';
+  const acquiredHand: HandSide = gender === 'female' ? 'left' : 'right';
+  const innateRes = innateHand === 'left' ? leftResult : rightResult;
+  const acquiredRes = acquiredHand === 'left' ? leftResult : rightResult;
+
+  const innateScore = avgPalmScore(innateRes);
+  const acquiredScore = avgPalmScore(acquiredRes);
+  const diff = acquiredScore - innateScore;
+
+  let balanceLabel = 'Tiên Hậu Đồng Bộ · Vận Thế Ổn Định';
+  let innateVsAcquired = '';
+  let keyAdvice = '';
+
+  if (diff >= 6) {
+    balanceLabel = 'Hậu Thiên Vượt Bậc · Tự Lực Cải Mệnh';
+    innateVsAcquired = `Tay Hậu Thiên (${acquiredHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${acquiredScore}đ) nổi trội hơn hẳn Tay Tiên Thiên (${innateHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${innateScore}đ). Điều này chứng tỏ bản thân đương số tự lực cánh sinh, càng trưởng thành càng bản lĩnh, vượt qua được hạn chế bẩm sinh nhờ ý chí và trải nghiệm thực tế.`;
+    keyAdvice = 'Tiếp tục giữ kỷ luật tự thân và tránh chủ quan khi bước vào chu kỳ vận mới; thành quả đến từ nỗ lực thật chứ không phải may mắn nhất thời.';
+  } else if (diff <= -6) {
+    balanceLabel = 'Tiên Thiên Dày · Hậu Thiên Đang Hao Tổn';
+    innateVsAcquired = `Tay Tiên Thiên (${innateHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${innateScore}đ) có nền tảng tốt hơn Tay Hậu Thiên (${acquiredHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${acquiredScore}đ). Nền tảng gốc rễ và trực giác bẩm sinh khá vượng, nhưng lối sống, áp lực công việc hoặc quyết định hiện tại đang làm hao hụt bớt phúc khí sẵn có.`;
+    keyAdvice = 'Cần rà soát lại nhịp sinh hoạt, giảm ôm đồm và cắt bớt các mối quan hệ/kế hoạch gây phân tán năng lượng để khôi phục thế cân bằng.';
+  } else {
+    innateVsAcquired = `Tay Tiên Thiên (${innateHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${innateScore}đ) và Tay Hậu Thiên (${acquiredHand === 'left' ? 'Tay Trái' : 'Tay Phải'} · ${acquiredScore}đ) giữ được sự tương đồng cao. Căn cơ bẩm sinh và hành động thực tế đang đi cùng một trục, ít bị giằng xé nội tâm.`;
+    keyAdvice = 'Phát huy thế mạnh cốt lõi ở đường chỉ nổi bật nhất, đồng thời chủ động bồi đắp những điểm yếu đã chỉ ra ở cả hai bàn tay.';
+  }
+
+  const harmonySummary = `Đối chiếu Song Thủ (${gender === 'female' ? 'Nữ: Phải Tiên Thiên · Trái Hậu Thiên' : 'Nam: Trái Tiên Thiên · Phải Hậu Thiên'}): Sinh Đạo (${leftResult.lifeLine.score}đ / ${rightResult.lifeLine.score}đ), Trí Đạo (${leftResult.headLine.score}đ / ${rightResult.headLine.score}đ), Tâm Đạo (${leftResult.heartLine.score}đ / ${rightResult.heartLine.score}đ), Định Mệnh (${leftResult.fateLine.score}đ / ${rightResult.fateLine.score}đ).`;
+
+  return {
+    primary: acquiredRes,
+    leftResult,
+    rightResult,
+    dualSynthesis: {
+      title: 'SONG THỦ HỢP THAM · ĐỐI CHIẾU TIÊN THIÊN & HẬU THIÊN',
+      innateHand,
+      acquiredHand,
+      innateScore,
+      acquiredScore,
+      balanceLabel,
+      innateVsAcquired,
+      harmonySummary,
+      keyAdvice,
+    },
+  };
+}
+

@@ -4,6 +4,10 @@
 
 ## Recent Milestones
 
+- **[2026-11-14] Đợt 32: Nâng Cấp Bói Chỉ Tay Hỗ Trợ 2 Tay (Song Thủ) Hoặc 1 Tay Tùy Ý & Chụp Ảnh Trực Tiếp Trên Điện Thoại**
+  - **Done:** Cập nhật `PalmPhotoUploader.tsx` với 3 chế độ chọn (`Cả 2 Tay (Song Thủ)`, `Chỉ Tay Trái`, `Chỉ Tay Phải`), tách riêng 2 nút `📷 Chụp Ảnh` (`capture="environment"`) và `🖼️ Chọn Ảnh` (thư viện/tệp) để điện thoại vừa chụp trực tiếp vừa chọn ảnh có sẵn. Bổ sung `analyzeDualPalms` trong `lib/metaphysics/palmistry.ts` và hiển thị khối **Song Thủ Hợp Tham** đối chiếu Tiên Thiên — Hậu Thiên kèm vẽ nét Neon đồng thời 2 bàn tay trong `app/metaphysics/page.tsx`.
+  - **Verified:** Kiểm tra Playwright trên viewport `390x844` tại `/metaphysics` (0 lỗi/cảnh báo console), `npm.cmd run typecheck` và `npm.cmd test` đạt 100% (19/19 bộ test).
+
 - **[2026-11-14] Đợt 31: Tối Ưu Giao Diện & Trải Nghiệm Di Động (Mobile Responsive UI/UX)**
   - **Done:** Tinh chỉnh `Navbar.tsx` (thu gọn header `< sm`, bỏ nút trùng với `MobileBottomNav`), `SpiritualManifestationOverlay.tsx` (thu nhỏ nút nổi mobile `bottom-[70px]` tránh che form/modal), `AnnouncementModal.tsx` (`maxHeight: min(78vh, 720px)`), `BirthForm.tsx` (padding responsive, grid nơi sinh 1 cột trên mobile, tinh chỉnh padding/cỡ chữ 3 ô ngày sinh), `ChartBoard.tsx` (thêm chế độ `Thẻ 12 Cung` 2 cột mặc định trên mobile kèm nút chuyển đổi sang lưới `4×4`), `app/metaphysics/page.tsx` (lưới tab 2 cột trên mobile), và `app/heming/page.tsx` (layout 1 cột `< lg`).
   - **Verified:** Kiểm tra Playwright trên viewport `390x844` tại `/`, `/chart`, `/metaphysics`, `/heming` (0 lỗi/cảnh báo console), `npm.cmd run typecheck` và `npm.cmd test` đạt 100%.
@@ -49,7 +53,4 @@
 
 - **[2026-11-11] Đợt 24: Bổ Sung Kết Luận Cốt Lõi Từng Cung Vị & Trợ Lý Tử Vi AI Đặt Câu Hỏi**
   - **Done:** Xây dựng engine luận đoán cốt lõi 5 tầng cho từng cung vị (`synthesizePalaceVerdict`). Tích hợp trợ lý Tử Vi AI hỏi đáp chuyên sâu trực tiếp trên lá số kèm 5 gợi ý câu hỏi 1-click. Cung cấp cẩm nang 3 tab phân biệt Bản Mệnh vs Cung Mệnh vs Cung Thân vs Đại Hạn.
-
-- **[2026-11-11] Đợt 23: Cấu Hình Gemini AI Tập Trung Dùng Chung Toàn Hệ Thống Cho Admin**
-  - **Done:** Xây dựng trang Admin `/admin` và API bảo mật `/api/admin/config`, `/api/admin/test` quản lý API Key Gemini dùng chung toàn hệ thống, bảo vệ bằng mật khẩu quản trị viên.
 

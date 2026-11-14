@@ -17,8 +17,10 @@ import ThematicMetaphysicsBackground, { MetaphysicsTheme } from '@/components/me
 import {
   analyzePalm,
   analyzePalmFromImage,
+  analyzeDualPalms,
   PalmInput,
   PalmistryResult,
+  DualPalmistryResult,
   HAND_ELEMENT_DATA,
   SPECIAL_SIGNS_DATA,
   HandElement,
@@ -94,6 +96,8 @@ export default function MetaphysicsPage() {
       gender: 'male',
     });
   });
+  const [dualPalmResult, setDualPalmResult] = useState<DualPalmistryResult | null>(null);
+  const [dualInspectSide, setDualInspectSide] = useState<'left' | 'right'>('right');
   const [isPalmAnalyzing, setIsPalmAnalyzing] = useState(false);
   const [activePalmLine, setActivePalmLine] = useState<string | null>(null);
 
@@ -315,22 +319,34 @@ export default function MetaphysicsPage() {
   const handleAnalyzePalm = () => {
     setIsPalmAnalyzing(true);
     setTimeout(() => {
+      setDualPalmResult(null);
       setPalmResult(analyzePalm(palmInput));
       setIsPalmAnalyzing(false);
     }, 400);
   };
 
-  // Phân tích chỉ tay từ hình ảnh người dùng tải lên
-  const handleAnalyzePalmImage = (imageData: string) => {
+  // Phân tích chỉ tay từ hình ảnh người dùng tải lên (hỗ trợ 1 tay hoặc cả 2 tay)
+  const handleAnalyzePalmImages = (images: { left?: string; right?: string }) => {
     setIsPalmAnalyzing(true);
     const gen = userProfile?.gender === 'female' ? 'female' : (palmInput.gender || 'male');
     const birthYear = userProfile?.year ? Number(userProfile.year) : 1995;
     const userName = userProfile?.name || 'Đương Số';
 
     setTimeout(() => {
-      const result = analyzePalmFromImage(imageData, palmInput.side, gen, birthYear, userName);
-      setPalmInput(result.input);
-      setPalmResult(result);
+      if (images.left && images.right) {
+        const dual = analyzeDualPalms(images.left, images.right, gen, birthYear, userName);
+        setDualPalmResult(dual);
+        setDualInspectSide(dual.dualSynthesis.acquiredHand);
+        setPalmInput(dual.primary.input);
+        setPalmResult(dual.primary);
+      } else {
+        const targetSide = images.left ? 'left' : 'right';
+        const targetImg = (images.left || images.right) as string;
+        const result = analyzePalmFromImage(targetImg, targetSide, gen, birthYear, userName);
+        setDualPalmResult(null);
+        setPalmInput(result.input);
+        setPalmResult(result);
+      }
       setIsPalmAnalyzing(false);
     }, 850);
   };
@@ -558,9 +574,10 @@ export default function MetaphysicsPage() {
                   onSaveUserProfile={handleSaveUserProfileFromPalm}
                   side={palmInput.side}
                   onChangeSide={(newSide) => setPalmInput((p) => ({ ...p, side: newSide }))}
-                  onAnalyzeImage={handleAnalyzePalmImage}
+                  onAnalyzeImages={handleAnalyzePalmImages}
                   isAnalyzing={isPalmAnalyzing}
-                  currentResult={palmResult}
+                  leftResult={dualPalmResult ? dualPalmResult.leftResult : (palmResult?.input.side === 'left' ? palmResult : null)}
+                  rightResult={dualPalmResult ? dualPalmResult.rightResult : (palmResult?.input.side === 'right' ? palmResult : null)}
                   onSwitchToManual={() => setPalmMode('manual')}
                 />
               ) : (
@@ -777,8 +794,96 @@ export default function MetaphysicsPage() {
         {/* BẢNG KẾT QUẢ LUẬN GIẢI CHỈ TAY TOÀN DIỆN */}
         {palmResult && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="space-y-6">
-            {/* 0. KHỐI THỊ GIÁC AI: NÉT VẼ CHỈ TAY TRỰC TIẾP TRÊN ẢNH ĐÃ ĐĂNG & ĐẶC TÍNH NHẬN DIỆN */}
-            {palmResult.uploadedImage && (
+            {/* 0A. KHỐI ĐỐI CHIẾU SONG THỦ (CHỈ HIỆN KHI ĐĂNG CẢ 2 TAY) */}
+            {dualPalmResult && (
+              <div className="card-glass p-4 sm:p-6 rounded-2xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-950/35 via-zinc-950/90 to-zinc-950/95 shadow-2xl space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/30 pb-3">
+                  <div className="text-xs sm:text-sm font-black text-amber-300 flex items-center gap-2">
+                    <span>🤲</span> {dualPalmResult.dualSynthesis.title}
+                  </div>
+                  <span className="text-[11px] px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/40 font-bold">
+                    {dualPalmResult.dualSynthesis.balanceLabel}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800">
+                    <div className="text-[11px] text-zinc-400">
+                      Tiên Thiên ({dualPalmResult.dualSynthesis.innateHand === 'left' ? 'Tay Trái' : 'Tay Phải'})
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-cyan-300">
+                      {dualPalmResult.dualSynthesis.innateScore}/100
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800">
+                    <div className="text-[11px] text-zinc-400">
+                      Hậu Thiên ({dualPalmResult.dualSynthesis.acquiredHand === 'left' ? 'Tay Trái' : 'Tay Phải'})
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-amber-300">
+                      {dualPalmResult.dualSynthesis.acquiredScore}/100
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed">
+                  {dualPalmResult.dualSynthesis.innateVsAcquired}
+                </p>
+                <div className="text-xs text-zinc-400 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+                  {dualPalmResult.dualSynthesis.harmonySummary}
+                </div>
+                <div className="text-xs text-emerald-300 font-medium">
+                  💡 <strong>Lời khuyên Song Thủ:</strong> {dualPalmResult.dualSynthesis.keyAdvice}
+                </div>
+
+                {/* Vẽ đồng thời 2 bàn tay song song */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
+                  {[
+                    { side: 'left' as const, label: '✋ TAY TRÁI', res: dualPalmResult.leftResult },
+                    { side: 'right' as const, label: '🤚 TAY PHẢI', res: dualPalmResult.rightResult },
+                  ].map((item) =>
+                    item.res.uploadedImage ? (
+                      <div key={item.side} className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-2">
+                        <div className="text-xs font-black text-amber-200">{item.label}</div>
+                        <PalmLinesOverlay
+                          imageUrl={item.res.uploadedImage}
+                          side={item.side}
+                          result={item.res}
+                          activeLine={activePalmLine}
+                          onSelectLine={(lineKey) => setActivePalmLine(activePalmLine === lineKey ? null : lineKey)}
+                          allowCalibration={true}
+                          showLabels={true}
+                        />
+                      </div>
+                    ) : null
+                  )}
+                </div>
+
+                {/* Nút chọn xem chi tiết từng tay bên dưới */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="text-xs text-zinc-400 font-semibold">Xem phân tích chi tiết:</span>
+                  {(['left', 'right'] as const).map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        setDualInspectSide(s);
+                        setPalmResult(s === 'left' ? dualPalmResult.leftResult : dualPalmResult.rightResult);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border cursor-pointer transition-all ${
+                        dualInspectSide === s
+                          ? 'bg-amber-500 text-zinc-950 border-amber-400'
+                          : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-amber-500/40'
+                      }`}
+                    >
+                      {s === 'left' ? '✋ Tay Trái' : '🤚 Tay Phải'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 0. KHỐI THỊ GIÁC AI: NÉT VẼ CHỈ TAY TRỰC TIẾP TRÊN ẢNH ĐÃ ĐĂNG & ĐẶC TÍNH NHẬN DIỆN (1 TAY) */}
+            {!dualPalmResult && palmResult.uploadedImage && (
               <div className="card-glass p-5 sm:p-6 rounded-2xl border-2 border-amber-500/40 bg-zinc-950/90 shadow-2xl space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">
                   <div className="text-xs sm:text-sm font-black text-amber-300 flex items-center gap-2">

@@ -4,6 +4,9 @@
 
 <!-- Archived entries go below, newest archived at top -->
 
+- **[2026-11-11] Đợt 23: Cấu Hình Gemini AI Tập Trung Dùng Chung Toàn Hệ Thống Cho Admin**
+  - **Done:** Xây dựng trang Admin `/admin` và API bảo mật `/api/admin/config`, `/api/admin/test` quản lý API Key Gemini dùng chung toàn hệ thống, bảo vệ bằng mật khẩu quản trị viên.
+
 - **[2026-11-11] Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời Trong Bói Động Tâm / Tarot**
   - **Done:** Tự động kết nối Gemini AI tạo lời phán độc bản 100% cho từng câu hỏi chiêm bốc; khắc phục lỗi trùng lặp văn mẫu và lỗi font tiếng Việt.
 
