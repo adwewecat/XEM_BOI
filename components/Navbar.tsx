@@ -26,24 +26,24 @@ export default function Navbar() {
         boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.4)' : '0 2px 12px rgba(184,146,42,0.06)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Logo & Brand */}
-        <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center border transition-transform duration-300 group-hover:scale-105"
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border transition-transform duration-300 group-hover:scale-105"
             style={{
               background: isDark ? 'linear-gradient(135deg, rgba(212,168,67,0.25), rgba(18,25,42,0.8))' : 'linear-gradient(135deg, rgba(184,146,42,0.2), #fff)',
               borderColor: 'var(--ac)',
               boxShadow: isDark ? '0 0 14px rgba(212,168,67,0.35)' : '0 0 8px rgba(184,146,42,0.2)'
             }}
           >
-            <span className="text-base select-none">☯</span>
+            <span className="text-sm sm:text-base select-none">☯</span>
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base tracking-wide" style={{ color: 'var(--tx-0)' }}>
+              <span className="font-bold text-sm sm:text-base tracking-wide" style={{ color: 'var(--tx-0)' }}>
                 XEM BÓI TỬ VI
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold"
+              <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold"
                 style={{
                   background: 'var(--ac-bg)',
                   color: 'var(--ac)',
@@ -53,7 +53,7 @@ export default function Navbar() {
                 紫微斗数
               </span>
             </div>
-            <span className="text-[10px] tracking-wider" style={{ color: 'var(--tx-3)' }}>
+            <span className="text-[9px] sm:text-[10px] tracking-wider" style={{ color: 'var(--tx-3)' }}>
               Thiên Kỷ Chuẩn Lý Số
             </span>
           </div>
@@ -94,22 +94,10 @@ export default function Navbar() {
 
         {/* Actions & Theme Toggle */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-          <Link
-            href="/chart"
-            className="md:hidden px-2.5 py-1 rounded-full border text-[11px] font-bold transition-all flex items-center gap-1"
-            style={{
-              borderColor: isDark ? 'rgba(212,168,67,0.45)' : 'rgba(184,146,42,0.4)',
-              background: isDark ? 'rgba(212,168,67,0.15)' : 'rgba(184,146,42,0.12)',
-              color: isDark ? '#f5d070' : '#8b6410',
-            }}
-          >
-            <span>🔮</span>
-            <span>Lập Số</span>
-          </Link>
           <button
             type="button"
             onClick={toggle}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all duration-200"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 cursor-pointer"
             style={{
               background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(184,146,42,0.08)',
               borderColor: isDark ? 'rgba(212,168,67,0.3)' : 'rgba(184,146,42,0.25)',

@@ -422,15 +422,15 @@ export default function MetaphysicsPage() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Breadcrumb Header */}
-        <div className="flex items-center justify-between mb-6 pb-3 border-b border-amber-500/20">
-          <Link href="/chart" className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
-            <span>←</span> Lập Lá Số Tử Vi (紫微)
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-amber-500/20 gap-2">
+          <Link href="/chart" className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 whitespace-nowrap">
+            <span>←</span> Lập Lá Số <span className="hidden sm:inline">Tử Vi (紫微)</span>
           </Link>
-          <div className="text-xs font-mono font-bold tracking-widest text-amber-200/80 uppercase">
+          <div className="hidden md:block text-xs font-mono font-bold tracking-widest text-amber-200/80 uppercase">
             Bách Gia Thuật Số · Kim Cổ Đông Tây
           </div>
-          <Link href="/knowledge" className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1">
-            Vạn Tinh Các (万星) <span>→</span>
+          <Link href="/knowledge" className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 whitespace-nowrap">
+            Vạn Tinh Các <span className="hidden sm:inline">(万星)</span> <span>→</span>
           </Link>
         </div>
 
@@ -470,9 +470,9 @@ export default function MetaphysicsPage() {
           </div>
         )}
 
-        {/* Navigation Tabs - Vuốt Ngang Mượt Mà Trên Mobile & Tích Hợp Thematic Background Animation */}
-        <div className="relative mb-8">
-          <div className="w-full overflow-x-auto scrollbar-none py-1 px-1 flex flex-nowrap sm:flex-wrap items-center sm:justify-center gap-1.5 sm:gap-2 snap-x">
+        {/* Navigation Tabs - Lưới 2 Cột Cân Đối Trên Mobile & Flex Wrap Trên Desktop */}
+        <div className="relative mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center sm:justify-center gap-2">
             {[
               { id: 'palmistry', label: 'Bói Chỉ Tay', icon: '🖐️', tag: 'Mới' },
               { id: 'tarot', label: 'Bài Tarot', icon: '🃏', tag: 'Chiêm Tinh' },
@@ -481,8 +481,9 @@ export default function MetaphysicsPage() {
               { id: 'bazi', label: 'Tử Bình Bát Tự', icon: '🎴', tag: 'Tứ Trụ' },
               { id: 'iching', label: 'Kinh Dịch', icon: '🪙', tag: '64 Quẻ' },
               { id: 'numerology', label: 'Thần Số Học', icon: '🔯', tag: 'Pitago' },
-            ].map((t) => {
+            ].map((t, idx) => {
               const isSelected = activeTab === t.id;
+              const isLastOdd = idx === 6;
               return (
                 <button
                   key={t.id}
@@ -493,9 +494,9 @@ export default function MetaphysicsPage() {
                   }}
                   onMouseEnter={() => setHoveredTab(t.id as MetaphysicsTheme)}
                   onMouseLeave={() => setHoveredTab(null)}
-                  className={`snap-center flex-shrink-0 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  className={`${isLastOdd ? 'col-span-2 sm:col-span-1' : ''} px-3 sm:px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer ${
                     isSelected
-                      ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/40 font-black scale-105 border-amber-300'
+                      ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/40 font-black sm:scale-105 border-amber-300'
                       : 'bg-zinc-900/85 text-zinc-300 border border-zinc-700/60 hover:text-amber-200 hover:border-amber-500/40'
                   }`}
                 >

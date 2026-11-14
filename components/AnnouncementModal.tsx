@@ -67,7 +67,7 @@ export default function AnnouncementModal() {
               borderRadius: '20px',
               width: '100%',
               maxWidth: '640px',
-              maxHeight: 'min(85vh, 760px)',
+              maxHeight: 'min(78vh, 720px)',
               overflow: 'hidden',
               boxShadow: '0 24px 80px rgba(60,30,10,0.4), 0 4px 16px rgba(60,30,10,0.2)',
               border: '1px solid rgba(184,146,42,0.25)',

@@ -152,7 +152,7 @@ export default function HemingPage() {
     background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.9)',
     border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(200,160,60,0.2)'}`,
     borderRadius: '16px',
-    padding: '24px',
+    padding: '14px',
   };
 
   const labelStyle = {
@@ -163,33 +163,34 @@ export default function HemingPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-0)' }}>
       {/* 顶栏 */}
-      <header style={{
-        position: 'sticky', top: 0, zIndex: 50,
-        background: isDark ? 'rgba(2,8,16,0.88)' : 'rgba(250,245,235,0.92)',
-        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--bdr)',
-        display: 'flex', alignItems: 'center', padding: '0 24px', height: '52px', gap: '16px',
-      }}>
+      <header
+        className="sticky top-0 z-40 px-3 sm:px-6 h-12 sm:h-[52px] flex items-center gap-2 sm:gap-4 border-b"
+        style={{
+          background: isDark ? 'rgba(2,8,16,0.88)' : 'rgba(250,245,235,0.92)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderColor: 'var(--bdr)',
+        }}
+      >
         <button
           onClick={() => router.push('/')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px',
-            color: 'var(--tx-3)', background: 'none', border: 'none', cursor: 'pointer',
-          }}
+          className="flex items-center gap-1 text-xs sm:text-[13px] whitespace-nowrap cursor-pointer bg-transparent border-none"
+          style={{ color: 'var(--tx-3)' }}
         >
-          <span style={{ fontSize: '16px' }}>‹</span>
-          <span>Trang Chủ (返回)</span>
+          <span className="text-base">‹</span>
+          <span>Trang Chủ</span>
         </button>
-        <div style={{ width: '1px', height: '20px', background: 'var(--bdr-med)' }} />
-        <span style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.15em', fontWeight: 600 }}>
-          SO KÈO HỢP MỆNH (合盘分析)
+        <div style={{ width: '1px', height: '18px', background: 'var(--bdr-med)' }} />
+        <span className="text-[11px] sm:text-xs font-semibold tracking-wider whitespace-nowrap truncate" style={{ color: 'var(--ac)' }}>
+          SO KÈO HỢP MỆNH
         </span>
-        <div style={{ flex: 1 }} />
-        <span style={{ fontSize: '11px', color: 'var(--tx-3)' }}>Tình Duyên · Làm Ăn · Cha Con · Bạn Bè</span>
+        <div className="flex-1" />
+        <span className="hidden md:inline text-[11px]" style={{ color: 'var(--tx-3)' }}>
+          Tình Duyên · Làm Ăn · Cha Con · Bạn Bè
+        </span>
       </header>
 
       {/* 主体 */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div className="max-w-[1100px] mx-auto px-3 sm:px-6 pt-6 pb-20">
 
         {/* 标题 */}
         <div style={{ textAlign: 'center', marginBottom: '36px' }}>
@@ -205,9 +206,8 @@ export default function HemingPage() {
           </p>
         </div>
 
-        {/* 双栏表单 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}
-          className="heming-grid">
+        {/* 双栏表单: 1 cột trên Mobile/Tablet, 2 cột trên Desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 mb-6">
           {/* 甲方 */}
           <div style={cardStyle}>
             <span style={labelStyle}>Bên A (Chủ Mệnh) · 甲方</span>

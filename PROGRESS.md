@@ -4,6 +4,10 @@
 
 ## Recent Milestones
 
+- **[2026-11-14] Đợt 31: Tối Ưu Giao Diện & Trải Nghiệm Di Động (Mobile Responsive UI/UX)**
+  - **Done:** Tinh chỉnh `Navbar.tsx` (thu gọn header `< sm`, bỏ nút trùng với `MobileBottomNav`), `SpiritualManifestationOverlay.tsx` (thu nhỏ nút nổi mobile `bottom-[70px]` tránh che form/modal), `AnnouncementModal.tsx` (`maxHeight: min(78vh, 720px)`), `BirthForm.tsx` (padding responsive, grid nơi sinh 1 cột trên mobile, tinh chỉnh padding/cỡ chữ 3 ô ngày sinh), `ChartBoard.tsx` (thêm chế độ `Thẻ 12 Cung` 2 cột mặc định trên mobile kèm nút chuyển đổi sang lưới `4×4`), `app/metaphysics/page.tsx` (lưới tab 2 cột trên mobile), và `app/heming/page.tsx` (layout 1 cột `< lg`).
+  - **Verified:** Kiểm tra Playwright trên viewport `390x844` tại `/`, `/chart`, `/metaphysics`, `/heming` (0 lỗi/cảnh báo console), `npm.cmd run typecheck` và `npm.cmd test` đạt 100%.
+
 - **[2026-11-13] Đợt 30: Hệ Thống Linh Tượng Tâm Linh Hiển Linh Định Kỳ (60s Bung Ấn Random Không Trùng Lặp)**
   - **Done:**
     - Xây dựng engine `lib/metaphysics/spiritualManifestations.ts` với **30 linh tượng tâm linh** chia làm 6 nhóm: Đạo Bùa Cổ Truyền (Linh Phù), Các Sao Tinh Tú (Bắc Đẩu, Tử Vi, Nam Đẩu, Nhị Thập Bát Tú, Nhật Nguyệt), 12 Con Giáp Địa Chi Linh Thú, Bát Quái & Thái Cực Trận Đồ, Tứ Linh Thần Thú & Bảo Ấn, Ngũ Hành Tương Sinh & Kim Liên Pháp Trận.
@@ -48,7 +52,4 @@
 
 - **[2026-11-11] Đợt 23: Cấu Hình Gemini AI Tập Trung Dùng Chung Toàn Hệ Thống Cho Admin**
   - **Done:** Xây dựng trang Admin `/admin` và API bảo mật `/api/admin/config`, `/api/admin/test` quản lý API Key Gemini dùng chung toàn hệ thống, bảo vệ bằng mật khẩu quản trị viên.
-
-- **[2026-11-11] Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời Trong Bói Động Tâm / Tarot**
-  - **Done:** Tự động kết nối Gemini AI tạo lời phán độc bản 100% cho từng câu hỏi chiêm bốc; khắc phục lỗi trùng lặp văn mẫu và lỗi font tiếng Việt.
 

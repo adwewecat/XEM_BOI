@@ -59,6 +59,7 @@ export default function ChartBoard({ chart, selectedBranch: extSelectedBranch, o
   const activeBranch = extSelectedBranch !== undefined ? extSelectedBranch : internalBranch;
   const [timeView, setTimeView] = useState<TimeView>('mingpan');
   const [liunianYear, setLiunianYear] = useState<number>(new Date().getFullYear());
+  const [mobileLayout, setMobileLayout] = useState<'cards' | 'grid'>('cards');
 
   const palaceMap: Record<number, Palace> = {};
   chart.palaces.forEach(p => { palaceMap[p.branch] = p; });
@@ -115,12 +116,118 @@ export default function ChartBoard({ chart, selectedBranch: extSelectedBranch, o
         </div>
         <h2 className="text-base sm:text-lg tracking-[0.15em] font-extrabold" style={{ color: 'var(--ac)' }}>
           {chart.birthInfo.name ? `${chart.birthInfo.name} · ` : ''}LÁ SỐ TỬ VI
-          <span className="text-xs font-normal opacity-50 ml-2">（紫微斗数命盘）</span>
+          <span className="hidden sm:inline text-xs font-normal opacity-50 ml-2">（紫微斗数命盘）</span>
         </h2>
       </motion.div>
 
-      {/* 4x4 命盘网格（含 SVG 叠加层） - Tối Ưu Vuốt Ngang Mượt Mà Trên Mobile */}
-      <div className="w-full overflow-x-auto pb-2 scrollbar-thin">
+      {/* Bộ chuyển đổi chế độ xem riêng cho Mobile (< 768px) */}
+      <div className="md:hidden flex items-center justify-center gap-2 mb-3">
+        <button
+          type="button"
+          onClick={() => setMobileLayout('cards')}
+          className={`flex-1 max-w-[175px] py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            mobileLayout === 'cards'
+              ? 'bg-amber-500 text-zinc-950 border-amber-300 shadow-md'
+              : 'bg-zinc-900/80 text-zinc-300 border-zinc-700'
+          }`}
+        >
+          <span>📱</span>
+          <span>Thẻ 12 Cung</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileLayout('grid')}
+          className={`flex-1 max-w-[175px] py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            mobileLayout === 'grid'
+              ? 'bg-amber-500 text-zinc-950 border-amber-300 shadow-md'
+              : 'bg-zinc-900/80 text-zinc-300 border-zinc-700'
+          }`}
+        >
+          <span>🕸️</span>
+          <span>Bảng 4×4 Cổ Điển</span>
+        </button>
+      </div>
+
+      {/* CHẾ ĐỘ XEM MOBILE DẠNG THẺ 2 CỘT (KHÔNG BỊ CẮT CHỮ) */}
+      {mobileLayout === 'cards' && (
+        <div className="md:hidden space-y-2.5 mb-3">
+          {/* Thẻ Thiên Bàn Tóm Tắt trên Mobile */}
+          <div className="p-3 rounded-xl border border-amber-500/35 bg-zinc-950/75 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div className="text-[10px] font-black tracking-widest text-amber-400 uppercase">
+                THIÊN BÀN · {getJuName(chart.wuxingJuName)}
+              </div>
+              <div className="text-xs text-zinc-300 mt-0.5 flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handlePalaceClick(chart.mingGongBranch)}
+                  className="underline decoration-dotted text-amber-300 font-bold"
+                >
+                  Mệnh: {BRANCHES_VI[chart.mingGongBranch]}
+                </button>
+                <span>·</span>
+                <button
+                  type="button"
+                  onClick={() => handlePalaceClick(chart.shenGongBranch)}
+                  className="underline decoration-dotted text-sky-300 font-bold"
+                >
+                  Thân: {BRANCHES_VI[chart.shenGongBranch]}
+                </button>
+              </div>
+              <div className="text-[10px] text-zinc-400 font-mono mt-0.5">
+                Âm Lịch: {chart.lunarInfo.lunarYear} · Tháng {chart.lunarInfo.lunarMonth}{chart.lunarInfo.isLeapMonth ? ' Nhuận' : ''} · Ngày {chart.lunarInfo.lunarDay}
+              </div>
+            </div>
+            {chart.currentDaXianIndex >= 0 && (() => {
+              const dx = chart.daXians[chart.currentDaXianIndex];
+              const pInfo = getPalaceName(dx.palaceName);
+              return (
+                <button
+                  type="button"
+                  onClick={() => handlePalaceClick(dx.palaceBranch)}
+                  className="px-2.5 py-1.5 rounded-lg border border-purple-500/50 bg-purple-950/50 text-right cursor-pointer"
+                >
+                  <div className="text-[9px] font-bold text-purple-300">⏳ Đại Hạn</div>
+                  <div className="text-xs font-black text-purple-200">{dx.startAge}–{dx.endAge}t · {pInfo.vi}</div>
+                </button>
+              );
+            })()}
+          </div>
+
+          {/* Lưới 12 Cung 2 cột vừa khít màn hình điện thoại */}
+          <div className="grid grid-cols-2 gap-1.5">
+            {chart.palaces.map((palace, idx) => {
+              const sanFangRole = activeBranch === palace.branch
+                ? 'selected'
+                : activeBranch !== null && (activeBranch + 6) % 12 === palace.branch
+                ? 'opposite'
+                : activeBranch !== null && ((activeBranch + 4) % 12 === palace.branch || (activeBranch + 8) % 12 === palace.branch)
+                ? 'trine'
+                : undefined;
+
+              return (
+                <div key={palace.branch} className="rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950/80">
+                  <PalaceCell
+                    palace={palace}
+                    onClick={() => handlePalaceClick(palace.branch)}
+                    onStarClick={(star) => onStarSelect?.(star, palace)}
+                    isSelected={activeBranch === palace.branch}
+                    isSanFang={!!(sanFangSet?.has(palace.branch) && activeBranch !== palace.branch)}
+                    sanFangRole={sanFangRole}
+                    delay={idx * 0.02}
+                    overlayStarSiHua={Object.keys(overlayData).length > 0 ? overlayData : undefined}
+                    overlayLabel={overlayLabel}
+                    onSiHuaClick={(starName, siHua) => onSiHuaClick?.(starName, siHua, timeView)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 4x4 命盘网格（含 SVG 叠加层） - Luôn hiện trên Desktop/Tablet, hoặc khi Mobile chọn Bảng 4x4 */}
+      <div className={`w-full overflow-x-auto pb-2 scrollbar-thin ${mobileLayout === 'cards' ? 'hidden md:block' : 'block'}`}>
         <div className="sm:hidden text-center text-[10px] text-amber-300/90 font-medium mb-1.5 flex items-center justify-center gap-1.5">
           <span>👈</span>
           <span>Vuốt ngang để xem trọn vẹn 12 cung</span>

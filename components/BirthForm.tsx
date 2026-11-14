@@ -203,8 +203,8 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
     background: inputBg,
     border: `1px solid ${inputBorder}`,
     color: inputClr,
-    borderRadius: '14px',
-    padding: '10px 14px',
+    borderRadius: '12px',
+    padding: '10px 10px',
     fontSize: '13px',
     width: '100%',
     outline: 'none',
@@ -239,7 +239,8 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      style={{ background: bg, border: `1px solid ${border}`, borderRadius: '24px', padding: '28px', backdropFilter: 'blur(20px)' }}
+      className="p-4 sm:p-7 rounded-2xl sm:rounded-3xl"
+      style={{ background: bg, border: `1px solid ${border}`, backdropFilter: 'blur(20px)' }}
     >
       {/* 标题 */}
       <h3 style={{ color: goldText, fontSize: '13px', letterSpacing: '0.25em', textAlign: 'center', marginBottom: '20px', fontWeight: 600 }}>
@@ -284,12 +285,13 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
           <span>Ngày Sinh Dương Lịch</span>
           <span style={{ fontSize: '10px', opacity: 0.55 }}>(Công Lịch · 公历)</span>
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
           <div>
             <select
               value={form.year}
               onChange={e => { setForm({ ...form, year: e.target.value }); setTouched(t => ({ ...t, year: true })); }}
               style={showErr('year') && errors.year ? errorInputStyle : inputStyle}
+              className="!px-1.5 sm:!px-2.5 !text-xs sm:!text-[13px]"
               required
             >
               <option value="">Năm (年)</option>
@@ -304,6 +306,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               value={form.month}
               onChange={e => { setForm({ ...form, month: e.target.value }); setTouched(t => ({ ...t, month: true })); }}
               style={showErr('month') && errors.month ? errorInputStyle : inputStyle}
+              className="!px-1.5 sm:!px-2.5 !text-xs sm:!text-[13px]"
               required
             >
               <option value="">Tháng (月)</option>
@@ -318,6 +321,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               value={form.day}
               onChange={e => { setForm({ ...form, day: e.target.value }); setTouched(t => ({ ...t, day: true })); }}
               style={showErr('day') && errors.day ? errorInputStyle : inputStyle}
+              className="!px-1.5 sm:!px-2.5 !text-xs sm:!text-[13px]"
               required
             >
               <option value="">Ngày (日)</option>
@@ -332,11 +336,11 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生地点 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'flex', alignItems: 'baseline', gap: '6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
+        <label style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', fontSize: '12px', color: labelClr, marginBottom: '6px', letterSpacing: '0.02em', fontWeight: 500 }}>
           <span>Nơi Sinh</span>
-          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Tự động tính Giờ Chân Thái Dương · 出生地点)</span>
+          <span style={{ fontSize: '10px', opacity: 0.55 }}>(Tự động tính Giờ Chân Thái Dương)</span>
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <select
             value={form.province}
             onChange={e => handleProvince(e.target.value)}

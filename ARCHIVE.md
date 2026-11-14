@@ -4,6 +4,9 @@
 
 <!-- Archived entries go below, newest archived at top -->
 
+- **[2026-11-11] Đợt 22: Khắc Phục Dứt Điểm Trùng Lặp Câu Trả Lời Trong Bói Động Tâm / Tarot**
+  - **Done:** Tự động kết nối Gemini AI tạo lời phán độc bản 100% cho từng câu hỏi chiêm bốc; khắc phục lỗi trùng lặp văn mẫu và lỗi font tiếng Việt.
+
 ### [2026-11-11] - Đợt 21: Tích Hợp Gemini AI Luận Giải Chiêm Bốc Trực Tiếp, Giải Mã Bản Mệnh - Đại Hạn
 - **Done:** Tích hợp trực tiếp trợ lý AI Gemini vào giao diện chiêm đoán; bổ sung hướng dẫn chi tiết giải mã Bản Mệnh, Đại Hạn 10 năm và Lưu Niên trên lá số Tử Vi.
 

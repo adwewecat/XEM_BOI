@@ -803,25 +803,25 @@ export default function SpiritualManifestationOverlay() {
   return (
     <>
       {/* ==================================================================== */}
-      {/* NÚT PHÁP KHÍ NỔI GÓC DƯỚI BÊN PHẢI: THỈNH LINH TƯỢNG NGAY & HẸN GIỜ */}
+      {/* NÚT PHÁP KHÍ NỔI GÓC DƯỚI BÊN PHẢI: THU GỌN TRÊN MOBILE KHÔNG CHE CHỮ */}
       {/* ==================================================================== */}
-      <div className="fixed bottom-20 md:bottom-11 xl:bottom-5 right-3 sm:right-5 z-[60] flex items-center gap-1.5 select-none">
+      <div className="fixed bottom-[70px] md:bottom-11 xl:bottom-5 right-2 sm:right-5 z-40 flex items-center gap-1 sm:gap-1.5 select-none">
         <button
           type="button"
           onClick={summonNextManifestation}
           data-testid="summon-spiritual-btn"
           title="Thỉnh ngẫu nhiên 1 Đạo Bùa, Chòm Sao, 12 Con Giáp hoặc Bát Quái (Không trùng lặp)"
-          className="group relative flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-950/95 via-red-950/95 to-zinc-950/95 border border-amber-400/60 hover:border-amber-300 text-amber-200 hover:text-amber-100 shadow-[0_4px_25px_rgba(0,0,0,0.7),0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_28px_rgba(251,191,36,0.55)] backdrop-blur-md transition-all duration-300 cursor-pointer"
+          className="group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-950/95 via-red-950/95 to-zinc-950/95 border border-amber-400/60 hover:border-amber-300 text-amber-200 hover:text-amber-100 shadow-[0_4px_20px_rgba(0,0,0,0.7),0_0_15px_rgba(245,158,11,0.3)] hover:shadow-[0_0_28px_rgba(251,191,36,0.55)] backdrop-blur-md transition-all duration-300 cursor-pointer"
         >
           <span className="text-sm group-hover:scale-125 transition-transform duration-300">
             🧧
           </span>
-          <span className="text-[11px] font-bold tracking-wide">
+          <span className="hidden sm:inline text-[11px] font-bold tracking-wide">
             Linh Phù Hiển Linh
           </span>
           {autoEnabled && (
             <span className="text-[10px] font-mono text-amber-300 bg-black/50 px-1.5 py-0.5 rounded-full border border-amber-500/30">
-              {activeItem ? 'Đang hiện' : `${secondsLeft}s`}
+              {activeItem ? '•••' : `${secondsLeft}s`}
             </span>
           )}
         </button>
@@ -831,13 +831,20 @@ export default function SpiritualManifestationOverlay() {
           onClick={cycleIntervalMode}
           data-testid="toggle-auto-spiritual-btn"
           title="Nhấp để đổi chu kỳ tự động: 60s (1 phút) ➔ 240s (4 phút) ➔ Tắt"
-          className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md ${
+          className={`px-2 sm:px-2.5 py-1.5 rounded-full text-[10px] font-bold border backdrop-blur-md transition-all cursor-pointer shadow-md ${
             autoEnabled
               ? 'bg-zinc-900/90 border-amber-500/50 text-amber-300 hover:border-amber-300'
               : 'bg-zinc-950/85 border-zinc-700 text-zinc-500 hover:text-zinc-300'
           }`}
         >
-          {autoEnabled ? `⚡${intervalSec}s` : '⏸Tắt'}
+          {autoEnabled ? (
+            <>
+              <span className="sm:hidden">⚡</span>
+              <span className="hidden sm:inline">⚡{intervalSec}s</span>
+            </>
+          ) : (
+            '⏸'
+          )}
         </button>
       </div>
 
@@ -869,7 +876,7 @@ export default function SpiritualManifestationOverlay() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.85, y: -25, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 210, damping: 20 }}
-              className={`relative z-10 max-w-md w-full rounded-3xl bg-gradient-to-b from-zinc-950/95 via-slate-950/95 to-zinc-950/98 border-2 ${style.border} ${style.glow} p-5 sm:p-6 text-center pointer-events-auto overflow-hidden select-none`}
+              className={`relative z-10 max-w-md w-full max-h-[84vh] overflow-y-auto rounded-3xl bg-gradient-to-b from-zinc-950/95 via-slate-950/95 to-zinc-950/98 border-2 ${style.border} ${style.glow} p-4 sm:p-6 text-center pointer-events-auto select-none`}
             >
               {/* Hạt bụi vàng tâm linh bay lơ lửng */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
